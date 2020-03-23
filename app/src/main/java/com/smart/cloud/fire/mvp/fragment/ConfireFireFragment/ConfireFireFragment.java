@@ -1,0 +1,713 @@
+package com.smart.cloud.fire.mvp.fragment.ConfireFireFragment;
+
+import android.Manifest;
+import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.baidu.location.BDLocation;
+import com.jakewharton.rxbinding.view.RxView;
+import com.smart.cloud.fire.GetLocationActivity;
+import com.smart.cloud.fire.activity.UploadNFCInfo.FileUtil;
+import com.smart.cloud.fire.activity.UploadNFCInfo.FormFile;
+import com.smart.cloud.fire.base.ui.MvpFragment;
+import com.smart.cloud.fire.global.Area;
+import com.smart.cloud.fire.global.ConstantValues;
+import com.smart.cloud.fire.global.MyApp;
+import com.smart.cloud.fire.global.ShopType;
+import com.smart.cloud.fire.mvp.fragment.MapFragment.Camera;
+import com.smart.cloud.fire.mvp.fragment.MapFragment.Smoke;
+import com.smart.cloud.fire.rqcode.Capture2Activity;
+import com.smart.cloud.fire.utils.DeviceTypeUtils;
+import com.smart.cloud.fire.utils.IntegerTo16;
+import com.smart.cloud.fire.utils.JsonUtils;
+import com.smart.cloud.fire.utils.SharedPreferencesManager;
+import com.smart.cloud.fire.utils.T;
+import com.smart.cloud.fire.utils.Utils;
+import com.smart.cloud.fire.view.XCDropDownListView;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import fire.cloud.smart.com.smartcloudfire.R;
+import rx.functions.Action1;
+
+/**
+ * Created by Administrator on 2016/9/21.
+ */
+public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresenter> implements ConfireFireFragmentView {
+
+    public static final int REQUEST_CODE_LOCATION=1;
+    public static final int REQUEST_CODE_SCAN_REPEATER=8;
+    public static final int REQUEST_CODE_SCAN_DEV=9;
+    public static final int REQUEST_CODE_CAMERA=102;
+
+    @Bind(R.id.add_repeater_mac)
+    EditText addRepeaterMac;//集中器。。
+    @Bind(R.id.add_fire_mac)
+    EditText addFireMac;//探测器。。
+    @Bind(R.id.add_fire_name)
+    EditText addFireName;//设备名称。。
+    @Bind(R.id.add_fire_lat)
+    EditText addFireLat;//经度。。
+    @Bind(R.id.add_fire_lon)
+    EditText addFireLon;//纬度。。
+    @Bind(R.id.add_fire_address)
+    EditText addFireAddress;//设备地址。。
+    @Bind(R.id.add_fire_man)
+    EditText addFireMan;//负责人姓名。。
+    @Bind(R.id.add_fire_man_phone)
+    EditText addFireManPhone;//负责人电话。。
+    @Bind(R.id.add_fire_man_two)
+    EditText addFireManTwo;//负责人2.。
+    @Bind(R.id.add_fire_man_phone_two)
+    EditText addFireManPhoneTwo;//负责人电话2.。
+    @Bind(R.id.scan_repeater_ma)
+    ImageView scanRepeaterMa;
+    @Bind(R.id.scan_er_wei_ma)
+    ImageView scanErWeiMa;
+    @Bind(R.id.location_image)
+    ImageView locationImage;
+    @Bind(R.id.add_fire_zjq)
+    XCDropDownListView addFireZjq;//选择区域。。
+    @Bind(R.id.add_fire_type)
+    XCDropDownListView addFireType;//选择类型。。
+    @Bind(R.id.add_fire_dev_btn)
+    RelativeLayout addFireDevBtn;//添加设备按钮。。
+    @Bind(R.id.mProgressBar)
+    ProgressBar mProgressBar;//加载进度。。
+    @Bind(R.id.add_camera_name)
+    EditText addCameraName;
+    @Bind(R.id.add_camera_relative)
+    RelativeLayout addCameraRelative;
+    @Bind(R.id.device_type_name)
+    TextView device_type_name;
+    @Bind(R.id.photo_image)
+    ImageView photo_image;//@@拍照上传
+    @Bind(R.id.tip_line)
+    LinearLayout tip_line;
+    @Bind(R.id.clean_all)
+    TextView clean_all;
+    @Bind(R.id.yc_mac)
+    TextView yc_mac;
+
+    private Context mContext;
+    private int privilege;
+    private String userID;
+    private ShopType mShopType;
+    private Area mArea;
+    private String areaId = "";
+    private String shopTypeId = "";
+    private String camera = "";
+
+    String mac="";
+    String devType="0";
+
+    private String uploadTime;
+    private String imageFilePath;
+    File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/devimage.jpg");//@@9.30
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_add_fire, null);
+        ButterKnife.bind(this, view);
+
+        if(f.exists()){
+            f.delete();
+        }//@@9.30
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mContext = getActivity();
+        userID = SharedPreferencesManager.getInstance().getData(mContext,
+                SharedPreferencesManager.SP_FILE_GWELL,
+                SharedPreferencesManager.KEY_RECENTNAME);
+        privilege = MyApp.app.getPrivilege();
+        init();
+    }
+
+    private void init() {
+        Intent intent=getActivity().getIntent();
+        String mac=intent.getStringExtra("mac");
+        devType=intent.getStringExtra("devType");
+        if(devType==null){
+            devType="";
+        }
+        addFireMac.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(devType.equals("221")&&!hasFocus){
+                    String temp=addFireMac.getText().toString();
+                    if(temp.length()!=12){
+                        T.showShort(mContext,"用传设备MAC长度必须为12位数字");
+                        return;
+                    }
+                    if(!Utils.isNumeric(temp)){
+                        T.showShort(mContext,"用传设备MAC长度必须为12位数字");
+                        return;
+                    }
+                    yc_mac.setText("您输入的设备码:"+temp);
+                    yc_mac.setVisibility(View.VISIBLE);
+
+                    temp=changeYongChuanMac(temp);
+                    addFireMac.setText("A"+temp.toUpperCase());
+                    T.showShort(mContext,"用传设备MAC转换成功");
+                }
+                if (!hasFocus&&addFireMac.getText().toString().length()>0) {
+                    mvpPresenter.getOneSmoke(userID, privilege + "", addFireMac.getText().toString());//@@5.5如果添加过该烟感则显示出原来的信息
+                }
+            }
+        });//@@10.18
+        addCameraRelative.setVisibility(View.VISIBLE);
+        addFireZjq.setEditTextHint("区域");
+        addFireType.setEditTextHint("类型");
+        RxView.clicks(addFireDevBtn).throttleFirst(2, TimeUnit.SECONDS).subscribe(new Action1<Void>() {
+            @Override
+            public void call(Void aVoid) {
+                addFire();
+            }
+        });
+
+        if (mac!=null){
+            addFireMac.setText(mac);
+            device_type_name.setVisibility(View.VISIBLE);
+            device_type_name.setText("设备类型:"+devType);
+            mvpPresenter.getOneSmoke(userID, privilege + "", mac);
+        }
+        photo_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageFilePath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/devimage.jpg";
+                File temp = new File(imageFilePath);
+                if(!temp.exists()){
+                    Uri imageFileUri = Uri.fromFile(temp);//获取文件的Uri
+                    Intent it = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//跳转到相机Activity
+                    it.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageFileUri);//告诉相机拍摄完毕输出图片到指定的Uri
+                    startActivityForResult(it, REQUEST_CODE_CAMERA);
+                }else{
+                    //使用Intent
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.fromFile(temp), "image/*");
+                    startActivity(intent);
+                }
+
+            }
+        });
+
+        clean_all.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cleanAllView();
+            }
+        });
+    }
+
+    private String changeYongChuanMac(String temp) {
+        String s="";
+        String[] ss=new String[6];//等长切分
+        for(int i=0;i<temp.length();i+=2){
+            ss[i/2]=temp.substring(i,i+2);
+        }
+        for (String each:ss) {
+            String t=Integer.toHexString(Integer.parseInt(each));
+            s=(t.length()==2?t:"0"+t)+s;
+        }
+        return s;
+    }
+
+    /**
+     * 添加设备，提交设备信息。。
+     */
+    private void addFire() {
+        if (mShopType != null) {
+            shopTypeId = mShopType.getPlaceTypeId();
+        }
+        if (mArea != null) {
+            areaId = mArea.getAreaId();
+        }
+        final String longitude = addFireLon.getText().toString().trim();
+        final String latitude = addFireLat.getText().toString().trim();
+        final String smokeName = addFireName.getText().toString().trim();
+        final String smokeMac = addFireMac.getText().toString().trim();
+        final String address = addFireAddress.getText().toString().trim();
+        final String placeAddress = "";
+        final String principal1 = addFireMan.getText().toString().trim();
+        final String principal2 = addFireManTwo.getText().toString().trim();
+        final String principal1Phone = addFireManPhone.getText().toString().trim();
+        final String principal2Phone = addFireManPhoneTwo.getText().toString().trim();
+        final String repeater = addRepeaterMac.getText().toString().trim();
+        camera = addCameraName.getText().toString().trim();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean isSuccess=false;
+                boolean isHavePhoto=false;
+                uploadTime=System.currentTimeMillis()+"";
+                if(imageFilePath!=null){
+                    File file = new File(imageFilePath); //这里的path就是那个地址的全局变量
+                    if(f.exists()){
+                        isHavePhoto=true;
+                    }else{
+                        isHavePhoto=false;
+                    }
+                    if(isHavePhoto){
+                        isSuccess=uploadFile(file,userID,areaId,uploadTime, DeviceTypeUtils.getDevType(smokeMac,repeater).getMac(),"devimages");
+                        if(isSuccess){
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    T.showShort(mContext,"图片上传成功");
+                                }
+                            });
+                        }else{
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    T.showShort(mContext,"图片上传失败");
+                                }
+                            });
+                        }
+                    }
+
+
+                    if(f.exists()){
+                        f.delete();
+                    }//@@9.30
+                }
+                mvpPresenter.addSmoke(userID, privilege + "", smokeName, smokeMac, address, longitude,
+                        latitude, placeAddress, shopTypeId, principal1, principal1Phone, principal2,
+                        principal2Phone, areaId, repeater, camera,isSuccess);
+            }
+        }).start();
+
+//        mvpPresenter.addSmoke(userID, privilege + "", smokeName, smokeMac, address, longitude,
+//                latitude, placeAddress, shopTypeId, principal1, principal1Phone, principal2,
+//                principal2Phone, areaId, repeater, camera);
+    }
+
+    @Override
+    protected ConfireFireFragmentPresenter createPresenter() {
+        ConfireFireFragmentPresenter mConfireFireFragmentPresenter = new ConfireFireFragmentPresenter(ConfireFireFragment.this);
+        return mConfireFireFragmentPresenter;
+    }
+
+    @Override
+    public String getFragmentName() {
+        return "ConfireFireFragment";
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (addFireZjq.ifShow()) {
+            addFireZjq.closePopWindow();
+        }
+        if (addFireType.ifShow()) {
+            addFireType.closePopWindow();
+        }
+        ButterKnife.unbind(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        mvpPresenter.stopLocation();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onStart() {
+        mvpPresenter.initLocation();
+        super.onStart();
+    }
+
+    @OnClick({R.id.scan_repeater_ma, R.id.scan_er_wei_ma, R.id.location_image, R.id.add_fire_zjq, R.id.add_fire_type})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.scan_repeater_ma:
+                Intent scanRepeater = new Intent(mContext, Capture2Activity.class);
+                scanRepeater.putExtra("isNeedResult",true);
+                startActivityForResult(scanRepeater, REQUEST_CODE_SCAN_REPEATER);
+                break;
+            case R.id.scan_er_wei_ma:
+                Intent openCameraIntent = new Intent(mContext, Capture2Activity.class);
+                openCameraIntent.putExtra("isNeedResult",true);
+                startActivityForResult(openCameraIntent, REQUEST_CODE_SCAN_DEV);
+                break;
+            case R.id.location_image:
+                mvpPresenter.startLocation();
+                Intent intent=new Intent(mContext, GetLocationActivity.class);
+                startActivityForResult(intent,REQUEST_CODE_LOCATION);//@@6.20
+                break;
+            case R.id.add_fire_zjq:
+                if (addFireZjq.ifShow()) {
+                    addFireZjq.closePopWindow();
+                } else {
+                    mvpPresenter.getPlaceTypeId(userID, privilege + "", 2);
+                    addFireZjq.setClickable(false);
+                    addFireZjq.showLoading();
+                }
+                break;
+            case R.id.add_fire_type:
+                if (addFireType.ifShow()) {
+                    addFireType.closePopWindow();
+                } else {
+                    mvpPresenter.getPlaceTypeId(userID, privilege + "", 1);
+                    addFireType.setClickable(false);
+                    addFireType.showLoading();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void getLocationData(BDLocation location) {
+        addFireLon.setText(location.getLongitude() + "");
+        addFireAddress.setText(location.getAddrStr());
+        addFireLat.setText(location.getLatitude() + "");
+    }
+
+    @Override
+    public void showLoading() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mProgressBar.setVisibility(View.VISIBLE);
+            }
+        });
+
+    }
+
+    @Override
+    public void hideLoading() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void getDataFail(String msg) {
+        T.showShort(mContext, msg);
+    }
+
+    @Override
+    public void getDataSuccess(Smoke smoke) {
+        tip_line.setVisibility(View.VISIBLE);
+        addFireLon.setText(smoke.getLongitude() + "");
+        addFireLat.setText(smoke.getLatitude() + "");
+        addFireAddress.setText(smoke.getAddress());
+        addFireName.setText(smoke.getName());
+        addFireMan.setText(smoke.getPrincipal1());
+        addFireManPhone.setText(smoke.getPrincipal1Phone());
+        addFireManTwo.setText(smoke.getPrincipal2());
+        addFireManPhoneTwo.setText(smoke.getPrincipal2Phone());
+        addFireZjq.setEditTextData(smoke.getAreaName());
+        addFireType.setEditTextData(smoke.getPlaceType());//@@10.18
+        areaId=smoke.getAreaId()+"";
+        shopTypeId=smoke.getPlaceTypeId();//@@10.18
+        Camera mCamera = smoke.getCamera();
+        if (mCamera != null) {
+            addCameraName.setText(mCamera.getCameraId());
+        }
+        addRepeaterMac.setText(smoke.getRepeater().trim());
+    }
+
+    @Override
+    public void getShopType(ArrayList<Object> shopTypes) {
+        addFireType.setItemsData(shopTypes,mvpPresenter);
+        addFireType.showPopWindow();
+        addFireType.setClickable(true);
+        addFireType.closeLoading();
+    }
+
+    @Override
+    public void getShopTypeFail(String msg) {
+        T.showShort(mContext, msg);
+        addFireType.setClickable(true);
+        addFireType.closeLoading();
+    }
+
+    @Override
+    public void getAreaType(ArrayList<Object> shopTypes) {
+        addFireZjq.setItemsData(shopTypes,mvpPresenter);
+        addFireZjq.showPopWindow();
+        addFireZjq.setClickable(true);
+        addFireZjq.closeLoading();
+    }
+
+    @Override
+    public void getAreaTypeFail(String msg) {
+        T.showShort(mContext, msg);
+        addFireZjq.setClickable(true);
+        addFireZjq.closeLoading();
+    }
+
+    @Override
+    public void addSmokeResult(String msg, int errorCode) {
+        if (errorCode == 0) {
+            cleanAllView();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    T.showShort(mContext,"添加成功");
+                }
+            });
+        }else{
+            imageFilePath=null;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    T.showShort(mContext,msg);
+                    photo_image.setImageResource(R.drawable.add_photo);
+                }
+            });
+        }
+
+        tip_line.setVisibility(View.GONE);
+    }
+
+    private void cleanAllView() {
+        mShopType = null;
+        mArea = null;
+        clearText();
+        areaId = "";
+        shopTypeId = "";
+        camera = "";
+        addFireMac.setText("");
+        addFireZjq.addFinish();
+        addFireType.addFinish();
+        tip_line.setVisibility(View.GONE);
+        yc_mac.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void getChoiceArea(Area area) {
+        mArea = area;
+    }
+
+    @Override
+    public void getChoiceShop(ShopType shopType) {
+        mShopType = shopType;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode){
+            case REQUEST_CODE_SCAN_REPEATER:
+                if (resultCode == getActivity().RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    String scanResult = bundle.getString("result");
+                    addRepeaterMac.setText(scanResult);
+
+                }
+                break;
+            case REQUEST_CODE_SCAN_DEV:
+                if (resultCode == getActivity().RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    String scanResult = bundle.getString("result");
+
+                    addFireMac.setText(scanResult);
+                    clearText();
+                    mvpPresenter.getOneSmoke(userID, privilege + "", scanResult);//@@5.5如果添加过该烟感则显示出原来的信息
+
+                }
+                break;
+            case REQUEST_CODE_LOCATION://@@6.20
+                if (resultCode == getActivity().RESULT_OK) {
+                    Bundle bundle=data.getBundleExtra("data");
+                    try{
+                        addFireLat.setText(String.format("%.8f",bundle.getDouble("lat")));
+                        addFireLon.setText(String.format("%.8f",bundle.getDouble("lon")));
+                        addFireAddress.setText(bundle.getString("address"));
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case REQUEST_CODE_CAMERA:
+                if (resultCode == Activity.RESULT_OK) {
+                    Bitmap bmp = BitmapFactory.decodeFile(imageFilePath);
+                    try {
+                        saveFile(compressBySize(Environment.getExternalStorageDirectory().getAbsolutePath()+"/devimage.jpg",1500,2000),Environment.getExternalStorageDirectory().getAbsolutePath()+"/devimage.jpg");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    DisplayMetrics dm = new DisplayMetrics();
+                    getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+                    int screenWidth=dm.widthPixels;
+                    if(bmp.getWidth()<=screenWidth){
+                        photo_image.setImageBitmap(bmp);
+                    }else{
+                        Bitmap mp=Bitmap.createScaledBitmap(bmp, screenWidth, bmp.getHeight()*screenWidth/bmp.getWidth(), true);
+                        photo_image.setImageBitmap(mp);
+                    }
+//                    photo_image.setImageBitmap(bmp);
+                }
+                break;
+            case 103:
+                Bitmap bm = null;
+                // 外界的程序访问ContentProvider所提供数据 可以通过ContentResolver接口
+                ContentResolver resolver = getActivity().getContentResolver();
+
+                try {
+                    Uri originalUri = data.getData(); // 获得图片的uri
+
+                    bm = MediaStore.Images.Media.getBitmap(resolver, originalUri); // 显得到bitmap图片
+
+                    // 这里开始的第二部分，获取图片的路径：
+
+                    String[] proj = {MediaStore.Images.Media.DATA};
+
+                    // 好像是android多媒体数据库的封装接口，具体的看Android文档
+                    @SuppressWarnings("deprecation")
+                    Cursor cursor = getActivity().managedQuery(originalUri, proj, null, null, null);
+                    // 按我个人理解 这个是获得用户选择的图片的索引值
+                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    // 将光标移至开头 ，这个很重要，不小心很容易引起越界
+                    cursor.moveToFirst();
+                    // 最后根据索引值获取图片路径
+                    String path = cursor.getString(column_index);
+                    photo_image.setImageURI(originalUri);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+
+    }
+
+    /**
+     * 清空其他编辑框内容。。
+     */
+    private void clearText() {
+        addFireLon.setText("");
+        addFireLat.setText("");
+        addFireAddress.setText("");
+        addFireName.setText("");
+        addFireMan.setText("");
+        addFireManPhone.setText("");
+        addFireManTwo.setText("");
+        addFireManPhoneTwo.setText("");
+        addFireZjq.setEditTextData("");
+        addFireType.setEditTextData("");
+        addCameraName.setText("");
+        photo_image.setImageResource(R.drawable.add_photo);
+        imageFilePath=null;
+    }
+
+    public static boolean uploadFile(File imageFile,String userId,String areaId,String uploadtime) {
+        try {
+            String requestUrl = ConstantValues.SERVER_IP_NEW+"UploadFileAction";
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("username", userId);
+            params.put("areaId", areaId);
+            params.put("time", uploadtime);
+            FormFile formfile = new FormFile(imageFile.getName(), imageFile, "image", "application/octet-stream");
+            FileUtil.post(requestUrl, params, formfile);
+            System.out.println("Success");
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Fail");
+            return false;
+        }
+    }
+
+    public static boolean uploadFile(File imageFile,String userId,String areaId,String uploadtime,String mac,String location) {
+        try {
+            String requestUrl = ConstantValues.SERVER_IP_NEW+"UploadFileAction";
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("username", userId);
+            params.put("areaId", areaId);
+            params.put("time", uploadtime);
+            params.put("mac", mac);
+            params.put("location", location);
+            FormFile formfile = new FormFile(imageFile.getName(), imageFile, "image", "application/octet-stream");
+            FileUtil.post(requestUrl, params, formfile);
+            System.out.println("Success");
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Fail");
+            return false;
+        }
+    }
+
+    //@@10.12存储文件到sd卡
+    public void saveFile(Bitmap bm, String fileName) throws Exception {
+        File dirFile = new File(fileName);//检测图片是否存在
+        if(dirFile.exists()){
+            dirFile.delete();  //删除原图片
+        }
+        File myCaptureFile = new File(fileName);
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(myCaptureFile));//100表示不进行压缩，70表示压缩率为30%
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+        bos.flush();
+        bos.close();
+    }
+
+    //@@10.12压缩图片尺寸
+    public Bitmap compressBySize(String pathName, int targetWidth,
+                                 int targetHeight) {
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;// 不去真的解析图片，只是获取图片的头部信息，包含宽高等；
+        Bitmap bitmap = BitmapFactory.decodeFile(pathName, opts);// 得到图片的宽度、高度；
+        float imgWidth = opts.outWidth;
+        float imgHeight = opts.outHeight;// 分别计算图片宽度、高度与目标宽度、高度的比例；取大于等于该比例的最小整数；
+        int widthRatio = (int) Math.ceil(imgWidth / (float) targetWidth);
+        int heightRatio = (int) Math.ceil(imgHeight / (float) targetHeight);
+        opts.inSampleSize = 1;
+        if (widthRatio > 1 || widthRatio > 1) {
+            if (widthRatio > heightRatio) {
+                opts.inSampleSize = widthRatio;
+            } else {
+                opts.inSampleSize = heightRatio;
+            }
+        }//设置好缩放比例后，加载图片进内容；
+        opts.inJustDecodeBounds = false;
+        bitmap = BitmapFactory.decodeFile(pathName, opts);
+        return bitmap;
+    }
+
+
+}
