@@ -17,6 +17,7 @@ import com.smart.cloud.fire.mvp.register.model.RegisterModel;
 import java.util.List;
 
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.adapter.rxjava.Result;
 import retrofit2.http.Field;
@@ -255,6 +256,15 @@ public interface ApiStores {
                                           @Field("principal2Phone") String principal2Phone, @Field("areaId") String areaId,
                                           @Field("repeater") String repeater,@Field("camera") String camera,@Field("deviceType") String deviceType,
                                           @Field("electrState") String electrState,@Field("image") String image);
+
+    @Multipart
+    @POST("addNFCRecordWithImage")
+    Observable<HttpError> addNFCRecordWithImage(@Part List<MultipartBody.Part> requestBodyMap);
+
+    @Multipart
+    @POST("addSmokeWithImage")
+    Observable<ConfireFireModel> addSmokeWithImage(@Part List<MultipartBody.Part> requestBodyMap);
+
 
     //添加烟感
     @FormUrlEncoded

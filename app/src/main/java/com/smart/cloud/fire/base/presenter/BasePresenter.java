@@ -18,6 +18,11 @@ import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.Utils;
 import com.smart.cloud.fire.view.NormalDialog;
 
+import java.io.File;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -123,6 +128,20 @@ public class BasePresenter<V> implements Presenter<V> {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(subscriber));
         }
+
+    //文字
+    public MultipartBody.Part toRequestBodyOfText (String keyStr, String value) {
+        MultipartBody.Part body = MultipartBody.Part.createFormData(keyStr, value);
+        return body;
+    }
+    //keyStr决定了你要上传到服务器的名称
+    //pFile.getName() 表示文件的名称
+    //图片
+    public MultipartBody.Part toRequestBodyOfImage(String keyStr, File pFile){
+        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), pFile);
+        MultipartBody.Part filedata = MultipartBody.Part.createFormData(keyStr, pFile.getName(), requestBody);
+        return filedata;
+    }
 
     }
 

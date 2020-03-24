@@ -6,8 +6,6 @@ package com.smart.cloud.fire.utils;
 
 import android.util.Log;
 
-import com.smart.cloud.fire.activity.UploadNFCInfo.FileUtil;
-import com.smart.cloud.fire.activity.UploadNFCInfo.FormFile;
 import com.smart.cloud.fire.global.ConstantValues;
 
 import java.io.DataOutputStream;
@@ -21,12 +19,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 
 public class UploadUtil {

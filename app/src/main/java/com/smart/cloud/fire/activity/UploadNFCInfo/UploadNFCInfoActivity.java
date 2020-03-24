@@ -37,12 +37,19 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.bumptech.glide.Glide;
+import com.smart.cloud.fire.base.ui.MvpActivity;
 import com.smart.cloud.fire.global.ConstantValues;
 import com.smart.cloud.fire.global.MyApp;
 import com.smart.cloud.fire.rqcode.Capture2Activity;
+import com.smart.cloud.fire.utils.FileUtil;
+import com.smart.cloud.fire.utils.FormFile;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.VolleyHelper;
+import com.yuyh.library.imgsel.ISNav;
+import com.yuyh.library.imgsel.common.ImageLoader;
+import com.yuyh.library.imgsel.config.ISCameraConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,7 +67,7 @@ import butterknife.ButterKnife;
 import fire.cloud.smart.com.smartcloudfire.R;
 
 
-public class UploadNFCInfoActivity extends Activity {
+public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> implements UploadNFCInfoView {
 
     public static final int REQUEST_CODE_SCAN_REPEATER=8;
 
@@ -91,12 +98,6 @@ public class UploadNFCInfoActivity extends Activity {
     private String uploadTime;
 
     private boolean mWriteMode = false;
-    NfcAdapter mNfcAdapter;
-    AlertDialog alertDialog;
-    PendingIntent mNfcPendingIntent;
-    IntentFilter[] mWriteTagFilters;
-    IntentFilter[] mNdefExchangeFilters;
-    private Tag mDetectedTag;
 
     private String deviceState="1";
     String lon="";
@@ -122,6 +123,7 @@ public class UploadNFCInfoActivity extends Activity {
     };
 
 
+    private UploadNFCInfoPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,103 +136,43 @@ public class UploadNFCInfoActivity extends Activity {
                 SharedPreferencesManager.SP_FILE_GWELL,
                 SharedPreferencesManager.KEY_RECENTNAME);
         privilege = MyApp.app.getPrivilege();
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if(f.exists()){
             f.delete();
-        }//@@9.30
-//        if (mNfcAdapter==null) {
-//            toast("设备不支持NFC功能");
-//            return;
-//        }
+        }
         initView();
-        initNFC();
+
+        ISNav.getInstance().init(new ImageLoader() {
+            @Override
+            public void displayImage(Context context, String path, ImageView imageView) {
+                Glide.with(context).load(path).into(photo_image);
+            }
+        });
+
+        ISCameraConfig config = new ISCameraConfig.Builder()
+//                .needCrop(true) // 裁剪
+//                .cropSize(1, 1, 200, 200)
+                .build();
+
+        ISNav.getInstance().toCameraActivity(this, config, 666);
+    }
+
+    @Override
+    protected UploadNFCInfoPresenter createPresenter() {
+        mPresenter=new UploadNFCInfoPresenter(this);
+        return mPresenter;
     }
 
     private void initView() {
         addFireDevBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Message message = new Message();
-                message.what = 1;
-                handler.sendMessage(message);
                 if(uid_name.getText()==null||uid_name.getText().toString().equals("")){
                     toast("请先录入设备标签信息");
-                    Message message1 = new Message();
-                    message.what = 0;
-                    handler.sendMessage(message1);
                     return;
                 }
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-
-                        boolean isSuccess=false;
-                        boolean isHavePhoto=false;
-                        if(imageFilePath!=null){
-                            File file = new File(imageFilePath); //这里的path就是那个地址的全局变量
-                            uploadTime=System.currentTimeMillis()+"";
-                            if(f.exists()){
-                                isHavePhoto=true;
-                            }//@@11.07
-                            isSuccess=uploadFile(file,userID,areaId,uploadTime);
-                        }
-                        String url="";
-                        if(isHavePhoto&&isSuccess){
-                            File file = new File(imageFilePath);//9.29
-                            file.delete();//@@9.29
-                            url= ConstantValues.SERVER_IP_NEW+"addNFCRecord?userId="+userID+"&uid="+uid_name.getText().toString()
-                                    +"&longitude="+lon+"&latitude="+lat+"&devicestate="+deviceState+"&memo="+ URLEncoder.encode(memo_name.getText().toString())
-                                    +"&photo1="+areaId+URLEncoder.encode("\\")+uploadTime+imageFilePath.substring(imageFilePath.lastIndexOf("."));
-                        }else{
-                            if(isHavePhoto&&!isSuccess){
-                                Message message= new Message();
-                                message.what = 2;
-                                handler.sendMessage(message);
-                            }
-                            url= ConstantValues.SERVER_IP_NEW+"addNFCRecord?userId="+userID+"&uid="+uid_name.getText().toString()
-                                    +"&longitude="+lon+"&latitude="+lat+"&devicestate="+deviceState+"&memo="+ URLEncoder.encode(memo_name.getText().toString())
-                                    +"&photo1=";
-                        }
-                        VolleyHelper.getInstance(mContext).getJsonResponse(url,
-                                new Response.Listener<JSONObject>() {
-                                    @Override
-                                    public void onResponse(JSONObject response) {
-                                        try {
-                                            int errorCode=response.getInt("errorCode");
-                                            String error=response.getString("error");
-                                            if(errorCode==0){
-                                                toast("记录上传成功");
-                                                clearView();
-                                                if(f.exists()){
-                                                    f.delete();
-                                                }//@@9.30
-                                            }else{
-                                                toast(error);
-                                            }
-                                            Message message = new Message();
-                                            message.what = 0;
-                                            handler.sendMessage(message);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                            Message message = new Message();
-                                            message.what = 0;
-                                            handler.sendMessage(message);
-                                        }
-                                    }
-                                }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                toast("网络错误");
-                                Message message = new Message();
-                                message.what = 0;
-                                handler.sendMessage(message);
-                            }
-                        });
-                    }
-                }).start();
-
+                File f = new File(imageFilePath);
+                mPresenter.uploadNFCInfo(userID, uid_name.getText().toString(), lon, lat, deviceState, URLEncoder.encode(memo_name.getText().toString()),f);
             }
         });
 
@@ -293,28 +235,15 @@ public class UploadNFCInfoActivity extends Activity {
         imageFilePath=null;
     }
 
-    private void initNFC() {
-        mNfcPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
-                getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-
-        // Intent filters for reading a note from a tag or exchanging over p2p.
-        IntentFilter ndefDetected = new IntentFilter(
-                NfcAdapter.ACTION_NDEF_DISCOVERED);
-        try {
-            ndefDetected.addDataType("text/plain");
-        } catch (IntentFilter.MalformedMimeTypeException e) {
-        }
-        mNdefExchangeFilters = new IntentFilter[] { ndefDetected };
-
-        // Intent filters for writing to a tag
-        IntentFilter tagDetected = new IntentFilter(
-                NfcAdapter.ACTION_TAG_DISCOVERED);
-        mWriteTagFilters = new IntentFilter[] { tagDetected };
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
+            case 666:
+                if ( resultCode == RESULT_OK && data != null) {
+                    String path = data.getStringExtra("result"); // 图片地址
+                    Glide.with(this).load(path).into(photo_image);
+                }
+                break;
             case  REQUEST_CODE_SCAN_REPEATER:
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle bundle = data.getExtras();
@@ -404,211 +333,6 @@ public class UploadNFCInfoActivity extends Activity {
         bos.close();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        mResumed = true;
-        // Sticky notes received from Android
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            NdefMessage[] messages = getNdefMessages(getIntent());
-            byte[] payload = messages[0].getRecords()[0].getPayload();
-            setNoteBody(new String(payload));
-            setIntent(new Intent()); // Consume this intent.
-        }
-        if (mNfcAdapter!=null) {
-            enableNdefExchangeMode();
-        }
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-//        mResumed = false;
-        if (mNfcAdapter!=null) {
-            mNfcAdapter.disableForegroundNdefPush(this);
-        }
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        // NDEF exchange mode
-        if (!mWriteMode && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-            mDetectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            //创建Ndef对象
-            NdefMessage[] msgs = getNdefMessages(intent);
-            String body = new String(msgs[0].getRecords()[0].getPayload());
-            setNoteBody(body);
-        }
-
-        // Tag writing mode
-        if (mWriteMode && NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
-            Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            writeTag(getNoteAsNdef(), detectedTag);
-        }
-    }
-
-    private TextWatcher mTextWatcher = new TextWatcher() {
-
-        @Override
-        public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable arg0) {
-//            if (mResumed) {
-//                mNfcAdapter.enableForegroundNdefPush(MainActivity.this, getNoteAsNdef());
-//            }
-        }
-    };
-
-    private void setNoteBody(String body) {
-        try {
-            JSONObject jsonObject=new JSONObject(body);
-            uid_name.setText(jsonObject.getString("uid"));
-            addFireName.setText(jsonObject.getString("deviceName"));
-            addFireAddress.setText(jsonObject.getString("address"));
-            area_name.setText(jsonObject.getString("areaName"));
-            device_type_name.setText(jsonObject.getString("deviceTypeName"));
-            lon=jsonObject.getString("longitude");
-            lat=jsonObject.getString("latitude");
-            areaId=jsonObject.getString("areaId");//@@9.27
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private NdefMessage getNoteAsNdef() {
-        byte[] textBytes = "".getBytes();
-        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_MIME_MEDIA, "text/plain".getBytes(),
-                new byte[] {}, textBytes);
-        return new NdefMessage(new NdefRecord[] {
-                textRecord
-        });
-    }
-
-    NdefMessage[] getNdefMessages(Intent intent) {
-        // Parse the intent
-        NdefMessage[] msgs = null;
-        String action = intent.getAction();
-        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
-                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
-            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            if (rawMsgs != null) {
-                msgs = new NdefMessage[rawMsgs.length];
-                for (int i = 0; i < rawMsgs.length; i++) {
-                    msgs[i] = (NdefMessage) rawMsgs[i];
-                }
-            } else {
-                // Unknown tag type
-                byte[] empty = new byte[] {};
-                NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, empty, empty);
-                NdefMessage msg = new NdefMessage(new NdefRecord[] {
-                        record
-                });
-                msgs = new NdefMessage[] {
-                        msg
-                };
-            }
-        } else {
-            finish();
-        }
-        return msgs;
-    }
-
-    private void enableNdefExchangeMode() {
-        mNfcAdapter.enableForegroundNdefPush(UploadNFCInfoActivity.this, getNoteAsNdef());
-        mNfcAdapter.enableForegroundDispatch(this, mNfcPendingIntent, mNdefExchangeFilters, null);
-    }
-
-    private void disableNdefExchangeMode() {
-        mNfcAdapter.disableForegroundNdefPush(this);
-        mNfcAdapter.disableForegroundDispatch(this);
-    }
-
-    private void enableTagWriteMode() {
-        mWriteMode = true;
-        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-        mWriteTagFilters = new IntentFilter[] {
-                tagDetected
-        };
-        mNfcAdapter.enableForegroundDispatch(this, mNfcPendingIntent, mWriteTagFilters, null);
-    }
-
-    private void disableTagWriteMode() {
-        mWriteMode = false;
-        mNfcAdapter.disableForegroundDispatch(this);
-    }
-
-    boolean writeTag(NdefMessage message, Tag tag) {
-        int size = message.toByteArray().length;
-
-        try {
-            Ndef ndef = Ndef.get(tag);
-            if (ndef != null) {
-                ndef.connect();
-
-                if (!ndef.isWritable()) {
-                    toast("Tag is read-only.");
-                    return false;
-                }
-                if (ndef.getMaxSize() < size) {
-                    toast("Tag capacity is " + ndef.getMaxSize() + " bytes, message is " + size
-                            + " bytes.");
-                    return false;
-                }
-
-                ndef.writeNdefMessage(message);
-                toast("写入数据成功.");
-                return true;
-            } else {
-                NdefFormatable format = NdefFormatable.get(tag);
-                if (format != null) {
-                    try {
-                        format.connect();
-                        format.format(message);
-                        toast("Formatted tag and wrote message");
-                        return true;
-                    } catch (IOException e) {
-                        toast("Failed to format tag.");
-                        return false;
-                    }
-                } else {
-                    toast("Tag doesn't support NDEF.");
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            toast("写入数据失败");
-        }
-
-        return false;
-    }
-
-    public static boolean uploadFile(File imageFile,String userId,String areaId,String uploadtime) {
-        try {
-            String requestUrl = ConstantValues.SERVER_IP_NEW+"UploadFileAction";
-            Map<String, String> params = new HashMap<String, String>();
-            params.put("username", userId);
-            params.put("areaId", areaId);
-            params.put("time", uploadtime);
-            FormFile formfile = new FormFile(imageFile.getName(), imageFile, "image", "application/octet-stream");
-            FileUtil.post(requestUrl, params, formfile);
-            System.out.println("Success");
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Fail");
-            return false;
-        }
-    }
-
-
     private void toast(String text) {
         Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
     }
@@ -634,6 +358,8 @@ public class UploadNFCInfoActivity extends Activity {
                                 addFireAddress.setText(response.getString("address"));
                                 area_name.setText(response.getString("areaName"));
                                 device_type_name.setText(response.getString("deviceTypeName"));
+                                lat=response.getString("latitude");
+                                lon=response.getString("longitude");
                             }else{
                                 T.showShort(mContext,"无数据");
                             }
@@ -648,5 +374,15 @@ public class UploadNFCInfoActivity extends Activity {
             }
         });
         mQueue.add(jsonObjectRequest);
+    }
+
+    @Override
+    public void T(String t) {
+
+    }
+
+    @Override
+    public void dealResult(String t, int resultCode) {
+
     }
 }

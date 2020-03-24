@@ -66,9 +66,6 @@ import java.util.Map;
     //更新接口
     public static final String UPDATE_URL="http://139.159.220.138:6660/download/update_cloudfire_zhongda.xml";
 
-    //更新接口22222222
-    public static final String UPDATE_URL222="http://139.159.220.138:6660/download/update_cloudfire_zhongda.xml";
-
 //    public static final String UPDATE_URL="http://139.159.220.138:6660/download/update_cloudfire_big.xml";
 //    public static final String UPDATE_URL="http://119.29.155.148/download/update_cloudfire.xml";
 //    public static final String UPDATE_URL="http://119.29.155.148/download/update_liaocheng.xml";

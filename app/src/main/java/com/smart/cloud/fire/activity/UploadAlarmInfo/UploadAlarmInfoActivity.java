@@ -23,7 +23,6 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,14 +32,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.smart.cloud.fire.SQLEntity.UploadAlarmMsgTemp;
-import com.smart.cloud.fire.activity.UploadNFCInfo.FileUtil;
-import com.smart.cloud.fire.activity.UploadNFCInfo.FormFile;
+import com.smart.cloud.fire.utils.FileUtil;
+import com.smart.cloud.fire.utils.FormFile;
 import com.smart.cloud.fire.activity.Video.RecordVideoActivity;
 import com.smart.cloud.fire.base.ui.MvpActivity;
 import com.smart.cloud.fire.global.ConstantValues;
@@ -49,10 +43,7 @@ import com.smart.cloud.fire.global.NpcCommon;
 import com.smart.cloud.fire.pushmessage.PushAlarmMsg;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
-import com.smart.cloud.fire.utils.VolleyHelper;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.litepal.LitePal;
 
 import java.io.BufferedOutputStream;

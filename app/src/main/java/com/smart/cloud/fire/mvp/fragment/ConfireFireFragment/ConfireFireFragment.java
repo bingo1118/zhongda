@@ -1,16 +1,13 @@
 package com.smart.cloud.fire.mvp.fragment.ConfireFireFragment;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -24,13 +21,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.jakewharton.rxbinding.view.RxView;
 import com.smart.cloud.fire.GetLocationActivity;
-import com.smart.cloud.fire.activity.UploadNFCInfo.FileUtil;
-import com.smart.cloud.fire.activity.UploadNFCInfo.FormFile;
+import com.smart.cloud.fire.utils.FileUtil;
+import com.smart.cloud.fire.utils.FormFile;
 import com.smart.cloud.fire.base.ui.MvpFragment;
 import com.smart.cloud.fire.global.Area;
 import com.smart.cloud.fire.global.ConstantValues;
@@ -39,9 +35,6 @@ import com.smart.cloud.fire.global.ShopType;
 import com.smart.cloud.fire.mvp.fragment.MapFragment.Camera;
 import com.smart.cloud.fire.mvp.fragment.MapFragment.Smoke;
 import com.smart.cloud.fire.rqcode.Capture2Activity;
-import com.smart.cloud.fire.utils.DeviceTypeUtils;
-import com.smart.cloud.fire.utils.IntegerTo16;
-import com.smart.cloud.fire.utils.JsonUtils;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.Utils;
@@ -133,7 +126,6 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
     String mac="";
     String devType="0";
 
-    private String uploadTime;
     private String imageFilePath;
     File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/devimage.jpg");//@@9.30
 
@@ -274,49 +266,12 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
         new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean isSuccess=false;
-                boolean isHavePhoto=false;
-                uploadTime=System.currentTimeMillis()+"";
-                if(imageFilePath!=null){
-                    File file = new File(imageFilePath); //这里的path就是那个地址的全局变量
-                    if(f.exists()){
-                        isHavePhoto=true;
-                    }else{
-                        isHavePhoto=false;
-                    }
-                    if(isHavePhoto){
-                        isSuccess=uploadFile(file,userID,areaId,uploadTime, DeviceTypeUtils.getDevType(smokeMac,repeater).getMac(),"devimages");
-                        if(isSuccess){
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    T.showShort(mContext,"图片上传成功");
-                                }
-                            });
-                        }else{
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    T.showShort(mContext,"图片上传失败");
-                                }
-                            });
-                        }
-                    }
-
-
-                    if(f.exists()){
-                        f.delete();
-                    }//@@9.30
-                }
                 mvpPresenter.addSmoke(userID, privilege + "", smokeName, smokeMac, address, longitude,
                         latitude, placeAddress, shopTypeId, principal1, principal1Phone, principal2,
-                        principal2Phone, areaId, repeater, camera,isSuccess);
+                        principal2Phone, areaId, repeater, camera , f);
             }
         }).start();
 
-//        mvpPresenter.addSmoke(userID, privilege + "", smokeName, smokeMac, address, longitude,
-//                latitude, placeAddress, shopTypeId, principal1, principal1Phone, principal2,
-//                principal2Phone, areaId, repeater, camera);
     }
 
     @Override
@@ -487,7 +442,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    T.showShort(mContext,"添加成功");
+                    T.showShort(mContext,msg);
                 }
             });
         }else{
