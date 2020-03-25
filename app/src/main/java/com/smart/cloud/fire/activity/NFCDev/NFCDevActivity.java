@@ -92,7 +92,7 @@ public class NFCDevActivity extends MvpActivity<NFCDevPresenter> implements NFCD
     @Bind(R.id.offline_num)
     TextView offlineNum;
     @Bind(R.id.trace_search)
-    ImageButton trace_search;
+    ImageView trace_search;
     private LinearLayoutManager linearLayoutManager;
     private NFCDevAdapter shopSmokeAdapter;
     private int lastVisibleItem;

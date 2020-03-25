@@ -276,13 +276,13 @@ public class ElectricActivity extends MvpActivity<ElectricPresenter> implements 
         final EditText Leakage_value=(EditText)layout.findViewById(R.id.Leakage_value);
         Leakage_value.setText(yuzhi46);
         final EditText Temp1_value=(EditText)layout.findViewById(R.id.Temp1_value);
-        Leakage_value.setText(yuzhi47);
+        Temp1_value.setText(yuzhi47);
         final EditText Temp2_value=(EditText)layout.findViewById(R.id.Temp2_value);
-        Leakage_value.setText(yuzhi47);
+        Temp2_value.setText(yuzhi47b);
         final EditText Temp3_value=(EditText)layout.findViewById(R.id.Temp3_value);
-        Leakage_value.setText(yuzhi47);
+        Temp3_value.setText(yuzhi47c);
         final EditText Temp4_value=(EditText)layout.findViewById(R.id.Temp4_value);
-        Leakage_value.setText(yuzhi47);
+        Temp4_value.setText(yuzhi47n);
 
 
         Button commit=(Button)layout.findViewById(R.id.commit);

@@ -524,11 +524,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="80dp"
                     android:background="@drawable/edit_view_bg">
-                    <ImageView
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:id="@+id/photo_image"
-                        android:background="@drawable/add_photo"/>
+                    <com.smart.cloud.fire.view.TakePhotoView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/photo_image"/>
                 </RelativeLayout>
 
             </RelativeLayout>

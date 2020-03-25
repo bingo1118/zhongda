@@ -47,6 +47,7 @@ import com.smart.cloud.fire.utils.FormFile;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.VolleyHelper;
+import com.smart.cloud.fire.view.TakePhotoView;
 import com.yuyh.library.imgsel.ISNav;
 import com.yuyh.library.imgsel.common.ImageLoader;
 import com.yuyh.library.imgsel.config.ISCameraConfig;
@@ -88,39 +89,17 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
     @Bind(R.id.memo_name)
     EditText memo_name;//@@备注
     @Bind(R.id.photo_image)
-    ImageView photo_image;//@@拍照上传
+    TakePhotoView photo_image;//@@拍照上传
     @Bind(R.id.scan_er_wei_ma)
     ImageView scan_er_wei_ma;
     private Context mContext;
     private int privilege;
     private String userID;
-    private String areaId;//@@9.27
-    private String uploadTime;
 
-    private boolean mWriteMode = false;
 
     private String deviceState="1";
     String lon="";
     String lat="";
-    private String imageFilePath;
-    File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/filename.jpg");//@@9.30
-
-    Handler handler = new Handler() {//@@9.29
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 0:
-                    mProgressBar.setVisibility(View.GONE);
-                    break;
-                case 1:
-                    mProgressBar.setVisibility(View.VISIBLE);
-                    break;
-                case 2:
-                    toast("图片上传失败");
-                    break;
-            }
-            super.handleMessage(msg);
-        }
-    };
 
 
     private UploadNFCInfoPresenter mPresenter;
@@ -136,24 +115,8 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
                 SharedPreferencesManager.SP_FILE_GWELL,
                 SharedPreferencesManager.KEY_RECENTNAME);
         privilege = MyApp.app.getPrivilege();
-        if(f.exists()){
-            f.delete();
-        }
+
         initView();
-
-        ISNav.getInstance().init(new ImageLoader() {
-            @Override
-            public void displayImage(Context context, String path, ImageView imageView) {
-                Glide.with(context).load(path).into(photo_image);
-            }
-        });
-
-        ISCameraConfig config = new ISCameraConfig.Builder()
-//                .needCrop(true) // 裁剪
-//                .cropSize(1, 1, 200, 200)
-                .build();
-
-        ISNav.getInstance().toCameraActivity(this, config, 666);
     }
 
     @Override
@@ -171,28 +134,19 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
                     return;
                 }
 
-                File f = new File(imageFilePath);
+                File f = new File(photo_image.getPath());
                 mPresenter.uploadNFCInfo(userID, uid_name.getText().toString(), lon, lat, deviceState, URLEncoder.encode(memo_name.getText().toString()),f);
             }
         });
 
-        photo_image.setOnClickListener(new View.OnClickListener() {
+        photo_image.setmIvClickListener(new TakePhotoView.IvClickListener() {
             @Override
-            public void onClick(View v) {
-                imageFilePath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/filename.jpg";
-                File temp = new File(imageFilePath);
-                if(!temp.exists()){
-                    Uri imageFileUri = Uri.fromFile(temp);//获取文件的Uri
-                    Intent it = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//跳转到相机Activity
-                    it.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageFileUri);//告诉相机拍摄完毕输出图片到指定的Uri
-                    startActivityForResult(it, 102);
-                }else{
-                    //使用Intent
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.fromFile(temp), "image/*");
-                    startActivity(intent);
-                }
-
+            public void onClick() {
+                ISNav.getInstance().init(photo_image);
+                ISCameraConfig config = new ISCameraConfig.Builder()
+                        .needCrop(false) // 裁剪
+                        .build();
+                ISNav.getInstance().toCameraActivity(mContext, config, 666);
             }
         });
 
@@ -231,8 +185,7 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
         area_name.setText("");
         device_type_name.setText("");
         memo_name.setText("");
-        photo_image.setImageResource(R.drawable.add_photo);
-        imageFilePath=null;
+        photo_image.clear();
     }
 
     @Override
@@ -241,7 +194,7 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
             case 666:
                 if ( resultCode == RESULT_OK && data != null) {
                     String path = data.getStringExtra("result"); // 图片地址
-                    Glide.with(this).load(path).into(photo_image);
+                    ISNav.getInstance().displayImage(this,path,null);
                 }
                 break;
             case  REQUEST_CODE_SCAN_REPEATER:
@@ -249,88 +202,11 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
                     Bundle bundle = data.getExtras();
                     String scanResult = bundle.getString("result");
                     uid_name.setText(scanResult);
-
                     getNormalDevInfo(scanResult);
-                }
-                break;
-            case 102:
-                if (resultCode == Activity.RESULT_OK) {
-                    Bitmap bmp = BitmapFactory.decodeFile(imageFilePath);
-                    try {
-                        saveFile(compressBySize(Environment.getExternalStorageDirectory().getAbsolutePath()+"/filename.jpg",150,200),Environment.getExternalStorageDirectory().getAbsolutePath()+"/filename.jpg");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    photo_image.setImageBitmap(bmp);
-                }
-                break;
-            case 103:
-                Bitmap bm = null;
-                // 外界的程序访问ContentProvider所提供数据 可以通过ContentResolver接口
-                ContentResolver resolver = getContentResolver();
-
-                try {
-                    Uri originalUri = data.getData(); // 获得图片的uri
-
-                    bm = MediaStore.Images.Media.getBitmap(resolver, originalUri); // 显得到bitmap图片
-
-                    // 这里开始的第二部分，获取图片的路径：
-
-                    String[] proj = {MediaStore.Images.Media.DATA};
-
-                    // 好像是android多媒体数据库的封装接口，具体的看Android文档
-                    @SuppressWarnings("deprecation")
-                    Cursor cursor = managedQuery(originalUri, proj, null, null, null);
-                    // 按我个人理解 这个是获得用户选择的图片的索引值
-                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    // 将光标移至开头 ，这个很重要，不小心很容易引起越界
-                    cursor.moveToFirst();
-                    // 最后根据索引值获取图片路径
-                    String path = cursor.getString(column_index);
-                    photo_image.setImageURI(originalUri);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    //@@10.12压缩图片尺寸
-    public Bitmap compressBySize(String pathName, int targetWidth,
-                                 int targetHeight) {
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inJustDecodeBounds = true;// 不去真的解析图片，只是获取图片的头部信息，包含宽高等；
-        Bitmap bitmap = BitmapFactory.decodeFile(pathName, opts);// 得到图片的宽度、高度；
-        float imgWidth = opts.outWidth;
-        float imgHeight = opts.outHeight;// 分别计算图片宽度、高度与目标宽度、高度的比例；取大于等于该比例的最小整数；
-        int widthRatio = (int) Math.ceil(imgWidth / (float) targetWidth);
-        int heightRatio = (int) Math.ceil(imgHeight / (float) targetHeight);
-        opts.inSampleSize = 1;
-        if (widthRatio > 1 || widthRatio > 1) {
-            if (widthRatio > heightRatio) {
-                opts.inSampleSize = widthRatio;
-            } else {
-                opts.inSampleSize = heightRatio;
-            }
-        }//设置好缩放比例后，加载图片进内容；
-        opts.inJustDecodeBounds = false;
-        bitmap = BitmapFactory.decodeFile(pathName, opts);
-        return bitmap;
-    }
-
-    //@@10.12存储文件到sd卡
-    public void saveFile(Bitmap bm, String fileName) throws Exception {
-        File dirFile = new File(fileName);//检测图片是否存在
-        if(dirFile.exists()){
-            dirFile.delete();  //删除原图片
-        }
-        File myCaptureFile = new File(fileName);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(myCaptureFile));//100表示不进行压缩，70表示压缩率为30%
-        bm.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-        bos.flush();
-        bos.close();
     }
 
     private void toast(String text) {
@@ -382,7 +258,26 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
     }
 
     @Override
-    public void dealResult(String t, int resultCode) {
+    protected void onDestroy() {
+        super.onDestroy();
+        clearView();
+    }
 
+    @Override
+    public void dealResult(String t, int resultCode) {
+        T.showShort(mContext,t);
+        if(resultCode==0){
+            clearView();
+        }
+    }
+
+    @Override
+    public void showLoading() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoading() {
+        mProgressBar.setVisibility(View.GONE);
     }
 }

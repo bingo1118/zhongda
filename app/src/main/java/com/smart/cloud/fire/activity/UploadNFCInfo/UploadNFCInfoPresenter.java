@@ -20,6 +20,7 @@ public class UploadNFCInfoPresenter extends BasePresenter<UploadNFCInfoView> {
 
     public void uploadNFCInfo(String userId, String uid, String longitude, String latitude, String devicestate, String memo, File file){
 
+        mvpView.showLoading();
 
         List<MultipartBody.Part> parts = new ArrayList<>();
         parts.add(toRequestBodyOfText("userId", userId));
@@ -49,9 +50,7 @@ public class UploadNFCInfoPresenter extends BasePresenter<UploadNFCInfoView> {
 
             @Override
             public void onCompleted() {
-                if(file.exists()){
-                    file.delete();
-                }
+                mvpView.hideLoading();
             }
         }));
     }
