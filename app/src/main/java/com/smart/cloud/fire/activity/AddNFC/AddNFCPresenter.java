@@ -129,6 +129,7 @@ public class AddNFCPresenter extends BasePresenter<AddNFCView> {
 
             @Override
             public void onFailure(int code, String msg) {
+
                 mvpView.addSmokeResult("添加失败",1);
             }
 

@@ -123,14 +123,9 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
     private boolean mWriteMode = false;
     NfcAdapter mNfcAdapter;
     AlertDialog alertDialog;
-    PendingIntent mNfcPendingIntent;
-    IntentFilter[] mWriteTagFilters;
-    IntentFilter[] mNdefExchangeFilters;
-    private Tag mDetectedTag;
 
     private NFCInfo nfcInfo;
 
-//    boolean isAddInfo=false;
 
 
     private static final int DATE_DIALOG_ID = 1;
@@ -140,8 +135,6 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
     private int mDay;
 
     String getDate;
-    int fromOrto=0;
-    boolean canNFC=true;//设备是否支持NFC
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,76 +148,7 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
                 SharedPreferencesManager.KEY_RECENTNAME);
         privilege = MyApp.app.getPrivilege();
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-//        if (mNfcAdapter==null) {
-//            toast("设备不支持NFC功能");
-//            canNFC=false;
-//            return;
-//        }
         init();
-        initNFC();
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        // NDEF exchange mode
-        if (!mWriteMode && (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())
-                ||NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))) {//@@10.19
-            byte[] myNFCID = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
-            String UID = Utils.ByteArrayToHexString(myNFCID);
-            addFireMac.setText(UID);
-
-            mDetectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            //创建Ndef对象
-            NdefMessage[] msgs = getNdefMessages(intent);
-            String body = new String(msgs[0].getRecords()[0].getPayload());
-//            setNoteBody(body);
-
-
-            if(alertDialog!=null){
-                alertDialog.dismiss();
-            }
-        }
-        // Tag writing mode
-        if (mWriteMode && NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
-            Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            writeTag(getNoteAsNdef(), detectedTag);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Sticky notes received from Android
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            NdefMessage[] messages = getNdefMessages(getIntent());
-            byte[] myNFCID = getIntent().getByteArrayExtra(NfcAdapter.EXTRA_ID);
-            String UID = Utils.ByteArrayToHexString(myNFCID);
-            addFireMac.setText(UID);
-            setIntent(new Intent()); // Consume this intent.
-        }
-        if (mNfcAdapter!=null) {
-            enableNdefExchangeMode();
-        }
-    }
-
-    private void initNFC() {
-        // Handle all of our received NFC intents in this activity.
-        mNfcPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
-                getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-
-        // Intent filters for reading a note from a tag or exchanging over p2p.
-        IntentFilter ndefDetected = new IntentFilter(
-                NfcAdapter.ACTION_TAG_DISCOVERED);//@@ 10.19 原NDEF
-//        try {
-//            ndefDetected.addDataType("text/plain");
-//        } catch (IntentFilter.MalformedMimeTypeException e) {
-//        }//@@10.19 防止显示NDEF为空时读取不了标签ID
-        mNdefExchangeFilters = new IntentFilter[] { ndefDetected };
-
-        // Intent filters for writing to a tag
-        IntentFilter tagDetected = new IntentFilter(
-                NfcAdapter.ACTION_TAG_DISCOVERED);
-        mWriteTagFilters = new IntentFilter[] { tagDetected };
     }
 
     private void init() {
@@ -246,29 +170,7 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
         mDay = c.get(Calendar.DAY_OF_MONTH);
         setDateTime();
     }
-    private void writeNFC() {
-        // Write to a tag for as long as the dialog is shown.
-        disableNdefExchangeMode();
-        enableTagWriteMode();
 
-
-        TextView textView=new TextView(mContext);//@@10.19
-        textView.setText("接触标签进行写入操作");
-        textView.setTextSize(18);
-        textView.setGravity(Gravity.CENTER);
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setView(textView);
-        builder.setCancelable(true);
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                         @Override
-                                         public void onCancel(DialogInterface dialog) {
-                                             disableTagWriteMode();
-                                             enableNdefExchangeMode();
-                                         }
-                                     });
-        alertDialog=builder.create();
-        alertDialog.show();
-    }
 
     /**
      * 添加设备，提交设备厂家信息。。
@@ -298,7 +200,6 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
             return;
         }
         nfcInfo=new NFCInfo(smokeMac,"","","","","","","","",producer,makeTime,"","");
-        writeNFC();
     }
 
 
@@ -345,7 +246,10 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
             return;
         }
         nfcInfo=new NFCInfo(smokeMac,longitude,latitude,areaId,mArea.getAreaName(),shopTypeId,nfcDeviceType.getPlaceTypeName(),smokeName,address,producer,makeTime,makeAddress,workerPhone);
-        writeNFC();
+
+        mvpPresenter.addNFC(userID, privilege + "", nfcInfo.getDeviceName(), nfcInfo.getUid(), nfcInfo.getAddress(),
+                nfcInfo.getLon(), nfcInfo.getLat(), nfcInfo.getDeviceTypeId(),nfcInfo.getAreaId(),nfcInfo.getProducer(),
+                nfcInfo.getMakeTime(),nfcInfo.getWorkerPhone(),nfcInfo.getMakeAddress());
     }
 
     @Override
@@ -379,34 +283,8 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
                 scanRepeater.putExtra("func",1);
                 startActivityForResult(scanRepeater, REQUEST_CODE_SCAN_REPEATER);
 
-                // Write to a tag for as long as the dialog is shown.
-//                if(!canNFC){
-//                    T.showShort(mContext,"设备不支持NFC");
-//                    return;
-//                }
-//                disableTagWriteMode();
-//                enableNdefExchangeMode();
-//
-//                TextView textView=new TextView(mContext);//@@10.19
-//                textView.setText("接触标签进行写入操作");
-//                textView.setTextSize(18);
-//                textView.setGravity(Gravity.CENTER);
-//                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-//                builder.setView(textView);
-//                builder.setCancelable(true);
-//                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                    @Override
-//                    public void onCancel(DialogInterface dialog) {
-//                        disableTagWriteMode();
-//                        enableNdefExchangeMode();
-//                    }
-//                });
-//                alertDialog=builder.create();
-//                alertDialog.show();
-
                 break;
             case R.id.location_image:
-//                mvpPresenter.startLocation();
                 Intent intent=new Intent(mContext, GetLocationActivity.class);
                 startActivityForResult(intent,1);//@@6.20
                 break;
@@ -577,24 +455,9 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
         addCameraName.setText("");
         makeAddress_edit.setText("");//@@11.28
     }
-    //@@NFC相关>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    private void disableTagWriteMode() {
-        mWriteMode = false;
-        mNfcAdapter.disableForegroundDispatch(this);
-    }
-    private void enableNdefExchangeMode() {
-        mNfcAdapter.enableForegroundNdefPush(this, getNoteAsNdef());
-        mNfcAdapter.enableForegroundDispatch(this, mNfcPendingIntent, mNdefExchangeFilters, null);
-    }
-    private NdefMessage getNoteAsNdef() {
-        String info=changeNFCInfoToJson(nfcInfo);
-        byte[] textBytes = info.getBytes();
-        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_MIME_MEDIA, "text/plain".getBytes(),
-                new byte[] {}, textBytes);
-        return new NdefMessage(new NdefRecord[] {
-                textRecord
-        });
-    }
+
+
+
     private void toast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
@@ -629,43 +492,7 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
         }
         return msgs;
     }
-    private void setNoteBody(String body) {
-//        addFireMac.setText("");
-//        addFireMac.setText(body);
 
-        try {
-            JSONObject jsonObject=new JSONObject(body);
-            if(jsonObject.getString("producer").length()>0){
-                producer_edit.setText(jsonObject.getString("producer"));
-                makeTime_text.setText(jsonObject.getString("makeTime"));
-//                isAddInfo=true;
-                info_line.setVisibility(View.VISIBLE);
-                producer_edit.setEnabled(false);
-                makeTime_text.setEnabled(false);
-            }else{
-//                isAddInfo=false;
-                info_line.setVisibility(View.GONE);
-                producer_edit.setEnabled(true);
-                makeTime_text.setEnabled(true);
-            }
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    private void disableNdefExchangeMode() {
-        mNfcAdapter.disableForegroundNdefPush(this);
-        mNfcAdapter.disableForegroundDispatch(this);
-    }
-    private void enableTagWriteMode() {
-        mWriteMode = true;
-        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-        mWriteTagFilters = new IntentFilter[] {
-                tagDetected
-        };
-        mNfcAdapter.enableForegroundDispatch(this, mNfcPendingIntent, mWriteTagFilters, null);
-    }
     boolean writeTag(NdefMessage message, Tag tag) {
         int size = message.toByteArray().length;
 
@@ -684,14 +511,8 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
                     return false;
                 }
 
-                ndef.writeNdefMessage(message);
-//                if (ndef.canMakeReadOnly()) {
-//                    ndef.makeReadOnly();//@@设置标签为只读(慎用！！)
-//                }
                 toast("写入数据成功.");
-                mvpPresenter.addNFC(userID, privilege + "", nfcInfo.getDeviceName(), nfcInfo.getUid(), nfcInfo.getAddress(),
-                        nfcInfo.getLon(), nfcInfo.getLat(), nfcInfo.getDeviceTypeId(),nfcInfo.getAreaId(),nfcInfo.getProducer(),
-                        nfcInfo.getMakeTime(),nfcInfo.getWorkerPhone(),nfcInfo.getMakeAddress());
+
                 mWriteMode=false;//@@10.19
                 return true;
             } else {
@@ -724,39 +545,7 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
     }
 
 
-    public static String changeNFCInfoToJson(NFCInfo nfcInfo){
-        try {
-            JSONObject object = new JSONObject();
-            String uid = nfcInfo.getUid();
-            String  deviceTypeId= nfcInfo.getDeviceTypeId();
-            String  deviceTypeName= nfcInfo.getDeviceTypeName();
-            String  areaId= nfcInfo.getAreaId();
-            String  areaName=nfcInfo.getAreaName();
-            String  deviceName= nfcInfo.getDeviceName();
-            String  address= nfcInfo.getAddress();
-            String  longitude= nfcInfo.getLon();
-            String  latitude= nfcInfo.getLat();
-            String  producer= nfcInfo.getProducer();
-            String  makeTime= nfcInfo.getMakeTime();
-            String  workerPhone= nfcInfo.getWorkerPhone();
-            object.put("uid", uid);
-            object.put("deviceTypeId", deviceTypeId);
-            object.put("deviceTypeName", deviceTypeName);
-            object.put("areaId", areaId);
-            object.put("areaName", areaName);
-            object.put("deviceName", deviceName);
-            object.put("address", address);
-            object.put("longitude", longitude);
-            object.put("latitude", latitude);
-            object.put("producer", producer);
-            object.put("makeTime", makeTime);
-            object.put("workerPhone", workerPhone);
-            return object.toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
+
 
 
 
