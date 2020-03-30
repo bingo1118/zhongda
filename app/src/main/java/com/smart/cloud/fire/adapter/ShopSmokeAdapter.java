@@ -451,6 +451,7 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     ((ItemViewHolder) holder).right_into_image.setVisibility(View.GONE);
                     break;
                 case 91://金特莱南京烟感
+                case 83://南京中电电气
                 case 53://NB电气
                 case 52://@@Lara电气设备
                 case 5://电气。。

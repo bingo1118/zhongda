@@ -1,5 +1,6 @@
 package com.smart.cloud.fire.global;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -34,6 +35,8 @@ import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 
 import org.litepal.LitePal;
 
+import java.util.List;
+
 import fire.cloud.smart.com.smartcloudfire.R;
 
 /**
@@ -50,6 +53,7 @@ public class MyApp extends Application {
     public LocationService locationService;
     public Vibrator mVibrator;
     public static String userid;
+    public static String mAppProcessName;//包名
 
     public static long a;
     public static long b;
@@ -211,6 +215,25 @@ public class MyApp extends Application {
             mNotificationManager.notify(NOTIFICATION_DOWN_ID,
                     mNotification);
         }
+    }
+
+    //获取包名
+    public static String getAppProcessName(Context context) {
+        if(mAppProcessName==null){
+            //当前应用pid
+            int pid = android.os.Process.myPid();
+            //任务管理类
+            ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            //遍历所有应用
+            List<ActivityManager.RunningAppProcessInfo> infos = manager.getRunningAppProcesses();
+            for (ActivityManager.RunningAppProcessInfo info : infos) {
+                if (info.pid == pid){
+                    mAppProcessName=info.processName;
+                    break;
+                }
+            }
+        }
+        return mAppProcessName;
     }
 
     public void hideDownNotification(){

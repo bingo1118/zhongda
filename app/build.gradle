@@ -18,6 +18,12 @@ configurations.all {
 
 
 android {
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
