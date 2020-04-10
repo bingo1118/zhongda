@@ -319,6 +319,12 @@ public interface ApiStores {
             ,@Query("areaId") String areaId,@Query("placeTypeId") String placeTypeId
             ,@Query("page") String page,@Query("parentId") String parentId);
 
+    //条件查询获取用户报警设备
+    @GET("getNeedAlarmDev")
+    @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
+    Observable<HttpError> getNeedAlarmDev(@Query("userId") String userId, @Query("privilege") String privilege
+            ,@Query("page") String page);
+
     //条件查询获取用户报警任务
     @GET("getNeedAlarmMessage")
     @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
@@ -421,7 +427,8 @@ public interface ApiStores {
     @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
     Observable<TemperatureTime> getElectricTypeInfo(@Query("userId") String userId, @Query("privilege") String privilege,
                                                     @Query("smokeMac") String smokeMac, @Query("electricType") String electricType,
-                                                    @Query("electricNum") String electricNum, @Query("page") String page, @Query("devType") int devType);
+                                                    @Query("electricNum") String electricNum, @Query("page") String page
+                                                    , @Query("devType") int devType, @Query("pageNum") int pageNum);
 
     @GET("getChuanganHistoryInfo")
     @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")

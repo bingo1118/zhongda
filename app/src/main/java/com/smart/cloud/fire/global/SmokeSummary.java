@@ -20,6 +20,7 @@ public class SmokeSummary {
     private int onlineSmokeNumber;
     private int lowVoltageNumber;
     private int alarmDevNumber;
+    private int faultDevNumber;
 
     public int getAllSmokeNumber() {
         return allSmokeNumber;
@@ -75,5 +76,13 @@ public class SmokeSummary {
 
     public void setAlarmDevNumber(int alarmDevNumber) {
         this.alarmDevNumber = alarmDevNumber;
+    }
+
+    public int getFaultDevNumber() {
+        return faultDevNumber;
+    }
+
+    public void setFaultDevNumber(int faultDevNumber) {
+        this.faultDevNumber = faultDevNumber;
     }
 }

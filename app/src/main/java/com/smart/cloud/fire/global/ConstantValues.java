@@ -47,7 +47,7 @@ import java.util.Map;
 //    public static final String SERVER_IP_NEW ="http://192.168.0.188:8080/fireSystem/";
 
     public static boolean isThe148Service(){
-        if(SERVER_IP_NEW.contains("119.29.155.148")||SERVER_IP_NEW.contains("193.112.150.195")){
+        if(SERVER_IP_NEW.contains("139.159.220.138")){
             return true;
         }else {
             return false;

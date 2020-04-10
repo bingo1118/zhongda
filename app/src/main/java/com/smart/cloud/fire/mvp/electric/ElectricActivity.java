@@ -52,6 +52,7 @@ import com.smart.cloud.fire.utils.VolleyHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.Bind;
@@ -134,12 +135,12 @@ public class ElectricActivity extends MvpActivity<ElectricPresenter> implements 
             MenuItem item=popupMenu.getMenu().findItem(R.id.electr_yuzhi_set);
             item.setVisible(false);
         }
-        if(!(devType==83||devType==80||devType==81||devType==88||devType==105)){
+        if(!(devType==83||devType==80||devType==81||devType==88||devType==105||devType==113)){
             MenuItem item=popupMenu.getMenu().findItem(R.id.fenli);
             item=popupMenu.getMenu().findItem(R.id.race);
             item.setVisible(false);
         }
-        if(!(devType==83)){
+        if(devType!=83&&devType!=113){
             MenuItem item=popupMenu.getMenu().findItem(R.id.electr_yuzhi_set_zd);
             item.setVisible(false);
             item=popupMenu.getMenu().findItem(R.id.electr_yuzhi_set_refresh);
@@ -167,6 +168,10 @@ public class ElectricActivity extends MvpActivity<ElectricPresenter> implements 
             MenuItem item=popupMenu.getMenu().findItem(R.id.change_history);
             item.setVisible(false);
         }
+        if(devType==83||devType==113){
+            MenuItem item=popupMenu.getMenu().findItem(R.id.change_history);
+            item.setVisible(false);
+        }
         if(!(devType==81||devType==88||devType==105)){
             MenuItem item=popupMenu.getMenu().findItem(R.id.restart);
             item.setVisible(false);
@@ -177,10 +182,10 @@ public class ElectricActivity extends MvpActivity<ElectricPresenter> implements 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.electr_yuzhi_set_refresh:
+                    case R.id.electr_yuzhi_set_refresh://中电阈值刷新
                         gotoYuzhiRefresh();
                         break;
-                    case R.id.electr_yuzhi_set_zd:
+                    case R.id.electr_yuzhi_set_zd://中电阈值参数设置
                         gotoElectrYuzhiSetZd();
                         break;
                     case R.id.electr_yuzhi_set:
@@ -207,7 +212,7 @@ public class ElectricActivity extends MvpActivity<ElectricPresenter> implements 
                     case R.id.reset:
                         gotoResetAlarm();
                         break;
-                    case R.id.change_history:
+                    case R.id.change_history://切电记录
                         Intent intent=new Intent(mContext, ElectricChangeHistoryActivity.class);
                         intent.putExtra("mac",electricMac);
                         startActivity(intent);
@@ -283,7 +288,15 @@ public class ElectricActivity extends MvpActivity<ElectricPresenter> implements 
         Temp3_value.setText(yuzhi47c);
         final EditText Temp4_value=(EditText)layout.findViewById(R.id.Temp4_value);
         Temp4_value.setText(yuzhi47n);
-
+        if(devType==113){
+            Temp2_value.setVisibility(View.GONE);
+            Temp3_value.setVisibility(View.GONE);
+            Temp4_value.setVisibility(View.GONE);
+        }else{
+            Temp2_value.setVisibility(View.VISIBLE);
+            Temp3_value.setVisibility(View.VISIBLE);
+            Temp4_value.setVisibility(View.VISIBLE);
+        }
 
         Button commit=(Button)layout.findViewById(R.id.commit);
         commit.setOnClickListener(new View.OnClickListener() {
@@ -527,6 +540,15 @@ public class ElectricActivity extends MvpActivity<ElectricPresenter> implements 
         if(smokeList.size()==0){
             Toast.makeText(mContext,"无数据",Toast.LENGTH_SHORT).show();
         }//@@7.7
+        if(devType==113){
+            Iterator<ElectricValue.ElectricValueBean> iterator = smokeList.iterator();
+            while(iterator.hasNext()){
+                ElectricValue.ElectricValueBean bean = iterator.next();
+                if(bean.getId()>1){
+                    iterator.remove();
+                }
+            }
+        }
         electricActivityAdapter = new ElectricActivityAdapterTest(mContext, smokeList, electricPresenter);
         recyclerView.setAdapter(electricActivityAdapter);
         swipeFreshLayout.setRefreshing(false);

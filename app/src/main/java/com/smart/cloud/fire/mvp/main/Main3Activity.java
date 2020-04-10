@@ -91,6 +91,8 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
     TextView offline_sum;
     @Bind(R.id.fault_sum)
     TextView fault_sum;
+    @Bind(R.id.lowvoltage_sum)
+    TextView lowvoltage_sum;
     @Bind(R.id.alarm_sum)
     TextView alarm_sum;
     @Bind(R.id.scan_btn)
@@ -426,6 +428,14 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
         offline_sum.setText(model.getLossSmokeNumber()+"");
         fault_sum.setText(model.getLowVoltageNumber()+"");
         alarm_sum.setText(model.getAlarmDevNumber()+"");
+        alarm_sum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(Main3Activity.this,AlarmHistoryActivity.class);
+                startActivity(intent);
+            }
+        });
+        lowvoltage_sum.setText(model.getLowVoltageNumber());
     }
 
     @Override

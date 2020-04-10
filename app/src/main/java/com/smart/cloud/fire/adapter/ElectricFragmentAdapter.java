@@ -146,26 +146,8 @@ public class ElectricFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
             int devType=normalSmoke.getDeviceType();
             final int state = normalSmoke.getNetState();
 
-            ((ItemViewHolder) holder).voltage_image.setVisibility(View.VISIBLE);
             int voltage=normalSmoke.getLowVoltage();
-            if(voltage==0){
-                ((ItemViewHolder) holder).voltage_image.setVisibility(View.GONE);
-            }else if(voltage>0&&voltage<10){
-                ((ItemViewHolder) holder).voltage_image.setVisibility(View.VISIBLE);
-                ((ItemViewHolder) holder).voltage_image.setImageResource(R.drawable.p0);
-            }else if(voltage>=10&&voltage<30){
-                ((ItemViewHolder) holder).voltage_image.setVisibility(View.VISIBLE);
-                ((ItemViewHolder) holder).voltage_image.setImageResource(R.drawable.p1);
-            }else if(voltage>=30&&voltage<60){
-                ((ItemViewHolder) holder).voltage_image.setVisibility(View.VISIBLE);
-                ((ItemViewHolder) holder).voltage_image.setImageResource(R.drawable.p2);
-            }else if(voltage>=60&&voltage<80){
-                ((ItemViewHolder) holder).voltage_image.setVisibility(View.VISIBLE);
-                ((ItemViewHolder) holder).voltage_image.setImageResource(R.drawable.p3);
-            }else if(voltage>=80){
-                ((ItemViewHolder) holder).voltage_image.setVisibility(View.VISIBLE);
-                ((ItemViewHolder) holder).voltage_image.setImageResource(R.drawable.p4);
-            }
+            setVoltageView(((ItemViewHolder) holder).voltage_image,voltage);
 
             switch (devType){
                 case 35:
@@ -352,8 +334,35 @@ public class ElectricFragmentAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     /**
+     * 设置电量视图显示
+     * @param voltage_image
+     * @param voltage
+     */
+    private void setVoltageView(ImageView voltage_image, int voltage) {
+        voltage_image.setVisibility(View.VISIBLE);
+
+        if(voltage==0){
+            voltage_image.setVisibility(View.GONE);
+        }else if(voltage>0&&voltage<10){
+            voltage_image.setVisibility(View.VISIBLE);
+            voltage_image.setImageResource(R.drawable.p0);
+        }else if(voltage>=10&&voltage<30){
+            voltage_image.setVisibility(View.VISIBLE);
+            voltage_image.setImageResource(R.drawable.p1);
+        }else if(voltage>=30&&voltage<60){
+            voltage_image.setVisibility(View.VISIBLE);
+            voltage_image.setImageResource(R.drawable.p2);
+        }else if(voltage>=60&&voltage<80){
+            voltage_image.setVisibility(View.VISIBLE);
+            voltage_image.setImageResource(R.drawable.p3);
+        }else if(voltage>=80){
+            voltage_image.setVisibility(View.VISIBLE);
+            voltage_image.setImageResource(R.drawable.p4);
+        }
+    }
+
+    /**
      * 进行判断是普通Item视图还是FootView视图
-     *
      * @param position
      * @return
      */

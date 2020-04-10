@@ -51,6 +51,12 @@ public class Smoke implements Serializable {
     private String rssivalue;//@@2018.03.07
     private int lowVoltage;//@@电池电量
 
+    private int ifAlarm;//是否报警 0报警 1正常
+    private int ifFault;//是否故障 0正常 1故障
+    private int voltage;//供电状态 0正常 1低电
+
+    private String image;//图片名称
+
     public String getAddress() {
         return address;
     }
@@ -243,5 +249,37 @@ public class Smoke implements Serializable {
 
     public void setLowVoltage(int lowVoltage) {
         this.lowVoltage = lowVoltage;
+    }
+
+    public int getIfAlarm() {
+        return ifAlarm;
+    }
+
+    public void setIfAlarm(int ifAlarm) {
+        this.ifAlarm = ifAlarm;
+    }
+
+    public int getIfFault() {
+        return ifFault;
+    }
+
+    public void setIfFault(int ifFault) {
+        this.ifFault = ifFault;
+    }
+
+    public int getVoltage() {
+        return voltage;
+    }
+
+    public void setVoltage(int voltage) {
+        this.voltage = voltage;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

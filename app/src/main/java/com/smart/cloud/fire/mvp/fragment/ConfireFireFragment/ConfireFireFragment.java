@@ -259,7 +259,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
         new Thread(new Runnable() {
             @Override
             public void run() {
-                File f=new File(photo_image.getPath());
+                File f=photo_image.getPath()==null?null:new File(photo_image.getPath());
                 mvpPresenter.addSmoke(userID, privilege + "", smokeName, smokeMac, address, longitude,
                         latitude, placeAddress, shopTypeId, principal1, principal1Phone, principal2,
                         principal2Phone, areaId, repeater, camera , f);

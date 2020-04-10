@@ -160,6 +160,12 @@ public class DeviceTypeUtils {
                         deviceName="电气设备";
                         deviceType="88";
                     }//@@lora中电电气
+                    if(smokeMac.endsWith("X")){
+                        smokeMac = smokeMac.substring(1, macLenghth-1);
+                        electrState=1;
+                        deviceName="电气设备";
+                        deviceType="113";
+                    }//@@南京平台中电电气单相（与83相同协议）
                     smokeMac =smokeMac.replace("Q","");
                     break;
                 case "T":

@@ -75,6 +75,27 @@
                     android:layout_height="25dp"
                     android:src="@drawable/p2"
                     android:visibility="gone"/>
+                <ImageView
+                    android:id="@+id/alarm_image"
+                    android:layout_width="20dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/alarm_dev"
+                    android:visibility="gone"/>
+                <ImageView
+                    android:id="@+id/fault_image"
+                    android:layout_width="20dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/fault_dev"
+                    android:visibility="gone"/>
+                <ImageView
+                    android:id="@+id/lowvaltage_image"
+                    android:layout_width="20dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/low_voltage"
+                    android:visibility="gone"/>
             </LinearLayout>
 
         </RelativeLayout>

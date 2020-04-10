@@ -52,6 +52,7 @@ public class ElectricPresenter extends BasePresenter<ElectricView>{
 
             @Override
             public void onFailure(int code, String msg) {
+
                 mvpView.getDataFail("网络错误，请检查网络");
             }
 

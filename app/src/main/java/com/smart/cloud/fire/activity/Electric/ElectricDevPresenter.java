@@ -98,7 +98,7 @@ public class ElectricDevPresenter extends BasePresenter<ElectricDevView> {
      */
     public void getAllElectricInfo(String userId, String privilege, String page, String devType, final List<Smoke> list, final int type, boolean refresh, final ElectricFragment electricFragment){
         if(!refresh){
-            mvpView.showLoading();
+            electricFragment.showLoading();
         }
         Observable mObservable = apiStores1.getNeedDev(userId,privilege,"",page,"","3");
         addSubscription(mObservable,new SubscriberCallBack<>(new ApiCallback<HttpError>() {
@@ -125,14 +125,14 @@ public class ElectricDevPresenter extends BasePresenter<ElectricDevView> {
             public void onFailure(int code, String msg) {
                 if(type!=1){
                     List<Smoke> electricList = new ArrayList<>();
-                    mvpView.getDataSuccess(electricList,false);
+                    electricFragment.getDataSuccess(electricList,false);
                 }
-                mvpView.getDataFail("网络错误");
+                electricFragment.getDataFail("网络错误");
             }
 
             @Override
             public void onCompleted() {
-                mvpView.hideLoading();
+                electricFragment.hideLoading();
             }
         }));
     }

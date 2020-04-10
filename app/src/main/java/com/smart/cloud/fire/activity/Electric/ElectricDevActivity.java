@@ -65,9 +65,9 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
     private ElectricFragment electricFragment;
     private OffLineElectricDevFragment offLineElectricDevFragment;
     private FragmentManager fragmentManager;
-    public static final int FRAGMENT_THREE = 2;
-    public static final int FRAGMENT_FIVE =4;
-    private int position;
+    public static final int FRAGMENT_ELECTRIC_DEVLIST = 2;
+    public static final int FRAGMENT_OFFLINE_DEVLIST =4;
+    private int position=0;
     private boolean visibility = false;
     private ShopType mShopType;
     private Area mArea;
@@ -91,30 +91,16 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        MyApp.b=System.currentTimeMillis();
-        long c1=MyApp.b-MyApp.a;
         super.onCreate(savedInstanceState);
-        MyApp.b=System.currentTimeMillis();
-        long c2=MyApp.b-MyApp.a;
         setContentView(R.layout.activity_all_smoke);
-        MyApp.b=System.currentTimeMillis();
-        long c3=MyApp.b-MyApp.a;
+
         //透明状态栏          
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         // 透明导航栏          
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        MyApp.b=System.currentTimeMillis();
-        long c4=MyApp.b-MyApp.a;
         mContext=this;
-        MyApp.b=System.currentTimeMillis();
-        long c5=MyApp.b-MyApp.a;
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         ButterKnife.bind(this);
-        init();
         title_name_tv=(TextView )findViewById(R.id.title_name_text);
         title_lose_dev_tv=(TextView)findViewById(R.id.title_lose_dev_text) ;
         title_name_rela=(LinearLayout) findViewById(R.id.title_name) ;
@@ -125,7 +111,7 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
                 title_lose_dev_rela.setEnabled(true);
                 title_name_rela.setEnabled(false);
                 mvpPresenter.unSubscribe("electric");
-                position=FRAGMENT_THREE;//@@在线设备
+                position=FRAGMENT_ELECTRIC_DEVLIST;//@@在线设备
             }
         });
         title_lose_dev_rela=(LinearLayout) findViewById(R.id.title_lose_dev) ;
@@ -135,19 +121,22 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
                 title_name_rela.setEnabled(true);
                 title_lose_dev_rela.setEnabled(false);
                 mvpPresenter.unSubscribe("lostSmoke");
-                position=FRAGMENT_FIVE;//@@离线设备
+                position=FRAGMENT_OFFLINE_DEVLIST;//@@离线设备
             }
         });
         title_name_tv.setText("电气防火");
         title_lose_dev_tv.setText("离线设备");
         areaCondition.setActivity(this);//@@12.21
-//        shopTypeCondition.setActivity(this);//@@12.21
         areaCondition.setHintTextColor("#ffffffff");
         areaCondition.setEditTextHint("#ffffffff");
         areaCondition.setEditTextHint("选择区域");
+        init();
+    }
 
-        MyApp.b=System.currentTimeMillis();
-        long c6=MyApp.b-MyApp.a;
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     @OnClick({ R.id.area_condition, R.id.turn_map_btn})
@@ -156,20 +145,13 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
             case R.id.add_fire://显示查询条件按钮。。
                 if (visibility) {
                     visibility = false;
-//                    lin1.setVisibility(View.GONE);
                     if (areaCondition.ifShow()) {
                         areaCondition.closePopWindow();
                     }
-//                    if (shopTypeCondition.ifShow()) {
-//                        shopTypeCondition.closePopWindow();
-//                    }
                 } else {
                     visibility = true;
                     areaCondition.setEditText("");
-//                    shopTypeCondition.setEditText("");
                     areaCondition.setEditTextHint("区域");
-//                    shopTypeCondition.setEditTextHint("类型");
-//                    lin1.setVisibility(View.VISIBLE);
                 }
                 break;
             case R.id.area_condition://地区类型下拉列表。。
@@ -239,18 +221,11 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
                 if (!Utils.isNetworkAvailable(this)) {
                     return;
                 }
-//                if (shopTypeCondition.ifShow()) {
-//                    shopTypeCondition.closePopWindow();
-//                }
                 if (areaCondition.ifShow()) {
                     areaCondition.closePopWindow();
                 }
                 if ((mShopType != null && mShopType.getPlaceTypeId() != null) || (mArea != null && mArea.getAreaId() != null)) {
-//                    lin1.setVisibility(View.GONE);
-//                    searchFire.setVisibility(View.GONE);
-//                    addFire.setVisibility(View.VISIBLE);
                     areaCondition.searchClose();
-//                    shopTypeCondition.searchClose();
                     visibility = false;
                     if (mArea != null && mArea.getAreaId() != null) {
                         if(mArea.getIsParent()==1){
@@ -270,18 +245,12 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
                         shopTypeId = "";
                     }
                     //判断当前在哪个子fragment。。
-//                    switch (position) {
-//                        case FRAGMENT_THREE:
-                            mvpPresenter.getNeedElectricInfo(userID, privilege + "",parentId, areaId,"", shopTypeId,"3",electricFragment);
-                            mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"3",electricFragment);
-//                            break;
-//                        case FRAGMENT_FIVE://@@6.29
-                            mvpPresenter.getNeedLossSmoke(userID, privilege + "",parentId, areaId, shopTypeId, "","3",false,0,null,offLineElectricDevFragment);
-                            mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"3",offLineElectricDevFragment);
-//                            break;
-//                        default:
-//                            break;
-//                    }
+                    mvpPresenter.getNeedElectricInfo(userID, privilege + "",parentId, areaId,"", shopTypeId,"3",electricFragment);
+                    mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"3",electricFragment);
+
+                    mvpPresenter.getNeedLossSmoke(userID, privilege + "",parentId, areaId, shopTypeId, "","3",false,0,null,offLineElectricDevFragment);
+                    mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"3",offLineElectricDevFragment);
+
                     mShopType = null;
                     mArea = null;
                 } else {
@@ -312,7 +281,12 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
                 SharedPreferencesManager.SP_FILE_GWELL,
                 SharedPreferencesManager.KEY_RECENTNAME);
         privilege = MyApp.app.getPrivilege();
-        showFragment(FRAGMENT_THREE);
+        if(position!=0){
+            showFragment(position);
+        }else{
+            showFragment(FRAGMENT_ELECTRIC_DEVLIST);
+        }
+
     }
 
     public void showFragment(int index) {
@@ -323,12 +297,8 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
         if (areaCondition.ifShow()) {
             areaCondition.closePopWindow();
         }//@@5.5关闭下拉选项
-//        if (shopTypeCondition.ifShow()) {
-//            shopTypeCondition.closePopWindow();
-//        }//@@5.5关闭下拉选项
         switch (index) {
-            case FRAGMENT_THREE:
-//                addFire.setVisibility(View.VISIBLE);//@@5.3
+            case FRAGMENT_ELECTRIC_DEVLIST:
                 if (electricFragment == null) {
                     offLineElectricDevFragment = new OffLineElectricDevFragment();
                     ft.add(R.id.fragment_content, offLineElectricDevFragment);
@@ -338,8 +308,7 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
                     ft.show(electricFragment);
                 }
                 break;
-            case FRAGMENT_FIVE:
-//                addFire.setVisibility(View.VISIBLE);//@@5.3
+            case FRAGMENT_OFFLINE_DEVLIST:
                 if (offLineElectricDevFragment == null) {
                     offLineElectricDevFragment = new OffLineElectricDevFragment();
                     ft.add(R.id.fragment_content, offLineElectricDevFragment);
@@ -387,18 +356,10 @@ public class ElectricDevActivity extends MvpActivity<ElectricDevPresenter> imple
     public void unSubscribe(String type) {
         switch (type) {
             case "electric":
-//                mElectricDevPresenter.getSmokeSummary(userID,privilege+"","","","","3",electricFragment);
-//                lin1.setVisibility(View.GONE);
-//                searchFire.setVisibility(View.GONE);
-//                addFire.setVisibility(View.VISIBLE);
-                showFragment(FRAGMENT_THREE);
+                showFragment(FRAGMENT_ELECTRIC_DEVLIST);
                 break;
             case "lostSmoke":
-//                mElectricDevPresenter.getSmokeSummary(userID,privilege+"","","","","3",offLineElectricDevFragment);
-//                lin1.setVisibility(View.GONE);
-//                searchFire.setVisibility(View.GONE);
-//                addFire.setVisibility(View.VISIBLE);
-                showFragment(FRAGMENT_FIVE);
+                showFragment(FRAGMENT_OFFLINE_DEVLIST);
                 break;
             default:
                 break;

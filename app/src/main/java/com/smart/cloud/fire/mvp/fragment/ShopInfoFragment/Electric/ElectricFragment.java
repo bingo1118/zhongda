@@ -68,15 +68,7 @@ public class ElectricFragment extends MvpFragment<ElectricDevPresenter> implemen
     SwipeRefreshLayout swipereFreshLayout;
     @Bind(R.id.mProgressBar)
     ProgressBar mProgressBar;
-//    @Bind(R.id.smoke_total)
-//    LinearLayout smokeTotal;//@@9.5
-//    @Bind(R.id.total_num)
-//    TextView totalNum;
-//    @Bind(R.id.online_num)
-//    TextView onlineNum;
-//    @Bind(R.id.offline_num)
-//    TextView offlineNum;
-    private ElectricFragmentAdapter electricFragmentAdapter;
+    private ShopSmokeAdapter mAdapter;
     private ElectricDevPresenter electricDevPresenter;
     private Context mContext;
     private String userID;
@@ -137,12 +129,12 @@ public class ElectricFragment extends MvpFragment<ElectricDevPresenter> implemen
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (research) {
-                    if(electricFragmentAdapter!=null){
-                        electricFragmentAdapter.changeMoreStatus(ShopCameraAdapter.NO_DATA);
+                    if(mAdapter!=null){
+                        mAdapter.changeMoreStatus(ShopCameraAdapter.NO_DATA);
                     }
                     return;
                 }
-                int count = electricFragmentAdapter.getItemCount();
+                int count = mAdapter.getItemCount();
                 int itemCount = lastVisibleItem+1;
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && itemCount == count) {
                     if(loadMoreCount>=20){
@@ -189,35 +181,35 @@ public class ElectricFragment extends MvpFragment<ElectricDevPresenter> implemen
         loadMoreCount = smokeList.size();
         list.clear();
         list.addAll((List<Smoke>)smokeList);
-        electricFragmentAdapter = new ElectricFragmentAdapter(mContext, list);
-        recyclerView.setAdapter(electricFragmentAdapter);
+        mAdapter = new ShopSmokeAdapter(mContext, list);
+        recyclerView.setAdapter(mAdapter);
         swipereFreshLayout.setRefreshing(false);
-        electricFragmentAdapter.setOnLongClickListener(new ElectricFragmentAdapter.OnLongClickListener() {
+        mAdapter.setOnLongClickListener(new ShopSmokeAdapter.OnLongClickListener() {
             @Override
             public void onLongClick(View view, int position) {
                 Smoke smoke =list.get(position);
-                if(smoke.getDeviceType()==75||smoke.getDeviceType()==77){
+                if(smoke.getDeviceType()==75||smoke.getDeviceType()==77||smoke.getDeviceType()==83||smoke.getDeviceType()==113){
                     showNormalDialog(smoke.getMac(),smoke.getDeviceType(),position);
                 }else{
                     T.showShort(mContext,"该设备无法删除");
                 }
             }
         });
-        electricFragmentAdapter.changeMoreStatus(ShopSmokeAdapter.NO_DATA);
-        electricFragmentAdapter.setOnItemClickListener(new ElectricFragmentAdapter.OnRecyclerViewItemClickListener(){
-            @Override
-            public void onItemClick(View view, int position){
-                Smoke data =list.get(position);
-                if(data.getDeviceType()!=35){
-                    Intent intent = new Intent(mContext, ElectricActivity.class);
-                    intent.putExtra("ElectricMac",data.getMac());
-                    intent.putExtra("devType",data.getDeviceType());
-                    intent.putExtra("repeatMac",data.getRepeater());
-                    startActivity(intent);
-                }
-            }
-        });
-        recyclerView.setAdapter(electricFragmentAdapter);
+        mAdapter.changeMoreStatus(ShopSmokeAdapter.NO_DATA);
+//        mAdapter.setOnClickListener(new ShopSmokeAdapter.OnClickListener() {
+//            @Override
+//            public void onClick(View view, int position) {
+//                Smoke data =list.get(position);
+//                if(data.getDeviceType()!=35){
+//                    Intent intent = new Intent(mContext, ElectricActivity.class);
+//                    intent.putExtra("ElectricMac",data.getMac());
+//                    intent.putExtra("devType",data.getDeviceType());
+//                    intent.putExtra("repeatMac",data.getRepeater());
+//                    startActivity(intent);
+//                }
+//            }
+//        });
+        recyclerView.setAdapter(mAdapter);
     }
 
     private void showNormalDialog(final String mac, final int deviceType, final int position){
@@ -248,7 +240,7 @@ public class ElectricFragment extends MvpFragment<ElectricDevPresenter> implemen
                                             int errorCode=jsonObject.getInt("errorCode");
                                             if(errorCode==0){
                                                 list.remove(position);
-                                                electricFragmentAdapter.notifyDataSetChanged();
+                                                mAdapter.notifyDataSetChanged();
                                                 T.showShort(mContext,"删除成功");
                                             }else{
                                                 T.showShort(mContext,"删除失败");
@@ -284,8 +276,8 @@ public class ElectricFragment extends MvpFragment<ElectricDevPresenter> implemen
     public void getDataFail(String msg) {
         swipereFreshLayout.setRefreshing(false);
         T.showShort(mContext, msg);
-        if(electricFragmentAdapter!=null){
-            electricFragmentAdapter.changeMoreStatus(ShopSmokeAdapter.NO_DATA);
+        if(mAdapter!=null){
+            mAdapter.changeMoreStatus(ShopSmokeAdapter.NO_DATA);
         }
     }
 
@@ -303,7 +295,7 @@ public class ElectricFragment extends MvpFragment<ElectricDevPresenter> implemen
     public void onLoadingMore(List<?> smokeList) {
         loadMoreCount = smokeList.size();
         list.addAll((List<Smoke>)smokeList);
-        electricFragmentAdapter.changeMoreStatus(ShopSmokeAdapter.LOADING_MORE);
+        mAdapter.changeMoreStatus(ShopSmokeAdapter.LOADING_MORE);
     }
 
     @Override

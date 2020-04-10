@@ -155,13 +155,7 @@ public class SettingFragment extends MvpFragment<SettingFragmentPresenter> imple
                 getActivity().startActivity(intent11);
                 break;
             case R.id.app_update:
-                if(ConstantValues.SERVER_IP_NEW.contains("119.29.155.148")
-                        ||ConstantValues.SERVER_IP_NEW.contains("193.112.150.195")){
-                    mvpPresenter.checkUpdate(mContext);
-                }else{
-                    T.showShort(mContext,"该版本不支持版本更新");
-                }
-//                getActivity().finish();//@@7.13
+                mvpPresenter.checkUpdate(mContext);
                 break;
 //            case R.id.setting_pay:
 //                Intent intent9 = new Intent(mContext, PayActivity.class);

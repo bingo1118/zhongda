@@ -208,7 +208,7 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
         parts.add(toRequestBodyOfText("camera", camera));
         parts.add(toRequestBodyOfText("deviceType", deviceType));
         parts.add(toRequestBodyOfText("electrState", electrState+""));
-        if(imagefile.exists()){
+        if(imagefile!=null&&imagefile.exists()){
             parts.add(toRequestBodyOfImage("imagefile",imagefile));//图片
         }
         mObservable = apiStores1.addSmokeWithImage(parts);
@@ -233,7 +233,9 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
             @Override
             public void onCompleted() {
                 mvpView.hideLoading();
-                imagefile.delete();
+                if(imagefile!=null){
+                    imagefile.delete();
+                }
             }
         }));
     }
