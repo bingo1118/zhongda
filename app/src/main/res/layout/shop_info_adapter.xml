@@ -198,6 +198,15 @@
                     android:layout_below="@id/tpye_name_tv"
                     android:layout_toRightOf="@id/address_name_tv"
                     android:text="广东省广州市黄浦区"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/update_tv"
+                    android:textColor="@color/blue"
+                    android:layout_below="@id/address_tv"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="5dp"
+                    android:text="更新信息"/>
             </RelativeLayout>
 
 

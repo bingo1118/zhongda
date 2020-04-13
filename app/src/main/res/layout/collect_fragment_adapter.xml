@@ -37,22 +37,23 @@
                     android:id="@+id/smoke_mac"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#e9393d"
                     android:layout_marginLeft="5dp"
+                    android:textStyle="bold"
                     android:text="@string/smoke_name"/>
                 <TextView
                     android:id="@+id/smoke_mac_tv"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textColor="#e9393d"
+                    android:textStyle="bold"
                     android:text="HJKDSA545FD"/>
 
                 <TextView
                     android:id="@+id/alarm_mark_image"
                     android:layout_width="wrap_content"
-                    android:layout_height="20dp"
+                    android:layout_height="wrap_content"
                     android:text="报警"
+                    android:textSize="10sp"
                     android:textColor="@color/wifi_acclerate_red"/>
 
             </LinearLayout>
@@ -87,7 +88,8 @@
                         android:id="@+id/zjq_name"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:visibility="gone">
                         <TextView
                             android:id="@+id/repeater_name"
                             android:layout_width="wrap_content"

@@ -50,11 +50,34 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_centerHorizontal="true"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:layout_below="@id/circleProgressBar">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:text="总数"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/all_sum"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:text="--"/>
+            </LinearLayout>
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/line2"
+                android:layout_margin="5dp"/>
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

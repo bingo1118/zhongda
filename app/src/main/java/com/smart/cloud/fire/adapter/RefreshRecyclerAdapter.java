@@ -108,8 +108,8 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             final AlarmMessageModel mNormalAlarmMessage = messageModelList.get(position);
             final int alarmType = mNormalAlarmMessage.getAlarmType();
             int ifDeal = mNormalAlarmMessage.getIfDealAlarm();
-            ((ItemViewHolder) holder).smokeMac.setTextColor(mContext.getResources().getColor(R.color.hj_color_text));
-            ((ItemViewHolder) holder).smokeMacTv.setTextColor(mContext.getResources().getColor(R.color.hj_color_text));
+//            ((ItemViewHolder) holder).smokeMac.setTextColor(mContext.getResources().getColor(R.color.hj_color_text));
+//            ((ItemViewHolder) holder).smokeMacTv.setTextColor(mContext.getResources().getColor(R.color.hj_color_text));
             ((ItemViewHolder) holder).alarmTimeTv.setText(mNormalAlarmMessage.getAlarmTime());
             ((ItemViewHolder) holder).smokeMacTv.setText(mNormalAlarmMessage.getName());
             ((ItemViewHolder) holder).repeaterAddressTv.setText("地址:"+mNormalAlarmMessage.getAddress());
@@ -398,6 +398,7 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
                     }
                     break;
+                case 113:
                 case 107:
                 case 105://中电Lora
                 case 91:
@@ -754,6 +755,7 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     //@@5.18
     public void setList(int index) {
         this.messageModelList.get(index).setIfDealAlarm(1);//@@5.19
+        messageModelList.remove(index);
         notifyDataSetChanged();//@@5.19
     }
 }

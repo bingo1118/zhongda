@@ -544,7 +544,10 @@ public class ElectricActivity extends MvpActivity<ElectricPresenter> implements 
             Iterator<ElectricValue.ElectricValueBean> iterator = smokeList.iterator();
             while(iterator.hasNext()){
                 ElectricValue.ElectricValueBean bean = iterator.next();
-                if(bean.getId()>1){
+                if(bean.getElectricType()!=9&&bean.getId()>1){
+                    iterator.remove();
+                }
+                if(bean.getElectricType()==9&&(bean.getId()==2||bean.getId()==3)){
                     iterator.remove();
                 }
             }

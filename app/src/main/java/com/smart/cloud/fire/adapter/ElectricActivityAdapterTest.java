@@ -106,7 +106,7 @@ public class ElectricActivityAdapterTest extends RecyclerView.Adapter<RecyclerVi
                     }
                     ((ItemViewHolder) holder).tvImage.setVisibility(View.VISIBLE);
                     ((ItemViewHolder) holder).electricLin.setVisibility(View.VISIBLE);
-                    ((ItemViewHolder) holder).electricName.setText("电压"+ElectricOne);
+                    ((ItemViewHolder) holder).electricName.setText("电压"+chuangeNuntoCase(ElectricOne));
                     if(electric.getElectricThreshold()!=null&&electric.getElectricThreshold().length()>0){
                         ((ItemViewHolder) holder).electricAlarmValue.setText(electric.getElectricThreshold()+"V");
                     }else{
@@ -137,7 +137,7 @@ public class ElectricActivityAdapterTest extends RecyclerView.Adapter<RecyclerVi
                         double electricThreshold = Double.parseDouble(electric.getElectricThreshold());
                         ((ItemViewHolder) holder).tvImage.setVisibility(View.VISIBLE);
                         ((ItemViewHolder) holder).electricLin.setVisibility(View.VISIBLE);
-                        ((ItemViewHolder) holder).electricName.setText("电流"+ElectricTwo);
+                        ((ItemViewHolder) holder).electricName.setText("电流"+chuangeNuntoCase(ElectricTwo));
                         ((ItemViewHolder) holder).electricAlarmValue.setText(electricThreshold+ "A");
                         ((ItemViewHolder) holder).electricCurrentValue.setText(value7 + "A");
                         if (Double.parseDouble(value7) - electricThreshold > 0) {
@@ -181,12 +181,12 @@ public class ElectricActivityAdapterTest extends RecyclerView.Adapter<RecyclerVi
             case 9:
                 String value97 = electric.getValue();
                 if (value97.length() > 0) {
-                    ElectricFour = ElectricFour+1;
+                    ElectricFour =electric.getId();;
                     if(electric.getElectricThreshold()!=null&&electric.getElectricThreshold().length()>0){
                         double electricThreshold = Double.parseDouble(electric.getElectricThreshold());
                         ((ItemViewHolder) holder).tvImage.setVisibility(View.VISIBLE);
                         ((ItemViewHolder) holder).electricLin.setVisibility(View.VISIBLE);
-                        ((ItemViewHolder) holder).electricName.setText("温度"+ElectricFour);
+                        ((ItemViewHolder) holder).electricName.setText("温度"+chuangeNuntoCase(ElectricFour));
                         ((ItemViewHolder) holder).electricAlarmValue.setText(electricThreshold+ "℃");
                         ((ItemViewHolder) holder).electricCurrentValue.setText(value97 + "℃");
                         if (Double.parseDouble(value97) - electricThreshold > 0) {
@@ -206,6 +206,25 @@ public class ElectricActivityAdapterTest extends RecyclerView.Adapter<RecyclerVi
         }
 
         holder.itemView.setTag(electric);
+    }
+
+    private String chuangeNuntoCase(int electricOne) {
+        String result="";
+        switch (electricOne){
+            case 1:
+                result="A";
+                break;
+            case 2:
+                result="B";
+                break;
+            case 3:
+                result="C";
+                break;
+            case 4:
+                result="N";
+                break;
+        }
+        return result;
     }
 
     /**

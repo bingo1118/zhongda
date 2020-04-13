@@ -1,6 +1,8 @@
 package com.smart.cloud.fire.activity.AlarmDevDetail;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -60,29 +62,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fire.cloud.smart.com.smartcloudfire.R;
 
-public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter> implements AlarmDevDetailView, View.OnFocusChangeListener {
+public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter> implements AlarmDevDetailView {
 
     @Bind(R.id.mProgressBar)
     ProgressBar mProgressBar;
-    @Bind(R.id.start_time)
-    EditText startTime;
-    @Bind(R.id.end_time)
-    EditText endTime;
-
-    @Bind(R.id.delete_start_time_rela)
-    RelativeLayout deleteStartTimeRela;
-    @Bind(R.id.delete_end_time_rela)
-    RelativeLayout deleteEndTimeRela;
-    @Bind(R.id.type_lin)
-    LinearLayout typeLin;
+    @Bind(R.id.sum_tv)
+    TextView sum_tv;
     @Bind(R.id.demo_recycler)
     RecyclerView demoRecycler;
     @Bind(R.id.demo_swiperefreshlayout)
     SwipeRefreshLayout demoSwiperefreshlayout;
-    @Bind(R.id.layout_cNumber)
-    RelativeLayout layoutCNumber;
-    @Bind(R.id.layout_cNumber2)
-    RelativeLayout layoutCNumber2;
     private String userID;
     private int privilege;
     private String page;
@@ -96,6 +85,8 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
     private RefreshRecyclerAdapter adapter;
     private int lastVisibleItem;
     private int deal_position;
+
+    String sum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +102,9 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
         init();
     }
     private void init() {
+        sum=getIntent().getStringExtra("sum");
+        sum_tv.setText(sum);
+
         //设置刷新时动画的颜色，可以设置4个
         demoSwiperefreshlayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
         demoSwiperefreshlayout.setColorSchemeResources(android.R.color.holo_blue_light,
@@ -132,13 +126,6 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
                 mProgressBar.setVisibility(View.GONE);
             }
         });
-        if (privilege == 1) {
-            typeLin.setVisibility(View.GONE);
-        }
-        startTime.setOnFocusChangeListener(this);
-        endTime.setOnFocusChangeListener(this);
-        startTime.setInputType(InputType.TYPE_NULL);
-        endTime.setInputType(InputType.TYPE_NULL);
         demoRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -185,15 +172,24 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
             loadMoreCount=alarmMessageModels.size();
             messageModelList.addAll(alarmMessageModels);
             adapter = new RefreshRecyclerAdapter(this, messageModelList, mPresenter, userID, privilege + "");
+
             adapter.setOnClickListener(new RefreshRecyclerAdapter.onClickListener() {
                 @Override
                 public void onClick(View view, int position) {
                     if(view.getId()==R.id.deal_alarm_action_tv){
-                        deal_position=position;
-
-                        mPresenter.dealAlarmDetail(userID, messageModelList.get(deal_position).getMac(), privilege+"" ,deal_position,userID,
-                                "","",
-                                "","");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setTitle("提示:");
+                        builder.setMessage("确认处理该设备报警？");
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deal_position=position;
+                                mPresenter.dealAlarmDetail(userID, messageModelList.get(deal_position).getMac(), privilege+"" ,deal_position,userID,
+                                        "","",
+                                        "","");
+                            }
+                        });
+                        builder.show();
                     }
                 }
             });
@@ -247,7 +243,8 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
 
     @Override
     public void updateAlarmMsgSuccess(int index) {
-
+        sum=Integer.parseInt(sum)-1+"";
+        sum_tv.setText(sum);
         adapter.setList(index);
     }
 
@@ -258,22 +255,5 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
         isDpShow = false;
     }
 
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        switch (v.getId()) {
-            case R.id.start_time:
-                startTime.setTextColor(getResources().getColor(R.color.login_btn));
-                startTime.setHintTextColor(getResources().getColor(R.color.hint_color_text));
-                endTime.setTextColor(Color.BLACK);
-                endTime.setHintTextColor(Color.BLACK);
-                break;
-            case R.id.end_time:
-                startTime.setTextColor(Color.BLACK);
-                startTime.setHintTextColor(Color.BLACK);
-                endTime.setTextColor(getResources().getColor(R.color.login_btn));
-                endTime.setHintTextColor(getResources().getColor(R.color.hint_color_text));
-                break;
-        }
-    }
 
 }

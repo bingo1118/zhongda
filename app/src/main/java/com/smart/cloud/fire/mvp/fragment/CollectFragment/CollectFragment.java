@@ -1,6 +1,8 @@
 package com.smart.cloud.fire.mvp.fragment.CollectFragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -137,7 +139,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
     private int lastVisibleItem;
 
     //startStr, endStr, areaId, placeTypeId
-    private int type=1;//@@是否是按条件查询 1 查询所有 2 条件查询
+    private int type = 1;//@@是否是按条件查询 1 查询所有 2 条件查询
     private String startStr;
     private String endStr;
     private String areaId;
@@ -165,7 +167,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                 SharedPreferencesManager.KEY_RECENTNAME);
         privilege = MyApp.app.getPrivilege();
         page = "1";
-        mvpPresenter.getAllAlarm(userID, privilege + "", page, 1, "", "", "", "","");
+        mvpPresenter.getAllAlarm(userID, privilege + "", page, 1, "", "", "", "", "");
         init();
     }
 
@@ -178,7 +180,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
         demoSwiperefreshlayout.setProgressViewOffset(false, 0, (int) TypedValue
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources()
                         .getDisplayMetrics()));
-        linearLayoutManager=new LinearLayoutManager(mContext);
+        linearLayoutManager = new LinearLayoutManager(mContext);
         linearLayoutManager.setOrientation(OrientationHelper.VERTICAL);
         demoRecycler.setLayoutManager(linearLayoutManager);
 
@@ -187,8 +189,8 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
             public void onRefresh() {
                 research = false;
                 page = "1";
-                mvpPresenter.getAllAlarm(userID, privilege + "", page, 1, "", "", "", "","");
-                type=1;//@@7.12
+                mvpPresenter.getAllAlarm(userID, privilege + "", page, 1, "", "", "", "", "");
+                type = 1;//@@7.12
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -207,21 +209,21 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if(adapter==null){
+                if (adapter == null) {
                     return;
                 }
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == adapter.getItemCount()) {
 //                    if (loadMoreCount >= 20 && research == false) {
-                    if (loadMoreCount >= 20 ) {//@@7.12
+                    if (loadMoreCount >= 20) {//@@7.12
                         page = Integer.parseInt(page) + 1 + "";
-                        if(type==2){
-                            mvpPresenter.getAllAlarm(userID, privilege + "", page, 2,startStr, endStr, areaId, placeTypeId,parentId);
-                        }else{
-                            mvpPresenter.getAllAlarm(userID, privilege + "", page, 1, "", "", "", "","");
+                        if (type == 2) {
+                            mvpPresenter.getAllAlarm(userID, privilege + "", page, 2, startStr, endStr, areaId, placeTypeId, parentId);
+                        } else {
+                            mvpPresenter.getAllAlarm(userID, privilege + "", page, 1, "", "", "", "", "");
                         }//@@7.12 区分是否是条件查询 1 查询全部 2 条件查询
                         mProgressBar.setVisibility(View.GONE);
-                    }else{
-                        T.showShort(mContext,"已经没有更多数据了");
+                    } else {
+                        T.showShort(mContext, "已经没有更多数据了");
                     }
                 }
             }
@@ -293,7 +295,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                     }
                 }
                 String areaId = "";
-                String parentId="";//@@9.11
+                String parentId = "";//@@9.11
 //                if (mArea != null) {
 //                    areaId = mArea.getAreaId();
 //                    if (areaId == null) {
@@ -302,26 +304,26 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
 //                }
 
                 if (mArea != null && mArea.getAreaId() != null) {
-                    if(mArea.getIsParent()==1){
-                        parentId= mArea.getAreaId();//@@9.1
-                        areaId="";
-                    }else{
+                    if (mArea.getIsParent() == 1) {
+                        parentId = mArea.getAreaId();//@@9.1
+                        areaId = "";
+                    } else {
                         areaId = mArea.getAreaId();
-                        parentId="";
+                        parentId = "";
                     }
                 } else {
                     areaId = "";
                 }
 
-                this.research=false;//@@8.10再次查询
+                this.research = false;//@@8.10再次查询
                 page = "1";//@@9.11
-                mvpPresenter.getAllAlarm(userID, privilege + "", page, 2, startStr, endStr, areaId, placeTypeId,parentId);
-                this.startStr=startStr;
-                this.endStr=endStr;
-                this.areaId=areaId;
-                this.parentId=parentId;
-                this.placeTypeId=placeTypeId;
-                this.type=2;//@@7.12保存查询条件
+                mvpPresenter.getAllAlarm(userID, privilege + "", page, 2, startStr, endStr, areaId, placeTypeId, parentId);
+                this.startStr = startStr;
+                this.endStr = endStr;
+                this.areaId = areaId;
+                this.parentId = parentId;
+                this.placeTypeId = placeTypeId;
+                this.type = 2;//@@7.12保存查询条件
 
 
                 hideDatePick();
@@ -339,7 +341,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                     showDatePick();
                     shangPuTypeChoice.setEditText("");
                     areaTypeChoice.setEditText("");
-                }else{
+                } else {
                     if (areaTypeChoice.ifShow()) {
                         areaTypeChoice.closePopWindow();
                     }//@@5.5关闭下拉选项
@@ -374,38 +376,38 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                 if (areaTypeChoice.ifShow()) {
                     areaTypeChoice.closePopWindow();
                 } else {
-                    String url= ConstantValues.SERVER_IP_NEW+"getAreaInfo?userId="+userID+"&privilege="+privilege;
+                    String url = ConstantValues.SERVER_IP_NEW + "getAreaInfo?userId=" + userID + "&privilege=" + privilege;
                     VolleyHelper.getInstance(mContext).getStringResponse(url,
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
                                     try {
-                                        JSONObject jsonObject=new JSONObject(response);
-                                        if(jsonObject.getInt("errorCode")==0){
+                                        JSONObject jsonObject = new JSONObject(response);
+                                        if (jsonObject.getInt("errorCode") == 0) {
                                             parent = new ArrayList<>();
                                             map = new HashMap<>();
-                                            JSONArray jsonArrayParent=jsonObject.getJSONArray("areas");
-                                            for(int i=0;i<jsonArrayParent.length();i++){
-                                                JSONObject tempParent= jsonArrayParent.getJSONObject(i);
-                                                Area tempArea=new Area();
+                                            JSONArray jsonArrayParent = jsonObject.getJSONArray("areas");
+                                            for (int i = 0; i < jsonArrayParent.length(); i++) {
+                                                JSONObject tempParent = jsonArrayParent.getJSONObject(i);
+                                                Area tempArea = new Area();
                                                 tempArea.setAreaId(tempParent.getString("areaId"));
                                                 tempArea.setAreaName(tempParent.getString("areaName"));
                                                 tempArea.setIsParent(1);
                                                 parent.add(tempArea);
                                                 List<Area> child = new ArrayList<>();
-                                                JSONArray jsonArrayChild=tempParent.getJSONArray("areas");
-                                                for(int j=0;j<jsonArrayChild.length();j++){
-                                                    JSONObject tempChild= jsonArrayChild.getJSONObject(j);
-                                                    Area tempAreaChild=new Area();
+                                                JSONArray jsonArrayChild = tempParent.getJSONArray("areas");
+                                                for (int j = 0; j < jsonArrayChild.length(); j++) {
+                                                    JSONObject tempChild = jsonArrayChild.getJSONObject(j);
+                                                    Area tempAreaChild = new Area();
                                                     tempAreaChild.setAreaId(tempChild.getString("areaId"));
                                                     tempAreaChild.setAreaName(tempChild.getString("areaName"));
                                                     tempAreaChild.setIsParent(0);
                                                     child.add(tempAreaChild);
                                                 }
-                                                map.put(tempParent.getString("areaName"),child);
+                                                map.put(tempParent.getString("areaName"), child);
                                             }
                                         }
-                                        areaTypeChoice.setItemsData2(parent,map, collectFragmentPresenter);
+                                        areaTypeChoice.setItemsData2(parent, map, collectFragmentPresenter);
                                         areaTypeChoice.showPopWindow();
                                         areaTypeChoice.setClickable(true);
                                         areaTypeChoice.closeLoading();
@@ -415,11 +417,11 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                                     }
                                 }
                             }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("error","error");
-                        }
-                    });
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.e("error", "error");
+                                }
+                            });
                     areaTypeChoice.setClickable(false);
                     areaTypeChoice.showLoading();
                 }
@@ -596,60 +598,56 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
     public void getDataSuccess(List<AlarmMessageModel> alarmMessageModels) {
         int pageInt = Integer.parseInt(page);
         if (messageModelList != null && messageModelList.size() >= 20 && pageInt > 1) {
-            loadMoreCount=alarmMessageModels.size();
+            loadMoreCount = alarmMessageModels.size();
             messageModelList.addAll(alarmMessageModels);
             adapter.changeMoreStatus(RefreshRecyclerAdapter.NO_DATA);
         } else {
             messageModelList = new ArrayList<>();
-            loadMoreCount=alarmMessageModels.size();
+            loadMoreCount = alarmMessageModels.size();
             messageModelList.addAll(alarmMessageModels);
             adapter = new RefreshRecyclerAdapter(getActivity(), messageModelList, collectFragmentPresenter, userID, privilege + "");
             adapter.setOnClickListener(new RefreshRecyclerAdapter.onClickListener() {
                 @Override
                 public void onClick(View view, int position) {
-                    if(view.getId()==R.id.deal_alarm_action_tv){
-//                        Intent intent=new Intent(mContext, UploadAlarmInfoActivity.class);
-//                        PushAlarmMsg mPushAlarmMsg=new PushAlarmMsg();
-//                        mPushAlarmMsg.setMac(messageModelList.get(position).getMac());
-//                        mPushAlarmMsg.setName(messageModelList.get(position).getName());
-//                        mPushAlarmMsg.setAddress(messageModelList.get(position).getAddress());
-//                        mPushAlarmMsg.setAlarmTypeName(messageModelList.get(position).getAlarmTypeName());
-//                        mPushAlarmMsg.setAlarmTime(messageModelList.get(position).getAlarmTime());
-//                        intent.putExtra("mPushAlarmMsg",mPushAlarmMsg);
-//                        intent.putExtra("mac",messageModelList.get(position).getMac());
-//                        intent.putExtra("alarm",messageModelList.get(position).getAlarmType()+"");
-//                        getActivity().startActivityForResult(intent,6);
-                        deal_position=position;
-
-                        collectFragmentPresenter.dealAlarmDetail(userID, messageModelList.get(deal_position).getMac(), privilege+"" ,deal_position,userID,
-                                "","",
-                                "","");
+                    if (view.getId() == R.id.deal_alarm_action_tv) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setTitle("提示:");
+                        builder.setMessage("确认处理该设备报警？");
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deal_position = position;
+                                collectFragmentPresenter.dealAlarmDetail(userID, messageModelList.get(deal_position).getMac(), privilege + "", deal_position, userID,
+                                        "", "",
+                                        "", "");
+                            }
+                        });
+                        builder.show();
                     }
-    }
-});
-        demoRecycler.setAdapter(adapter);
+                }
+            });
+            demoRecycler.setAdapter(adapter);
             demoSwiperefreshlayout.setRefreshing(false);
             adapter.changeMoreStatus(RefreshRecyclerAdapter.NO_DATA);
         }
     }
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==6){
-            if(data!=null)
-            collectFragmentPresenter.dealAlarmDetail(userID, messageModelList.get(deal_position).getMac(), privilege+"" ,deal_position,userID,
-                    data.getStringExtra("alarmTruth"),data.getStringExtra("dealDetail"),
-                    data.getStringExtra("image_path"),data.getStringExtra("video_path"));//@@5.19添加index位置参数
+        if (requestCode == 6) {
+            if (data != null)
+                collectFragmentPresenter.dealAlarmDetail(userID, messageModelList.get(deal_position).getMac(), privilege + "", deal_position, userID,
+                        data.getStringExtra("alarmTruth"), data.getStringExtra("dealDetail"),
+                        data.getStringExtra("image_path"), data.getStringExtra("video_path"));//@@5.19添加index位置参数
         }
     }
 
     @Override
     public void getDataFail(String msg) {
         demoSwiperefreshlayout.setRefreshing(false);
-        if(adapter!=null){
+        if (adapter != null) {
             adapter.changeMoreStatus(RefreshRecyclerAdapter.NO_DATA);
         }
         T.showShort(mContext, msg);
@@ -669,7 +667,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
     public void dealAlarmMsgSuccess(List<AlarmMessageModel> alarmMessageModels) {
         messageModelList.clear();
         messageModelList.addAll(alarmMessageModels);
-        loadMoreCount=alarmMessageModels.size();//@@7.13
+        loadMoreCount = alarmMessageModels.size();//@@7.13
         adapter = new RefreshRecyclerAdapter(getActivity(), messageModelList, collectFragmentPresenter, userID, privilege + "");
         demoRecycler.setAdapter(adapter);
         adapter.changeMoreStatus(RefreshRecyclerAdapter.NO_DATA);
@@ -683,7 +681,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
 
     @Override
     public void getShopType(ArrayList<Object> shopTypes) {
-        shangPuTypeChoice.setItemsData(shopTypes,mvpPresenter);
+        shangPuTypeChoice.setItemsData(shopTypes, mvpPresenter);
         shangPuTypeChoice.showPopWindow();
         shangPuTypeChoice.setClickable(true);
         shangPuTypeChoice.closeLoading();
@@ -698,7 +696,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
 
     @Override
     public void getAreaType(ArrayList<Object> shopTypes) {
-        areaTypeChoice.setItemsData(shopTypes,mvpPresenter);
+        areaTypeChoice.setItemsData(shopTypes, mvpPresenter);
         areaTypeChoice.showPopWindow();
         areaTypeChoice.setClickable(true);
         areaTypeChoice.closeLoading();
@@ -713,17 +711,17 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
 
     @Override
     public void getDataByCondition(List<AlarmMessageModel> alarmMessageModels) {
-        if(!research){
+        if (!research) {
             research = true;
             messageModelList.clear();
         }//@@7.13
         int pageInt = Integer.parseInt(page);
         if (messageModelList != null && messageModelList.size() >= 20 && pageInt > 1) {
-            loadMoreCount=alarmMessageModels.size();
+            loadMoreCount = alarmMessageModels.size();
             messageModelList.addAll(alarmMessageModels);
             adapter.changeMoreStatus(RefreshRecyclerAdapter.NO_DATA);
         } else {
-            loadMoreCount=alarmMessageModels.size();
+            loadMoreCount = alarmMessageModels.size();
             messageModelList.addAll(alarmMessageModels);
             adapter = new RefreshRecyclerAdapter(getActivity(), messageModelList, collectFragmentPresenter, userID, privilege + "");//@@9.11
             demoRecycler.setAdapter(adapter);//@@9.11
@@ -739,7 +737,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
 
     @Override
     public void getChoiceArea(Area area) {
-            mArea = area;
+        mArea = area;
     }
 
     @Override
@@ -778,6 +776,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                 break;
         }
     }
+
     @Override
     public void onPause() {
         super.onPause();

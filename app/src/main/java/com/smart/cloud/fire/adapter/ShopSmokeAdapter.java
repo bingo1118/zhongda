@@ -29,6 +29,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.smart.cloud.fire.activity.AddDev.AddDevActivity;
 import com.smart.cloud.fire.activity.AllSmoke.AllSmokePresenter;
 import com.smart.cloud.fire.activity.GasDevice.OneGasInfoActivity;
 import com.smart.cloud.fire.activity.NFCDev.NFCImageShowActivity;
@@ -165,6 +166,16 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 ((ItemViewHolder) holder).rssi_value.setText(normalSmoke.getRssivalue());
             }
 
+            ((ItemViewHolder) holder).update_tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(mContext,AddDevActivity.class);
+                    intent.putExtra("devType",normalSmoke.getDeviceType()+"");
+                    intent.putExtra("mac",normalSmoke.getMac());
+                    mContext.startActivity(intent);
+                }
+            });
+
 
             int lowvaltage=normalSmoke.getVoltage();//是否低电
             int voltage=normalSmoke.getLowVoltage();//电量
@@ -212,7 +223,7 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             ((ItemViewHolder) holder).power_button.setVisibility(View.GONE);
             ((ItemViewHolder) holder).category_group_lin.setOnClickListener(null);
 
-            if (normalSmoke.getImage().length()>0){
+            if (normalSmoke.getImage()!=null&&normalSmoke.getImage().length()>0){
                 ((ItemViewHolder) holder).dev_image.setVisibility(View.VISIBLE);
             }else{
                 ((ItemViewHolder) holder).dev_image.setVisibility(View.GONE);
@@ -1063,6 +1074,8 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         ImageView online_state_image;
         @Bind(R.id.setting_button)
         TextView setting_button;
+        @Bind(R.id.update_tv)
+        TextView update_tv;
 
         @Bind(R.id.alarm_image)
         ImageView alarm_image;
