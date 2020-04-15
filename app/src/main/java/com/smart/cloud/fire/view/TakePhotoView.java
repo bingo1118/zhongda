@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.smart.cloud.fire.utils.ImageUtils;
 import com.yuyh.library.imgsel.common.ImageLoader;
 
@@ -43,11 +44,16 @@ public class TakePhotoView extends LinearLayout implements ImageLoader {
         return path;
     }
 
+    private String oldImage="";
     private String path;
     public IvClickListener mIvClickListener;
 
     public void setmIvClickListener(IvClickListener mIvClickListener) {
         this.mIvClickListener = mIvClickListener;
+    }
+
+    public String getOldImage() {
+        return oldImage;
     }
 
     public interface IvClickListener{
@@ -100,6 +106,7 @@ public class TakePhotoView extends LinearLayout implements ImageLoader {
                     new File(path).delete();
                 }
                 path=null;
+                oldImage="";
                 image_view.setImageResource(R.drawable.take_photo);
                 line.setVisibility(GONE);
                 break;
@@ -109,6 +116,16 @@ public class TakePhotoView extends LinearLayout implements ImageLoader {
                 }
                 break;
         }
+    }
+
+    public void displayOldImage(Context context, String path) {
+        Glide.with(context)
+                .load(path).skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(image_view);
+        this.path=path;
+        this.oldImage=path;
+        line.setVisibility(VISIBLE);
     }
 
     @Override

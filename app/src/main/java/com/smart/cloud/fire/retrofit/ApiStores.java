@@ -193,6 +193,11 @@ public interface ApiStores {
                                      @Query("areaId") String areaId,@Query("page") String page,
                                      @Query("placeTypeId") String placeTypeId,@Query("devType") String devType);
 
+    @GET("getNeedAlarmDevice")
+    @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
+    Observable<HttpError> getNeedAlarmDevice(@Query("userId") String userId, @Query("privilege") String privilege,
+                                     @Query("page") String page,@Query("type") String type);
+
     //根据条件查询用户设备@@9.1 添加区域分级查询
     @GET("getNeedDev")
     @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
@@ -323,7 +328,13 @@ public interface ApiStores {
     @GET("getNeedAlarmDev")
     @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
     Observable<HttpError> getNeedAlarmDev(@Query("userId") String userId, @Query("privilege") String privilege
-            ,@Query("page") String page);
+            ,@Query("page") String page,@Query("type") String type);
+
+    @GET("getNeedAlarmByMac")
+    @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
+    Observable<HttpError> getNeedAlarmByMac(@Query("mac") String mac,@Query("page") String page);
+
+
 
     //条件查询获取用户报警任务
     @GET("getNeedAlarmMessage")

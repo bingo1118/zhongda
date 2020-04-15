@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -24,6 +25,7 @@ import com.igexin.sdk.PushManager;
 import com.p2p.core.P2PHandler;
 import com.smart.cloud.fire.activity.AddDev.ChioceDevTypeActivity;
 import com.smart.cloud.fire.activity.AlarmDevDetail.AlarmDevDetailActivity;
+import com.smart.cloud.fire.activity.AlarmDeviceByType.AlarmDeviceByTypeActivity;
 import com.smart.cloud.fire.activity.AlarmHistory.AlarmHistoryActivity;
 import com.smart.cloud.fire.activity.AlarmMsg.AlarmMsgActivity;
 import com.smart.cloud.fire.activity.AllSmoke.AllSmokeActivity;
@@ -102,6 +104,15 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
     Button scan_btn;
     @Bind(R.id.circleProgressBar)
     CircleProgressBar circleProgressBar;
+
+    @Bind(R.id.fault_line)
+    LinearLayout fault_line;
+    @Bind(R.id.offline_line)
+    LinearLayout offline_line;
+    @Bind(R.id.alarmdev_line)
+    LinearLayout alarmdev_line;
+    @Bind(R.id.lowvoltage_line)
+    LinearLayout lowvoltage_line;
 
 
     Timer getlastestAlarm;
@@ -429,19 +440,49 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
     @Override
     public void getOnlineSummary(SmokeSummary model) {
         all_sum.setText(model.getAllSmokeNumber()+"");
-        dev_sum.setText((model.getAllSmokeNumber()-model.getLossSmokeNumber())+"");
+        dev_sum.setText((model.getOnlineSmokeNumber())+"");
         offline_sum.setText(model.getLossSmokeNumber()+"");
-        fault_sum.setText(model.getLowVoltageNumber()+"");
+        fault_sum.setText(model.getFaultDevNumber()+"");
         alarm_sum.setText(model.getAlarmDevNumber()+"");
-        alarm_sum.setOnClickListener(new View.OnClickListener() {
+        lowvoltage_sum.setText(model.getLowVoltageNumber()+"");
+
+        alarmdev_line.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(Main3Activity.this,AlarmDevDetailActivity.class);
+                Intent intent=new Intent(Main3Activity.this,AlarmDeviceByTypeActivity.class);
                 intent.putExtra("sum",model.getAlarmDevNumber()+"");
+                intent.putExtra("type",1);
                 startActivity(intent);
             }
         });
-        lowvoltage_sum.setText(model.getLowVoltageNumber()+"");
+        offline_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(Main3Activity.this,AlarmDeviceByTypeActivity.class);
+                intent.putExtra("sum",model.getLossSmokeNumber()+"");
+                intent.putExtra("type",2);
+                startActivity(intent);
+            }
+        });
+        fault_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(Main3Activity.this,AlarmDeviceByTypeActivity.class);
+                intent.putExtra("sum",model.getFaultDevNumber()+"");
+                intent.putExtra("type",3);
+                startActivity(intent);
+            }
+        });
+        lowvoltage_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(Main3Activity.this,AlarmDeviceByTypeActivity.class);
+                intent.putExtra("sum",model.getLowVoltageNumber()+"");
+                intent.putExtra("type",4);
+                startActivity(intent);
+            }
+        });
+
     }
 
     @Override

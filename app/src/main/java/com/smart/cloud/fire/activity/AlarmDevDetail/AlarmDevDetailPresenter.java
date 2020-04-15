@@ -18,10 +18,41 @@ public class AlarmDevDetailPresenter extends BasePresenter<AlarmDevDetailView> {
     }
 
     //type:1表示获取第一页的报警消息，2表示根据条件查询相应的报警消息
-    public void getAllAlarm(String userId, String privilege, String page){
+    public void getAllAlarm(String userId, String privilege, String page,int type){
         mvpView.showLoading();
         Observable observable=null;
-        observable = apiStores1.getNeedAlarmDev(userId,privilege,page);
+        observable = apiStores1.getNeedAlarmDev(userId,privilege,page,type+"");
+
+        addSubscription(observable,new SubscriberCallBack<>(new ApiCallback<HttpError>() {
+            @Override
+            public void onSuccess(HttpError model) {
+                int errorCode = model.getErrorCode();
+                if(errorCode==0){
+                    List<AlarmMessageModel> alarmMessageModels = model.getAlarm();
+                    mvpView.getDataSuccess(alarmMessageModels);
+                }else{
+                    List<AlarmMessageModel> alarmMessageModels = new ArrayList<AlarmMessageModel>();//@@5.3
+                    mvpView.getDataSuccess(alarmMessageModels);//@@5.3
+                    mvpView.getDataFail("无数据");
+                }
+            }
+
+            @Override
+            public void onFailure(int code, String msg) {
+                mvpView.getDataFail("网络错误");
+            }
+
+            @Override
+            public void onCompleted() {
+                mvpView.hideLoading();
+            }
+        }));
+    }
+
+    public void getAllAlarmBymac(String mac, String page){
+        mvpView.showLoading();
+        Observable observable=null;
+        observable = apiStores1.getNeedAlarmByMac(mac,page);
 
         addSubscription(observable,new SubscriberCallBack<>(new ApiCallback<HttpError>() {
             @Override

@@ -407,7 +407,8 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="stateHidden|stateUnchanged" />
         <activity android:name="com.smart.cloud.fire.rqcode.Capture2Activity" />
-        <activity android:name="com.smart.cloud.fire.activity.AlarmDevDetail.AlarmDevDetailActivity"></activity>
+        <activity android:name="com.smart.cloud.fire.activity.AlarmDevDetail.AlarmDevDetailActivity" />
+        <activity android:name="com.smart.cloud.fire.activity.AlarmDeviceByType.AlarmDeviceByTypeActivity"></activity>
     </application>
 
 </manifest>

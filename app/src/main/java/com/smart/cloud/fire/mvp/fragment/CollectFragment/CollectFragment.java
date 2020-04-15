@@ -675,8 +675,8 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
 
     @Override
     public void updateAlarmMsgSuccess(int index) {
-
         adapter.setList(index);
+        T.showShort(mContext,"处理成功");
     }
 
     @Override

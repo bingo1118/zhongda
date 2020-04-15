@@ -132,6 +132,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
 
     String mac="";
     String devType="0";
+    String oldImage="";
 
     Fragment mmm;
 
@@ -158,6 +159,12 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
         Intent intent=getActivity().getIntent();
         String mac=intent.getStringExtra("mac");
         devType=intent.getStringExtra("devType");
+        oldImage=intent.getStringExtra("oldImage");
+        if(oldImage!=null&&oldImage.length()>0){
+            String path=ConstantValues.NFC_IMAGES+"devimages/"+oldImage;
+            photo_image.displayOldImage(mContext,path);
+        }
+
         if(devType==null){
             devType="";
         }
@@ -262,7 +269,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
                 File f=photo_image.getPath()==null?null:new File(photo_image.getPath());
                 mvpPresenter.addSmoke(userID, privilege + "", smokeName, smokeMac, address, longitude,
                         latitude, placeAddress, shopTypeId, principal1, principal1Phone, principal2,
-                        principal2Phone, areaId, repeater, camera , f,devType);
+                        principal2Phone, areaId, repeater, camera , f,devType,photo_image.getOldImage());
             }
         }).start();
 
@@ -399,6 +406,12 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
             addCameraName.setText(mCamera.getCameraId());
         }
         addRepeaterMac.setText(smoke.getRepeater().trim());
+
+        oldImage=smoke.getImage();
+        if(oldImage!=null&&oldImage.length()>0){
+            String path=ConstantValues.NFC_IMAGES+"devimages/"+oldImage;
+            photo_image.displayOldImage(mContext,path);
+        }
     }
 
     @Override

@@ -30,6 +30,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.smart.cloud.fire.activity.AddDev.AddDevActivity;
+import com.smart.cloud.fire.activity.AlarmDevDetail.AlarmDevDetailActivity;
 import com.smart.cloud.fire.activity.AllSmoke.AllSmokePresenter;
 import com.smart.cloud.fire.activity.GasDevice.OneGasInfoActivity;
 import com.smart.cloud.fire.activity.NFCDev.NFCImageShowActivity;
@@ -46,6 +47,7 @@ import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.Security.AirInfoActivi
 import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.Security.NewAirInfoActivity;
 import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.ShopInfoFragmentPresenter;
 import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.WiredDevFragment.WiredSmokeListActivity;
+import com.smart.cloud.fire.mvp.main.Main3Activity;
 import com.smart.cloud.fire.retrofit.ApiStores;
 import com.smart.cloud.fire.retrofit.AppClient;
 import com.smart.cloud.fire.ui.CallManagerDialogActivity;
@@ -172,6 +174,7 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     Intent intent=new Intent(mContext,AddDevActivity.class);
                     intent.putExtra("devType",normalSmoke.getDeviceType()+"");
                     intent.putExtra("mac",normalSmoke.getMac());
+                    intent.putExtra("oldImage",normalSmoke.getImage());
                     mContext.startActivity(intent);
                 }
             });
@@ -676,10 +679,10 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 case 84:
                 case 8://手动。。
                     if (netStates == 0) {//设备不在线。。
-                        ((ItemViewHolder) holder).smoke_name_text.setText("手动报警："+normalSmoke.getName()+"（已离线)");
+                        ((ItemViewHolder) holder).smoke_name_text.setText("手报按钮："+normalSmoke.getName()+"（已离线)");
                         ((ItemViewHolder) holder).smoke_name_text.setTextColor(Color.RED);
                     } else {//设备在线。。
-                        ((ItemViewHolder) holder).smoke_name_text.setText("手动报警："+normalSmoke.getName());
+                        ((ItemViewHolder) holder).smoke_name_text.setText("手报按钮："+normalSmoke.getName());
                         ((ItemViewHolder) holder).smoke_name_text.setTextColor(Color.BLACK);
                     }
                     ((ItemViewHolder) holder).right_into_image.setVisibility(View.GONE);
@@ -927,6 +930,16 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         }
                     });
                     break;
+                    default:
+                        if (netStates == 0) {//设备不在线。。
+                            ((ItemViewHolder) holder).smoke_name_text.setText("未知设备："+normalSmoke.getName()+"（已离线)");
+                            ((ItemViewHolder) holder).smoke_name_text.setTextColor(Color.RED);
+                        } else {//设备在线。。
+                            ((ItemViewHolder) holder).smoke_name_text.setText("未知设备"+normalSmoke.getName());
+                            ((ItemViewHolder) holder).smoke_name_text.setTextColor(Color.BLACK);
+                        }
+                        break;
+
             }
 
             if (netStates == 0) {//设备不在线。。
@@ -942,7 +955,15 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             ((ItemViewHolder) holder).type_tv.setText(normalSmoke.getPlaceType());
             ((ItemViewHolder) holder).area_tv.setText(normalSmoke.getAreaName());
 
-
+            ((ItemViewHolder) holder).alarm_history_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(mContext,AlarmDevDetailActivity.class);
+                    intent.putExtra("mac",normalSmoke.getMac()+"");
+                    intent.putExtra("name",normalSmoke.getName()+"");
+                    mContext.startActivity(intent);
+                }
+            });
 
             ((ItemViewHolder) holder).manager_img.setOnClickListener(new View.OnClickListener() {//拨打电话提示框。。
                 @Override
@@ -1076,6 +1097,8 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         TextView setting_button;
         @Bind(R.id.update_tv)
         TextView update_tv;
+        @Bind(R.id.alarm_history_button)
+        TextView alarm_history_button;
 
         @Bind(R.id.alarm_image)
         ImageView alarm_image;

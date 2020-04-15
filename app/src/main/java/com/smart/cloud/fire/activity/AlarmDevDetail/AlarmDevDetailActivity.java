@@ -47,6 +47,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -68,6 +69,8 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
     ProgressBar mProgressBar;
     @Bind(R.id.sum_tv)
     TextView sum_tv;
+    @Bind(R.id.title_tv)
+    TextView title_tv;
     @Bind(R.id.demo_recycler)
     RecyclerView demoRecycler;
     @Bind(R.id.demo_swiperefreshlayout)
@@ -87,6 +90,9 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
     private int deal_position;
 
     String sum;
+    int type;
+    String mac;
+    String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,12 +104,22 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
         userID = MyApp.getUserID();
         privilege = MyApp.app.getPrivilege();
         page = "1";
-        mvpPresenter.getAllAlarm(userID, privilege + "", page);
+        sum=getIntent().getStringExtra("sum");
+        type=getIntent().getIntExtra("type",1);
+        mac=getIntent().getStringExtra("mac");
+        name=getIntent().getStringExtra("name");
+
+        if(mac!=null&&mac.length()>0){
+            mvpPresenter.getAllAlarmBymac(mac,page);
+            title_tv.setText(mac);
+            sum_tv.setText(name);
+        }else{
+            sum_tv.setText(sum);
+            mvpPresenter.getAllAlarm(userID, privilege + "", page,type );
+        }
         init();
     }
     private void init() {
-        sum=getIntent().getStringExtra("sum");
-        sum_tv.setText(sum);
 
         //设置刷新时动画的颜色，可以设置4个
         demoSwiperefreshlayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
@@ -122,7 +138,11 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
             public void onRefresh() {
                 research = false;
                 page = "1";
-                mvpPresenter.getAllAlarm(userID, privilege + "", page);
+                if(mac!=null&&mac.length()>0){
+                    mvpPresenter.getAllAlarmBymac(mac,page);
+                }else{
+                    mvpPresenter.getAllAlarm(userID, privilege + "", page,type );
+                }
                 mProgressBar.setVisibility(View.GONE);
             }
         });
@@ -136,7 +156,11 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == adapter.getItemCount()) {
                     if (loadMoreCount >= 20 ) {//@@7.12
                         page = Integer.parseInt(page) + 1 + "";
-                        mvpPresenter.getAllAlarm(userID, privilege + "", page);
+                        if(mac!=null&&mac.length()>0){
+                            mvpPresenter.getAllAlarmBymac(mac,page);
+                        }else{
+                            mvpPresenter.getAllAlarm(userID, privilege + "", page,type );
+                        }
                         mProgressBar.setVisibility(View.GONE);
                     }else{
                         T.showShort(mContext,"已经没有更多数据了");
@@ -243,8 +267,8 @@ public class AlarmDevDetailActivity extends MvpActivity<AlarmDevDetailPresenter>
 
     @Override
     public void updateAlarmMsgSuccess(int index) {
-        sum=Integer.parseInt(sum)-1+"";
-        sum_tv.setText(sum);
+//        sum=Integer.parseInt(sum)-1+"";
+//        sum_tv.setText(sum);
         adapter.setList(index);
     }
 

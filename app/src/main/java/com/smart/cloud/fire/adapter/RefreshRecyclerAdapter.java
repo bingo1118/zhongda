@@ -755,7 +755,7 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     //@@5.18
     public void setList(int index) {
         this.messageModelList.get(index).setIfDealAlarm(1);//@@5.19
-        messageModelList.remove(index);
+//        messageModelList.remove(index);
         notifyDataSetChanged();//@@5.19
     }
 }

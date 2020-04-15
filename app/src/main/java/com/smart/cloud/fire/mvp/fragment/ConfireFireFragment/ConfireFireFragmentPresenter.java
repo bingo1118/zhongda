@@ -151,7 +151,7 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
 
     public void addSmoke(String userID, String privilege, String smokeName, String smokeMac, String address, String longitude,
                          String latitude, String placeAddress, String placeTypeId, String principal1, String principal1Phone, String principal2,
-                         String principal2Phone, String areaId, String repeater, String camera, File imagefile,String mDeviceType){
+                         String principal2Phone, String areaId, String repeater, String camera, File imagefile,String mDeviceType,String oldimage){
         int electrState=0;//@@8.26电气开关
         if(longitude.length()==0||latitude.length()==0){
             mvpView.addSmokeResult("请获取经纬度",1);
@@ -180,7 +180,7 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
         if(devType.getErrorCode()==0){
             smokeMac=devType.getMac();
             electrState=devType.getElectrState();
-            deviceType=mDeviceType!=null?mDeviceType:devType.getDevType();
+            deviceType=(mDeviceType!=null&&mDeviceType.length()>0&&mDeviceType.length()<4)?mDeviceType:devType.getDevType();
         }else{
             mvpView.addSmokeResult(devType.getError(),1);
             return;
@@ -210,6 +210,9 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
         parts.add(toRequestBodyOfText("electrState", electrState+""));
         if(imagefile!=null&&imagefile.exists()){
             parts.add(toRequestBodyOfImage("imagefile",imagefile));//图片
+        }
+        if(imagefile==null&&oldimage!=null&&oldimage.length()>1){
+            parts.add(toRequestBodyOfText("oldimage", "1"));
         }
         mObservable = apiStores1.addSmokeWithImage(parts);
 

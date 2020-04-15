@@ -307,6 +307,18 @@
                     android:background="@drawable/dev_list_item_shape"
                     android:text="切断电源"
                     android:visibility="gone"/>
+                <TextView
+                    android:id="@+id/alarm_history_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#6573f9"
+                    android:textSize="12sp"
+                    android:padding="5dp"
+                    android:gravity="center"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/dev_list_item_shape"
+                    android:text="报警记录"/>
             </LinearLayout>
         </LinearLayout>
 

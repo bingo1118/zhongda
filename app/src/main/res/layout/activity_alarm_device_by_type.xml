@@ -2,13 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ecf0f1"
+    android:background="#e6e6e6"
     android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/title_rela"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="150dp"
         android:background="@color/colorPrimary"
         >
 
@@ -19,33 +19,40 @@
             android:text="报警设备数:"
             android:textColor="#ffffff"
             android:layout_centerHorizontal="true"
-            android:textSize="10sp"
+            android:textSize="16sp"
             android:layout_marginTop="15dp"/>
 
         <TextView
             android:id="@+id/sum_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10"
+            android:text="——"
             android:textColor="#ffffff"
             android:layout_centerHorizontal="true"
-            android:textSize="20sp"
+            android:textSize="50sp"
+            android:textStyle="bold"
             android:layout_below="@id/title_tv"
             android:layout_marginTop="15dp"/>
 
     </RelativeLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/demo_swiperefreshlayout"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        >
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/demo_recycler"
+        android:background="#e6e6e6">
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipere_fresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            ></android.support.v7.widget.RecyclerView>
-    </android.support.v4.widget.SwipeRefreshLayout>
-    <include layout="@layout/progress_bar"/>
+            android:scrollbars="vertical"
+            >
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                ></android.support.v7.widget.RecyclerView>
+        </android.support.v4.widget.SwipeRefreshLayout>
+        <include layout="@layout/progress_bar"/>
+    </RelativeLayout>
+
 </LinearLayout>
