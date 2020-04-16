@@ -180,7 +180,7 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
         if(devType.getErrorCode()==0){
             smokeMac=devType.getMac();
             electrState=devType.getElectrState();
-            deviceType=(mDeviceType!=null&&mDeviceType.length()>0&&mDeviceType.length()<4)?mDeviceType:devType.getDevType();
+            deviceType=(mDeviceType!=null&&mDeviceType.length()>0)?mDeviceType:devType.getDevType();
         }else{
             mvpView.addSmokeResult(devType.getError(),1);
             return;

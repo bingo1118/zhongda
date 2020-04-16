@@ -134,7 +134,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
     String devType="0";
     String oldImage="";
 
-    Fragment mmm;
+    Fragment mFramgent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -147,7 +147,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mContext = getActivity();
-        mmm=this;
+        mFramgent=this;
         userID = SharedPreferencesManager.getInstance().getData(mContext,
                 SharedPreferencesManager.SP_FILE_GWELL,
                 SharedPreferencesManager.KEY_RECENTNAME);
@@ -216,7 +216,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
                 ISCameraConfig config = new ISCameraConfig.Builder()
                         .needCrop(false) // 裁剪
                         .build();
-                ISNav.getInstance().toCameraActivity(mmm, config, 666);
+                ISNav.getInstance().toCameraActivity(mFramgent, config, 666);
             }
         });
 

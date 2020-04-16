@@ -78,7 +78,7 @@ public class Capture2Activity extends AppCompatActivity implements View.OnClickL
             }else{
                 DeviceType devType= DeviceTypeUtils.getDevType(result,"");
                 Intent intent=new Intent(mContext,AddDevActivity.class);
-                intent.putExtra("devType",devType.getDevTypeName());
+                intent.putExtra("devType",devType.getDevType());
                 intent.putExtra("mac",result);
                 startActivity(intent);
                 finish();

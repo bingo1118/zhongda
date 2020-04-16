@@ -4,7 +4,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#ffffff"
-		android:visibility="gone"
         android:orientation="vertical"
         >
         <TextView
