@@ -322,7 +322,7 @@ public interface ApiStores {
     Observable<HttpError> getNeedAlarm(@Query("userId") String userId, @Query("privilege") String privilege
             ,@Query("startTime") String startTime,@Query("endTime") String endTime
             ,@Query("areaId") String areaId,@Query("placeTypeId") String placeTypeId
-            ,@Query("page") String page,@Query("parentId") String parentId);
+            ,@Query("page") String page,@Query("parentId") String parentId,@Query("alarmType") String alarmType);
 
     //条件查询获取用户报警设备
     @GET("getNeedAlarmDev")

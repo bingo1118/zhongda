@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@drawable/edit_view_bg"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/time_tv"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="5dp"
+        android:layout_weight="1"
+        android:gravity="left|center_vertical"
+        android:hint="@string/start_time"
+        android:singleLine="true"
+        android:text=""
+        android:textColor="@color/text_color_black"
+        android:textColorHint="@color/hint_color_text"
+        android:textSize="12sp" />
+
+
+    <ImageView
+        android:id="@+id/clear_im"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:visibility="gone"
+        android:src="@drawable/shanchu_selector" />
+
+</LinearLayout>

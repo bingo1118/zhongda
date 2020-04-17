@@ -4,15 +4,40 @@
     android:layout_height="match_parent"
     android:background="#ecf0f1"
     android:orientation="vertical" >
-    
-    <!-- title bar -->
-    <include android:id="@+id/title_include" layout="@layout/title_bar"/>
+
+    <RelativeLayout
+        android:id="@+id/title_rela"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/titlebar_height"
+        android:background="@color/colorPrimary">
+
+
+        <TextView
+            android:id="@+id/title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="#ffffff"
+            android:layout_centerInParent="true"
+            android:textSize="18sp"
+            />
+        <ImageView
+            android:id="@+id/add_fire"
+            android:layout_width="45dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/search"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"/>
+
+
+    </RelativeLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/demo_swiperefreshlayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/title_include"
+        android:layout_below="@id/title_rela"
         android:scrollbars="vertical"
         >
         <android.support.v7.widget.RecyclerView
@@ -21,6 +46,6 @@
             android:layout_height="match_parent"
             ></android.support.v7.widget.RecyclerView>
     </android.support.v4.widget.SwipeRefreshLayout>
-    <include layout="@layout/play_back_date_pick_fire" />
+    <!--<include layout="@layout/play_back_date_pick_fire" />-->
     <include layout="@layout/progress_bar"/>
 </RelativeLayout>
