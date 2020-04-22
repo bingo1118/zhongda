@@ -138,7 +138,7 @@ public class BigDataActivity extends MvpActivity<BigDataPresenter> implements Bi
 //                    break;
                 case 1:
                     offline_rela.startAnimation(mShowAnim );
-                    offline_text.setText("离线设备:"+model.getOffline()+"分");
+                    offline_text.setText("失联设备:"+model.getOffline()+"分");
                     offline_rela.setVisibility(View.VISIBLE);
                     offline_rela.setOnClickListener(new View.OnClickListener() {
                         @Override

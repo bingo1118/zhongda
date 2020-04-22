@@ -257,9 +257,6 @@
             android:name="com.smart.cloud.fire.activity.AddDev.ChioceDevTypeActivity"
             android:launchMode="singleTop" />
         <activity
-            android:name="com.smart.cloud.fire.activity.NFC.NFCActivity"
-            android:launchMode="singleTop" />
-        <activity
             android:name="com.smart.cloud.fire.mvp.electricChangeHistory.ElectricChangeHistoryActivity"
             android:launchMode="singleTop" />
         <activity

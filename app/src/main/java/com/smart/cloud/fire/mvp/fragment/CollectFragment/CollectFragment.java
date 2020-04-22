@@ -1,6 +1,7 @@
 package com.smart.cloud.fire.mvp.fragment.CollectFragment;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,9 +14,13 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.util.TypedValue;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -181,11 +186,41 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
 
 
     PopupWindow popupWindow;
+    Dialog dialog;
 
     @OnClick({R.id.add_fire})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.add_fire:
+//                AlertDialog.Builder builder =new AlertDialog.Builder(mContext);
+//                View contentView = LayoutInflater.from(mContext).inflate(R.layout.play_back_date_pick_fire_zd, null);
+//                builder.setView(contentView);
+//                Dialog dialogMyAddress=builder.create();
+//                Window window = dialogMyAddress.getWindow();
+//                window.getDecorView().setPadding(0, 0, 0, 0);
+//                WindowManager.LayoutParams layoutParams = window.getAttributes();
+//                layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+//                window.setAttributes(layoutParams);
+//                window.setGravity(Gravity.TOP);
+//                window.getDecorView().setBackgroundColor(Color.TRANSPARENT);//不加这句不可以占全屏
+//                dialogMyAddress.show();
+
+//                AlertDialog.Builder dialogbuilder=new AlertDialog.Builder(mContext);
+//                View contentView = LayoutInflater.from(mContext).inflate(R.layout.play_back_date_pick_fire_zd, null);
+//                dialogbuilder.setView(contentView);
+//                dialog=dialogbuilder.create();
+//
+//
+//                Window window = dialog.getWindow();
+//                window.getDecorView().setPadding(0, 0, 0, 0);
+//                WindowManager.LayoutParams layoutParams = window.getAttributes();
+//                layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+//                window.setAttributes(layoutParams);
+//                window.setGravity(Gravity.TOP);
+//
+//                dialog.show();
+
+
                 if(popupWindow!=null&&popupWindow.isShowing()){
                     break;
                 }
@@ -198,12 +233,12 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
 
                 ZDAlarmTypeChooseListView zdAlarmTypeChooseListView=(ZDAlarmTypeChooseListView)contentView.findViewById(R.id.alarm_view);
                 zdAlarmTypeChooseListView.setEditTextHint("报警类型");
-                zdAlarmTypeChooseListView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        zdAlarmTypeChooseListView.showPopWindow();
-                    }
-                });
+//                zdAlarmTypeChooseListView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        zdAlarmTypeChooseListView.showPopWindow();
+//                    }
+//                });
                 zdAlarmTypeChooseListView.setOnChildChooceClickListener(new ZDAlarmTypeChooseListView.OnChildChooceClickListener() {
                     @Override
                     public void OnChildClick(AlarmType info) {
@@ -211,19 +246,12 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                     }
                 });
 
-                zdarea.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        zdarea.showPopWindow();
-                    }
-                });
-                start_picker.setClickable(true);
-                start_picker.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        start_picker.show();
-                    }
-                });
+//                zdarea.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        zdarea.showPopWindow();
+//                    }
+//                });
                 start_picker.setmOnTimeGetListener(new TimePickerViewHelper.OnTimeGetListener() {
                     @Override
                     public void getDate(String dateString) {
@@ -235,12 +263,6 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                     @Override
                     public void getDate(String dateString) {
                         endStr=dateString;
-                    }
-                });
-                end_picker.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        end_picker.show();
                     }
                 });
 
@@ -287,7 +309,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                             alarmType=mAlarmType.getAlarmCode()+"";
                         }
 
-                        if(startStr.length()==0&&endStr.length()==0&&areaId.length()==0){
+                        if(startStr.length()==0&&endStr.length()==0&&areaId.length()==0&&alarmType.length()==0){
                             T.showShort(mContext,"筛选条件不能为空");
                             return;
                         }
@@ -295,6 +317,7 @@ public class CollectFragment extends MvpFragment<CollectFragmentPresenter> imple
                         mvpPresenter.getAllAlarm(userID, privilege + "", page, 2, startStr, endStr, areaId, placeTypeId, parentId,alarmType);
                         isSearching=false;
                         popupWindow.dismiss();
+//                        dialog.dismiss();
                     }
                 });
 

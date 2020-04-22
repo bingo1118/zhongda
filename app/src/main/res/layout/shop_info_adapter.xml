@@ -75,26 +75,60 @@
                     android:layout_height="25dp"
                     android:src="@drawable/p2"
                     android:visibility="gone"/>
-                <ImageView
-                    android:id="@+id/alarm_image"
-                    android:layout_width="20dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/alarm_dev"
-                    android:visibility="gone"/>
-                <ImageView
-                    android:id="@+id/fault_image"
-                    android:layout_width="20dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/fault_dev"
-                    android:visibility="gone"/>
+
+                <LinearLayout
+                    android:id="@+id/alarm_image_line"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+                    <ImageView
+                        android:id="@+id/alarm_image"
+                        android:layout_width="20dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/alarm_dev"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:layout_marginLeft="1dp"
+                        android:textColor="@color/wifi_acclerate_red"
+                        android:textStyle="bold"
+                        android:text="报警"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fault_image_line"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+                    <ImageView
+                        android:id="@+id/fault_image"
+                        android:layout_width="20dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/fault_dev"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:layout_marginLeft="1dp"
+                        android:textColor="@color/wifi_acclerate_red"
+                        android:text="故障"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+
                 <ImageView
                     android:id="@+id/lowvaltage_image"
                     android:layout_width="20dp"
                     android:layout_marginLeft="8dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/low_voltage"
+                    android:src="@drawable/p1"
                     android:visibility="gone"/>
             </LinearLayout>
 
@@ -319,6 +353,18 @@
                     android:layout_margin="5dp"
                     android:background="@drawable/dev_list_item_shape"
                     android:text="报警记录"/>
+                <TextView
+                    android:id="@+id/map_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#6573f9"
+                    android:textSize="12sp"
+                    android:padding="5dp"
+                    android:gravity="center"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/dev_list_item_shape"
+                    android:text="导航"/>
             </LinearLayout>
         </LinearLayout>
 

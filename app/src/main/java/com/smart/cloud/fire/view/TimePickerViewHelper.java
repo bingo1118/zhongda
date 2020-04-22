@@ -76,11 +76,7 @@ public class TimePickerViewHelper extends LinearLayout{
         clear_im.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                time_tv.setText("");
-                if(mOnTimeGetListener!=null){
-                    mOnTimeGetListener.getDate("");
-                }
-                clear_im.setVisibility(GONE);
+                clearView();
             }
         });
 
@@ -112,11 +108,25 @@ public class TimePickerViewHelper extends LinearLayout{
                 .isCenterLabel(false) //是否只显示中间选中项的label文字，false则每项item全部都带有label。
                 .isDialog(true)//是否显示为对话框样式
                 .build();
+        this.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                show();
+            }
+        });
     }
 
     public void show(){
-        if(pvTime!=null){
+        if(pvTime!=null&&!pvTime.isShowing()){
             pvTime.show();
         }
+    }
+
+    public void clearView(){
+        time_tv.setText("");
+        if(mOnTimeGetListener!=null){
+            mOnTimeGetListener.getDate("");
+        }
+        clear_im.setVisibility(GONE);
     }
 }

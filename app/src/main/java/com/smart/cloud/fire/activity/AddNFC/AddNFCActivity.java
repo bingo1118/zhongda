@@ -49,10 +49,13 @@ import com.smart.cloud.fire.global.MyApp;
 import com.smart.cloud.fire.global.ShopType;
 import com.smart.cloud.fire.mvp.fragment.MapFragment.Smoke;
 import com.smart.cloud.fire.rqcode.Capture2Activity;
+import com.smart.cloud.fire.utils.NFCHelper;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.Utils;
+import com.smart.cloud.fire.view.TimePickerViewHelper;
 import com.smart.cloud.fire.view.XCDropDownListView;
+import com.smart.cloud.fire.view.ZDAlarmTypeChooseListView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,7 +89,7 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
     @Bind(R.id.add_fire_address)
     EditText addFireAddress;//设备地址。。
     @Bind(R.id.makeTime_edit)
-    TextView makeTime_text;//生产时间@@11.16
+    TimePickerViewHelper makeTime_text;//生产时间@@11.16
     @Bind(R.id.makeAddress_edit)
     EditText makeAddress_edit;//生产地址@@11.28
     @Bind(R.id.scan_er_wei_ma)
@@ -107,8 +110,6 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
     EditText addCameraName;
     @Bind(R.id.producer_edit)
     EditText producer_edit;
-    @Bind(R.id.workerPhone_edit)
-    EditText workerPhone_edit;
     @Bind(R.id.info_line)
     LinearLayout info_line;//@@11.16
     private Context mContext;
@@ -120,21 +121,12 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
     private String areaId = "";
     private String shopTypeId = "";
 
-    private boolean mWriteMode = false;
-    NfcAdapter mNfcAdapter;
-    AlertDialog alertDialog;
 
     private NFCInfo nfcInfo;
+    String makeTime="";
+    private NFCHelper nfcHelper;
 
-
-
-    private static final int DATE_DIALOG_ID = 1;
-    private static final int SHOW_DATAPICK = 0;
-    private int mYear;
-    private int mMonth;
-    private int mDay;
-
-    String getDate;
+    Dialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,14 +139,18 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
                 SharedPreferencesManager.SP_FILE_GWELL,
                 SharedPreferencesManager.KEY_RECENTNAME);
         privilege = MyApp.app.getPrivilege();
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         init();
     }
 
     private void init() {
         addFireZjq.setEditTextHint("区域");
         addFireType.setEditTextHint("类型");
-        makeTime_text.setOnClickListener(new DateButtonOnClickListener());//@@11.16
+        makeTime_text.setmOnTimeGetListener(new TimePickerViewHelper.OnTimeGetListener() {
+            @Override
+            public void getDate(String dateString) {
+                makeTime=dateString;
+            }
+        });
         RxView.clicks(addFireDevBtn).throttleFirst(2, TimeUnit.SECONDS).subscribe(new Action1<Void>() {
             @Override
             public void call(Void aVoid) {
@@ -163,43 +159,6 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
         });
         nfcInfo=new NFCInfo();
 
-
-        final Calendar c = Calendar.getInstance();
-        mYear = c.get(Calendar.YEAR);
-        mMonth = c.get(Calendar.MONTH);
-        mDay = c.get(Calendar.DAY_OF_MONTH);
-        setDateTime();
-    }
-
-
-    /**
-     * 添加设备，提交设备厂家信息。。
-     */
-    private void addFire2() {
-        if (nfcDeviceType != null) {
-            shopTypeId = nfcDeviceType.getPlaceTypeId();//@@8.16
-        }
-        if (mArea != null) {
-            areaId = mArea.getAreaId();
-        }
-
-        String smokeMac = addFireMac.getText().toString().trim();
-        String producer=producer_edit.getText().toString().trim();
-        String makeTime=makeTime_text.getText().toString().trim();
-
-        if(smokeMac.length()==0){
-            toast("请填写探测器MAC");
-            return;
-        }
-        if(producer.length()==0||producer.length()==0){
-            toast("请填写厂家");
-            return;
-        }
-        if(makeTime.length()==0||makeTime.length()==0){
-            toast("请填写生产日期");
-            return;
-        }
-        nfcInfo=new NFCInfo(smokeMac,"","","","","","","","",producer,makeTime,"","");
     }
 
 
@@ -220,10 +179,9 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
         String address = addFireAddress.getText().toString().trim();
 
         String producer=producer_edit.getText().toString().trim();
-        String makeTime=makeTime_text.getText().toString().trim();
         String makeAddress=makeAddress_edit.getText().toString().trim();
 
-        String workerPhone=workerPhone_edit.getText().toString().trim();
+        String workerPhone="";
 
         if(longitude.length()==0||latitude.length()==0){
             toast("请获取经纬度");
@@ -277,12 +235,7 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.scan_er_wei_ma:
-
-                Intent scanRepeater = new Intent(mContext, Capture2Activity.class);
-                scanRepeater.putExtra("isNeedResult",true);
-                scanRepeater.putExtra("func",1);
-                startActivityForResult(scanRepeater, REQUEST_CODE_SCAN_REPEATER);
-
+                showChooseDialog();
                 break;
             case R.id.location_image:
                 Intent intent=new Intent(mContext, GetLocationActivity.class);
@@ -308,6 +261,72 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
                 break;
             default:
                 break;
+        }
+    }
+
+    private void showChooseDialog(){
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(this);
+        normalDialog.setTitle("选取获取ID方式");
+        normalDialog.setPositiveButton("二维码",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent scanRepeater = new Intent(mContext, Capture2Activity.class);
+                        scanRepeater.putExtra("isNeedResult",true);
+                        scanRepeater.putExtra("func",1);
+                        startActivityForResult(scanRepeater, REQUEST_CODE_SCAN_REPEATER);
+                    }
+                });
+        normalDialog.setNegativeButton("NFC",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        nfcHelper=NFCHelper.getInstance((Activity) mContext);
+                        if (!nfcHelper.isSupportNFC()) {
+                            toast("设备不支持NFC功能");
+                            return;
+                        }
+                        nfcHelper.changeToReadMode();
+
+                        TextView textView=new TextView(mContext);//@@10.19
+                        textView.setText("接触标签进行读取操作");
+                        textView.setTextSize(18);
+                        textView.setGravity(Gravity.CENTER);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setView(textView);
+                        builder.setCancelable(true);
+                        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                nfcHelper.changeToReadMode();
+                            }
+                        });
+                        alertDialog=builder.create();
+                        alertDialog.show();
+                    }
+                });
+        // 显示
+        normalDialog.show();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        // NDEF exchange mode
+        if (!nfcHelper.ismWriteMode() && (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())
+                ||NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))) {//@@10.19
+            byte[] myNFCID = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
+            String UID = Utils.ByteArrayToHexString(myNFCID);
+            addFireMac.setText(UID);
+
+            if(alertDialog!=null){
+                alertDialog.dismiss();
+            }
+        }
+        // Tag writing mode
+        if (nfcHelper.ismWriteMode() && NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
+            Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            nfcHelper.writeTag(detectedTag);
         }
     }
 
@@ -445,7 +464,7 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
      */
     private void clearText() {
         producer_edit.setText("");//@@11.16
-        makeTime_text.setText("");//@@11.16
+        makeTime_text.clearView();//@@11.16
         addFireLon.setText("");
         addFireLat.setText("");
         addFireAddress.setText("");
@@ -463,160 +482,4 @@ public class AddNFCActivity extends MvpActivity<AddNFCPresenter> implements AddN
     }
 
 
-
-    NdefMessage[] getNdefMessages(Intent intent) {
-        // Parse the intent
-        NdefMessage[] msgs = null;
-        String action = intent.getAction();
-        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
-                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
-            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            if (rawMsgs != null) {
-                msgs = new NdefMessage[rawMsgs.length];
-                for (int i = 0; i < rawMsgs.length; i++) {
-                    msgs[i] = (NdefMessage) rawMsgs[i];
-                }
-            } else {
-                // Unknown tag type
-                byte[] empty = new byte[] {};
-                NdefRecord record = new NdefRecord(NdefRecord.TNF_UNKNOWN, empty, empty, empty);
-                NdefMessage msg = new NdefMessage(new NdefRecord[] {
-                        record
-                });
-                msgs = new NdefMessage[] {
-                        msg
-                };
-            }
-        } else {
-            finish();
-        }
-        return msgs;
-    }
-
-    boolean writeTag(NdefMessage message, Tag tag) {
-        int size = message.toByteArray().length;
-
-        try {
-            Ndef ndef = Ndef.get(tag);
-            if (ndef != null) {
-                ndef.connect();
-
-                if (!ndef.isWritable()) {
-                    toast("Tag is read-only.");
-                    return false;
-                }
-                if (ndef.getMaxSize() < size) {
-                    toast("Tag capacity is " + ndef.getMaxSize() + " bytes, message is " + size
-                            + " bytes.");
-                    return false;
-                }
-
-                toast("写入数据成功.");
-
-                mWriteMode=false;//@@10.19
-                return true;
-            } else {
-                NdefFormatable format = NdefFormatable.get(tag);
-                if (format != null) {
-                    try {
-                        format.connect();
-                        format.format(message);
-                        toast("Formatted tag and wrote message");
-                        return true;
-                    } catch (IOException e) {
-                        toast("Failed to format tag.");
-                        return false;
-                    }
-                } else {
-                    toast("Tag doesn't support NDEF.");
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            toast("写入数据失败");
-        }finally {
-            if(alertDialog!=null){
-                alertDialog.dismiss();
-            }
-        }
-
-        return false;
-    }
-
-
-
-
-
-
-    private void setDateTime() {
-        final Calendar c = Calendar.getInstance();
-        mYear = c.get(Calendar.YEAR);
-        mMonth = c.get(Calendar.MONTH);
-        mDay = c.get(Calendar.DAY_OF_MONTH);
-//        updateDisplay(c);
-    }
-
-    private class DateButtonOnClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            Message msg = new Message();
-            msg.what = SHOW_DATAPICK;
-            saleHandler.sendMessage(msg);
-        }
-    }
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case DATE_DIALOG_ID:
-                return new DatePickerDialog(this, mDateSetListener, mYear, mMonth, mDay);
-        }
-        return null;
-    }
-    @Override
-    protected void onPrepareDialog(int id, Dialog dialog) {
-        switch (id) {
-            case DATE_DIALOG_ID:
-                ((DatePickerDialog) dialog).updateDate(mYear, mMonth, mDay);
-                break;
-        }
-    }
-    /**
-
-     * 处理日期控件的Handler
-
-     */
-
-    Handler saleHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case SHOW_DATAPICK:
-                    showDialog(DATE_DIALOG_ID);
-                    break;
-            }
-        }
-    };
-    /**
-     * 日期控件的事件
-     */
-
-    private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
-        public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
-            mYear = year;
-            mMonth = monthOfYear;
-            mDay = dayOfMonth;
-            updateDisplay(null);
-        }
-    };
-    /**
-     * 更新日期
-     */
-    private void updateDisplay(Calendar c) {
-        getDate=new StringBuilder().append(mYear).append(
-                (mMonth + 1) < 10 ? "-0" + (mMonth + 1) : "-"+(mMonth + 1)).append(
-                (mDay < 10) ? "-0" + mDay : "-"+mDay).toString();
-        makeTime_text.setText(getDate);
-    }
 }

@@ -141,7 +141,7 @@ public class WiredDevActivity extends MvpActivity<WiredDevPresenter> implements 
             }
         });
         title_name_tv.setText("传输装置");
-        title_lose_dev_tv.setText("离线设备");
+        title_lose_dev_tv.setText("失联设备");
         areaCondition.setActivity(this);//@@12.21
 //        shopTypeCondition.setActivity(this);//@@12.21
         areaCondition.setHintTextColor("#ffffffff");
@@ -374,7 +374,7 @@ public class WiredDevActivity extends MvpActivity<WiredDevPresenter> implements 
     public void getSmokeSummary(SmokeSummary smokeSummary) {
 //        totalNum.setText(smokeSummary.getAllSmokeNumber()+"");
         onlineNum.setText("总数:"+smokeSummary.getAllSmokeNumber()+"");
-        offlineNum.setText("离线:"+smokeSummary.getLossSmokeNumber()+"");
+        offlineNum.setText("失联:"+smokeSummary.getLossSmokeNumber()+"");
     }
 
     @Override

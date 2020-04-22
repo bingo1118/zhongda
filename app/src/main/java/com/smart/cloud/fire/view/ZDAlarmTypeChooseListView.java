@@ -90,16 +90,23 @@ public class ZDAlarmTypeChooseListView extends LinearLayout {
                 if(onChildChooceClickListener!=null){
                     onChildChooceClickListener.OnChildClick(null);
                     editText.setText("");
-                    imageView.setVisibility(GONE);
+                    clear_choice.setVisibility(GONE);
+                    imageView.setVisibility(VISIBLE);
                 }
             }
         });
         getAreaListData();
+        this.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopWindow();
+            }
+        });
     }
 
     private void getAreaListData() {
         showLoading();
-        String url = ConstantValues.SERVER_IP_NEW + "alarmTypeList" ;
+        String url = ConstantValues.SERVER_IP_NEW + "getAlarmType" ;
         VolleyHelper.getInstance(mContext).getStringResponse(url,
                 new Response.Listener<String>() {
                     @Override

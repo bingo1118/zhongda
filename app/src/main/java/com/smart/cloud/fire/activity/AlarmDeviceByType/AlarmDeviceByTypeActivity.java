@@ -100,7 +100,7 @@ public class AlarmDeviceByTypeActivity extends MvpActivity<AllSmokePresenter> im
                 title_tv.setText("报警设备数");
                 break;
             case "2":
-                title_tv.setText("离线设备数");
+                title_tv.setText("失联设备数");
                 break;
             case "3":
                 title_tv.setText("故障设备数");

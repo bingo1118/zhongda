@@ -28,14 +28,9 @@ public class ChioceDevTypeActivity extends Activity {
         ButterKnife.bind(this);
     }
 
-    @OnClick({R.id.spjk_lin,R.id.nfc_lin,R.id.sdtj_lin,R.id.smsr_lin,R.id.yongchuang_lin})
+    @OnClick({R.id.nfc_lin,R.id.sdtj_lin,R.id.smsr_lin})
     public void onclick(View view) {
         switch (view.getId()) {
-            case R.id.spjk_lin:
-                Intent intent5=new Intent(ChioceDevTypeActivity.this,AddCameraFirstActivity.class);
-                intent5.putExtra("devType",5);
-                startActivity(intent5);
-                break;
             case R.id.nfc_lin:
                 Intent intent6=new Intent(ChioceDevTypeActivity.this,AddNFCActivity.class);
                 intent6.putExtra("devType",6);
@@ -47,16 +42,9 @@ public class ChioceDevTypeActivity extends Activity {
                 startActivity(intent7);
                 break;
             case R.id.smsr_lin:
-//                Intent intent8=new Intent(ChioceDevTypeActivity.this,AddCaptureActivity.class);
                 Intent intent8=new Intent(ChioceDevTypeActivity.this,Capture2Activity.class);
-//                startActivityForResult(intent8, 100);
                 intent8.putExtra("devType",6);
                 startActivity(intent8);
-                break;
-            case R.id.yongchuang_lin:
-                Intent intent10=new Intent(ChioceDevTypeActivity.this,AddDevActivity.class);
-                intent10.putExtra("devType",221);
-                startActivity(intent10);
                 break;
         }
     }

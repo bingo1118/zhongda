@@ -3,16 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/date_pick"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="300dp"
     android:layout_alignParentBottom="true"
     android:background="#ffffff"
     android:orientation="vertical"
     android:padding="10dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#c3c3c3" />
 
     <com.smart.cloud.fire.view.ZDAlarmTypeChooseListView
         android:id="@+id/alarm_view"
@@ -33,14 +29,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_margin="5dp"
         android:orientation="horizontal">
         <com.smart.cloud.fire.view.TimePickerViewHelper
             android:id="@+id/start_time_picker"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_margin="5dp"
             app:timerpicker_hint_Text="起始时间"/>
 
         <com.smart.cloud.fire.view.TimePickerViewHelper
@@ -48,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_margin="5dp"
+            android:layout_marginLeft="5dp"
             app:timerpicker_hint_Text="结束时间"/>
 
     </LinearLayout>

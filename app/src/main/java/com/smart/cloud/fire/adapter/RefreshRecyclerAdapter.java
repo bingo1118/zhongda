@@ -32,6 +32,7 @@ import com.smart.cloud.fire.utils.BingoDialog;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.VolleyHelper;
+import com.smart.cloud.fire.view.SingleLineZoomTextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -579,6 +580,9 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                     ((ItemViewHolder) holder).alarmMarkImage.setText(R.string.baojing);//@@8.10
                     break;
             }
+            if(alarmType==404){
+                ((ItemViewHolder) holder).alarmMarkImage.setText(R.string.shilian);
+            }
             RxView.clicks(((ItemViewHolder) holder).actionNowTv).throttleFirst(2, TimeUnit.SECONDS).subscribe(new Action1<Void>() {
                 @Override
                 public void call(Void aVoid) {
@@ -672,7 +676,7 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         @Bind(R.id.smoke_mac)
         TextView smokeMac;
         @Bind(R.id.smoke_mac_tv)
-        TextView smokeMacTv;
+        SingleLineZoomTextView smokeMacTv;
         @Bind(R.id.alarm_mark_image)
         TextView alarmMarkImage;
         @Bind(R.id.repeater_address_tv)

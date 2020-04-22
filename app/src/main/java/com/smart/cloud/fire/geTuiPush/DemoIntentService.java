@@ -695,6 +695,10 @@ public class DemoIntentService extends GTIntentService {
                             alarmMsg = "电气探测器发出：无该报警类型（测试）";
                             break;
                     }
+                    int alarmFamilyTemp = pushAlarmMsg1.getAlarmFamily();
+                    if(alarmFamilyTemp==404){
+                        alarmMsg = "设备发出：失联报警";
+                    }
                     Random random = new Random();
                     showDownNotification(context,alarmMsg,pushAlarmMsg1,random.nextInt(),AlarmActivity.class);
                     Intent intent2 = new Intent(context, AlarmActivity.class);

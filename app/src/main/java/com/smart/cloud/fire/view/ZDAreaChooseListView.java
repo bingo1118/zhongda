@@ -116,8 +116,14 @@ public class ZDAreaChooseListView extends LinearLayout {
                 choosed_area=null;
             }
         });
-
+        imageView.setVisibility(VISIBLE);
         getAreaListData();
+        this.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopWindow();
+            }
+        });
     }
 
 
@@ -218,14 +224,6 @@ public class ZDAreaChooseListView extends LinearLayout {
         });//@@12.20
         popupWindow.setTouchable(true);
         popupWindow.setOutsideTouchable(true);
-        WindowUtils.backgroundAlpha(mContext,0.5f);
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                WindowUtils.backgroundAlpha(mContext,1f);
-                popupWindow = null;
-            }
-        });
         popupWindow.showAsDropDown(this);
         mTextView.setOnClickListener(new OnClickListener() {//@@9.12
             @Override

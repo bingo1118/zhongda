@@ -115,7 +115,7 @@ public class NFCHistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             if(normalSmoke.getPhoto1()!=null&&!normalSmoke.getPhoto1().equals("")){
                 ((ItemViewHolder) holder).photo1_image.setVisibility(View.VISIBLE);//@@9.28
                 String temp=normalSmoke.getPhoto1();
-                final String temp1=ConstantValues.NFC_IMAGES+normalSmoke.getPhoto1().replace("\\","/");
+                final String temp1=ConstantValues.NFC_IMAGES+"nfcimages//"+normalSmoke.getPhoto1().replace("\\","/");
                 Glide.with(mContext)
 //                    .load("http://139.159.209.212:51091/nfcimages/2017/1506499353470.jpg").thumbnail((float)0.0001)
                         .load(temp1).thumbnail(0.00001f).listener(new RequestListener() {

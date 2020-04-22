@@ -1,5 +1,6 @@
 package com.smart.cloud.fire.adapter;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,6 +38,7 @@ import com.smart.cloud.fire.activity.NFCDev.NFCImageShowActivity;
 import com.smart.cloud.fire.activity.THDevice.OneTHDevInfoActivity;
 import com.smart.cloud.fire.base.presenter.BasePresenter;
 import com.smart.cloud.fire.global.ConstantValues;
+import com.smart.cloud.fire.global.InitBaiduNavi;
 import com.smart.cloud.fire.global.MyApp;
 import com.smart.cloud.fire.mvp.ChuangAn.ChuangAnActivity;
 import com.smart.cloud.fire.mvp.LineChart.LineChartActivity;
@@ -59,6 +61,8 @@ import com.smart.cloud.fire.view.LochoLineChartView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import butterknife.Bind;
@@ -193,16 +197,16 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
             int ifAlarm=normalSmoke.getIfAlarm();
             if(ifAlarm==0){
-                ((ItemViewHolder) holder).alarm_image.setVisibility(View.VISIBLE);
+                ((ItemViewHolder) holder).alarm_image_line.setVisibility(View.VISIBLE);
             }else{
-                ((ItemViewHolder) holder).alarm_image.setVisibility(View.GONE);
+                ((ItemViewHolder) holder).alarm_image_line.setVisibility(View.GONE);
             }
 
             int ifFault=normalSmoke.getIfFault();
             if(ifFault==1){
-                ((ItemViewHolder) holder).fault_image.setVisibility(View.VISIBLE);
+                ((ItemViewHolder) holder).fault_image_line.setVisibility(View.VISIBLE);
             }else{
-                ((ItemViewHolder) holder).fault_image.setVisibility(View.GONE);
+                ((ItemViewHolder) holder).fault_image_line.setVisibility(View.GONE);
             }
 
             ((ItemViewHolder) holder).dev_hearttime_set.setOnClickListener(new View.OnClickListener() {
@@ -965,6 +969,18 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 }
             });
 
+            ((ItemViewHolder) holder).map_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Smoke smoke = new Smoke();
+                    smoke.setLatitude(normalSmoke.getLatitude());
+                    smoke.setLongitude(normalSmoke.getLongitude());
+                    Reference<Activity> reference = new WeakReference(mContext);
+                    new InitBaiduNavi(reference.get(), smoke);
+                }
+            });
+
+
             ((ItemViewHolder) holder).manager_img.setOnClickListener(new View.OnClickListener() {//拨打电话提示框。。
                 @Override
                 public void onClick(View v) {
@@ -1099,11 +1115,13 @@ public class ShopSmokeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         TextView update_tv;
         @Bind(R.id.alarm_history_button)
         TextView alarm_history_button;
+        @Bind(R.id.map_button)
+        TextView map_button;
 
-        @Bind(R.id.alarm_image)
-        ImageView alarm_image;
-        @Bind(R.id.fault_image)
-        ImageView fault_image;
+        @Bind(R.id.alarm_image_line)
+        LinearLayout alarm_image_line;
+        @Bind(R.id.fault_image_line)
+        LinearLayout fault_image_line;
         @Bind(R.id.lowvaltage_image)
         ImageView lowvaltage_image;
 

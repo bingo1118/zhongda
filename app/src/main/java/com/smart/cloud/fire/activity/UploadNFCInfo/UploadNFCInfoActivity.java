@@ -2,9 +2,11 @@ package com.smart.cloud.fire.activity.UploadNFCInfo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -25,12 +27,14 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -44,8 +48,10 @@ import com.smart.cloud.fire.global.MyApp;
 import com.smart.cloud.fire.rqcode.Capture2Activity;
 import com.smart.cloud.fire.utils.FileUtil;
 import com.smart.cloud.fire.utils.FormFile;
+import com.smart.cloud.fire.utils.NFCHelper;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
+import com.smart.cloud.fire.utils.Utils;
 import com.smart.cloud.fire.utils.VolleyHelper;
 import com.smart.cloud.fire.view.TakePhotoView;
 import com.yuyh.library.imgsel.ISNav;
@@ -101,6 +107,9 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
     String lon="";
     String lat="";
 
+    private NFCHelper nfcHelper;
+
+    Dialog alertDialog;
 
     private UploadNFCInfoPresenter mPresenter;
 
@@ -153,9 +162,7 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
         scan_er_wei_ma.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent scanRepeater = new Intent(mContext, Capture2Activity.class);
-                scanRepeater.putExtra("isNeedResult",true);
-                startActivityForResult(scanRepeater, REQUEST_CODE_SCAN_REPEATER);
+                showChooseDialog();
             }
         });
 
@@ -186,6 +193,27 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
         device_type_name.setText("");
         memo_name.setText("");
         photo_image.clear();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        // NDEF exchange mode
+        if (!nfcHelper.ismWriteMode() && (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())
+                ||NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction()))) {//@@10.19
+            byte[] myNFCID = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
+            String UID = Utils.ByteArrayToHexString(myNFCID);
+            uid_name.setText(UID);
+            getNormalDevInfo(UID);
+
+            if(alertDialog!=null){
+                alertDialog.dismiss();
+            }
+        }
+        // Tag writing mode
+        if (nfcHelper.ismWriteMode() && NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
+            Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            nfcHelper.writeTag(detectedTag);
+        }
     }
 
     @Override
@@ -279,5 +307,50 @@ public class UploadNFCInfoActivity extends MvpActivity<UploadNFCInfoPresenter> i
     @Override
     public void hideLoading() {
         mProgressBar.setVisibility(View.GONE);
+    }
+
+    private void showChooseDialog(){
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(this);
+        normalDialog.setTitle("选取获取ID方式");
+        normalDialog.setPositiveButton("二维码",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent scanRepeater = new Intent(mContext, Capture2Activity.class);
+                        scanRepeater.putExtra("isNeedResult",true);
+                        startActivityForResult(scanRepeater, REQUEST_CODE_SCAN_REPEATER);
+                    }
+                });
+        normalDialog.setNegativeButton("NFC",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        nfcHelper=NFCHelper.getInstance((Activity) mContext);
+                        if (!nfcHelper.isSupportNFC()) {
+                            toast("设备不支持NFC功能");
+                            return;
+                        }
+                        nfcHelper.changeToReadMode();
+
+                        TextView textView=new TextView(mContext);//@@10.19
+                        textView.setText("接触标签进行读取操作");
+                        textView.setTextSize(18);
+                        textView.setGravity(Gravity.CENTER);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setView(textView);
+                        builder.setCancelable(true);
+                        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                nfcHelper.changeToReadMode();
+                            }
+                        });
+                        alertDialog=builder.create();
+                        alertDialog.show();
+                    }
+                });
+        // 显示
+        normalDialog.show();
     }
 }

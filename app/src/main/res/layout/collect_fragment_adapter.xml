@@ -40,7 +40,7 @@
                     android:layout_marginLeft="5dp"
                     android:textStyle="bold"
                     android:text="@string/smoke_name"/>
-                <TextView
+                <com.smart.cloud.fire.view.SingleLineZoomTextView
                     android:id="@+id/smoke_mac_tv"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
