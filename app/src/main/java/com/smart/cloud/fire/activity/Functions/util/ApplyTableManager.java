@@ -62,13 +62,13 @@ public class ApplyTableManager {
         ArrayList<ApplyTable> newsChannelTables = new ArrayList<>();
         newsChannelTables.add(new ApplyTable("添加设备","0", 0, isFixed(0),"tjsb.png", 0));
         newsChannelTables.add(new ApplyTable("烟感设备","1", 1, isFixed(1),"ygsb.png", 0));
-//        newsChannelTables.add(new ApplyTable("传输装置","2", 2, isFixed(2),"zddw.png", 0));
-        newsChannelTables.add(new ApplyTable("电气防火","3", 3, isFixed(3), "dqfh.png", 0));
-        newsChannelTables.add(new ApplyTable("消防物联","4", 4, isFixed(4),  "xfwl.png", 0));
-//        newsChannelTables.add(new ApplyTable("视频监控","5", 5, isFixed(5),  "spjk.png", 0));
+        newsChannelTables.add(new ApplyTable("电气防火","3", 3, isFixed(2), "dqfh.png", 0));
+        newsChannelTables.add(new ApplyTable("消防物联","4", 2, isFixed(3),  "xfwl.png", 0));
         newsChannelTables.add(new ApplyTable("维保系统","6", 6, isFixed(6),  "wbxt.png", 0));
+        newsChannelTables.add(new ApplyTable("手动报警","5", 5, isFixed(5),  "sdbj.png", 0));
+//        newsChannelTables.add(new ApplyTable("传输装置","2", 2, isFixed(2),"zddw.png", 0));
+//        newsChannelTables.add(new ApplyTable("视频监控","5", 5, isFixed(5),  "spjk.png", 0));
 //        newsChannelTables.add(new ApplyTable("巡检系统","8", 8, isFixed(8), "xunjian.png", 0));
-        newsChannelTables.add(new ApplyTable("手动报警","9", 9, isFixed(9),  "sdbj.png", 0));
         if(privilege!=51){
 //            newsChannelTables.add(new ApplyTable("主机管理","7", 7, isFixed(7), "zjgl.png", 0));
         }

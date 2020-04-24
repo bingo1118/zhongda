@@ -110,10 +110,7 @@ public class ZDAreaChooseListView extends LinearLayout {
         clear_choice.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageView.setVisibility(View.VISIBLE);
-                clear_choice.setVisibility(View.GONE);
-                mTextView.setText("");
-                choosed_area=null;
+                clearView();
             }
         });
         imageView.setVisibility(VISIBLE);
@@ -124,6 +121,13 @@ public class ZDAreaChooseListView extends LinearLayout {
                 showPopWindow();
             }
         });
+    }
+
+    public void clearView() {
+        imageView.setVisibility(View.VISIBLE);
+        clear_choice.setVisibility(View.GONE);
+        mTextView.setText("");
+        choosed_area=null;
     }
 
 

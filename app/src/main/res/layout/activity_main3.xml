@@ -24,12 +24,11 @@
 
         <ImageView
             android:id="@+id/my_image"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/shouye_zhanghao"
             android:visibility="visible"
-            android:layout_alignParentRight="true"
-            android:layout_margin="10dp" />
+            android:layout_alignParentRight="true" />
 
 
             <com.smart.cloud.fire.ui.view.CircleProgressBar

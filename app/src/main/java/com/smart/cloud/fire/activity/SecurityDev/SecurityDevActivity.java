@@ -360,7 +360,6 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
     @Override
     public void getDataSuccess(List<?> smokeList, boolean research) {
         int a=0;
-        securityFragment.getDataSuccess(smokeList,research);
     }
 
     @Override
