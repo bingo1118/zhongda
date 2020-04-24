@@ -1,4 +1,4 @@
-package com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.Security;
+package com.smart.cloud.fire.activity.AlarmButtonDev;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -15,18 +15,12 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.smart.cloud.fire.activity.AllSmoke.AllSmokeActivity;
 import com.smart.cloud.fire.activity.SecurityDev.SecurityDevActivity;
 import com.smart.cloud.fire.activity.SecurityDev.SecurityDevPresenter;
-import com.smart.cloud.fire.activity.SecurityDev.SecurityDevView;
 import com.smart.cloud.fire.adapter.ShopCameraAdapter;
 import com.smart.cloud.fire.adapter.ShopSmokeAdapter;
 import com.smart.cloud.fire.base.ui.MvpFragment;
@@ -36,8 +30,6 @@ import com.smart.cloud.fire.global.MyApp;
 import com.smart.cloud.fire.global.ShopType;
 import com.smart.cloud.fire.global.SmokeSummary;
 import com.smart.cloud.fire.mvp.fragment.MapFragment.Smoke;
-import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.ShopInfoFragment;
-import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.ShopInfoFragmentPresenter;
 import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.ShopInfoFragmentView;
 import com.smart.cloud.fire.utils.BingoDialog;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
@@ -57,7 +49,7 @@ import fire.cloud.smart.com.smartcloudfire.R;
 /**
  * Created by Rain on 2017/5/13.
  */
-public class SecurityFragment extends MvpFragment<SecurityDevPresenter> implements ShopInfoFragmentView {
+public class AlarmButtomFragment extends MvpFragment<SecurityDevPresenter> implements ShopInfoFragmentView {
     @Bind(R.id.recycler_view)
     RecyclerView recyclerView;
     @Bind(R.id.swipere_fresh_layout)
@@ -103,8 +95,8 @@ public class SecurityFragment extends MvpFragment<SecurityDevPresenter> implemen
 //        smokeTotal.setVisibility(View.VISIBLE);
         list = new ArrayList<>();
         refreshListView();
-        mvpPresenter.getSecurityInfo(userID, privilege + "", page,"4", list, 1,false,this);//@@5.15
-        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","4");
+        mvpPresenter.getSecurityInfo(userID, privilege + "", page,"5", list, 1,false,this);//@@5.15
+        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","5");
     }
 
     private void refreshListView() {
@@ -124,7 +116,7 @@ public class SecurityFragment extends MvpFragment<SecurityDevPresenter> implemen
         swipereFreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ((SecurityDevActivity)getActivity()).refreshView();
+                ((AlarmButtomActivity)getActivity()).refreshView();
             }
         });
 
@@ -146,7 +138,7 @@ public class SecurityFragment extends MvpFragment<SecurityDevPresenter> implemen
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem+1 == count) {
                     if(loadMoreCount>=20){
                         page = Integer.parseInt(page) + 1 + "";
-                        mvpPresenter.getSecurityInfo(userID, privilege + "", page,"4",list, 1,true,SecurityFragment.this);
+                        mvpPresenter.getSecurityInfo(userID, privilege + "", page,"5",list, 1,true,AlarmButtomFragment.this);
                     }else{
                         T.showShort(mContext,"已经没有更多数据了");
                     }
@@ -164,7 +156,7 @@ public class SecurityFragment extends MvpFragment<SecurityDevPresenter> implemen
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     protected SecurityDevPresenter createPresenter() {
-        mSecurityDevPresenter = new SecurityDevPresenter((SecurityDevActivity)getActivity());
+        mSecurityDevPresenter = new SecurityDevPresenter((AlarmButtomActivity)getActivity());
         return mSecurityDevPresenter;
     }
 
@@ -326,8 +318,8 @@ public class SecurityFragment extends MvpFragment<SecurityDevPresenter> implemen
     public void refreshView() {
         page = "1";
         list.clear();
-        mvpPresenter.getSecurityInfo(userID, privilege + "", page,"4", list, 1,true,this);//@@5.15
-        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","4");
+        mvpPresenter.getSecurityInfo(userID, privilege + "", page,"5", list, 1,true,this);//@@5.15
+        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","5");
     }
 
     @Override

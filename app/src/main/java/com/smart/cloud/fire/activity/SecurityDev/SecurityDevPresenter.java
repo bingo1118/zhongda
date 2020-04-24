@@ -31,7 +31,7 @@ public class SecurityDevPresenter extends BasePresenter<SecurityDevView> {
         attachView(view);
     }
     //@@5.15获取安防设备
-    public void getSecurityInfo(String userId, String privilege, String page,String devType, final List<Smoke> list, final int type, boolean refresh,final SecurityFragment securityFragment){
+    public void getSecurityInfo(String userId, String privilege, String page,String devType, final List<Smoke> list, final int type, boolean refresh,ShopInfoFragmentView shopInfoFragmentView){
         if(!refresh){
             mvpView.showLoading();
         }
@@ -44,24 +44,24 @@ public class SecurityDevPresenter extends BasePresenter<SecurityDevView> {
                     List<Smoke> smokeList = model.getSmoke();
                     if(type==1){
                         if(list==null||list.size()==0){
-                            securityFragment.getDataSuccess(smokeList,false);
+                            shopInfoFragmentView.getDataSuccess(smokeList,false);
                         }else if(list!=null&&list.size()>=20){
-                            securityFragment.onLoadingMore(smokeList);
+                            shopInfoFragmentView.onLoadingMore(smokeList);
                         }
                     }
                 }else{
                     List<Smoke> mSmokeList = new ArrayList<>();
-                    securityFragment.getDataSuccess(mSmokeList,false);
-                    securityFragment.getDataFail("无数据");
+                    shopInfoFragmentView.getDataSuccess(mSmokeList,false);
+                    shopInfoFragmentView.getDataFail("无数据");
                 }
             }
             @Override
             public void onFailure(int code, String msg) {
                 if(type!=1){
                     List<Smoke> mSmokeList = new ArrayList<>();
-                    securityFragment.getDataSuccess(mSmokeList,false);
+                    shopInfoFragmentView.getDataSuccess(mSmokeList,false);
                 }
-                securityFragment.getDataFail("网络错误");
+                shopInfoFragmentView.getDataFail("网络错误");
             }
 
             @Override
@@ -127,7 +127,7 @@ public class SecurityDevPresenter extends BasePresenter<SecurityDevView> {
         }));
     }
     //@@5.13安防界面查询设备
-    public void getNeedSecurity(String userId, String privilege,String parentId, String areaId, String placeTypeId, String devType,final SecurityFragment securityFragment){
+    public void getNeedSecurity(String userId, String privilege,String parentId, String areaId, String placeTypeId, String devType,ShopInfoFragmentView shopInfoFragmentView){
         mvpView.showLoading();
         Observable mObservable = apiStores1.getNeedDev2(userId,privilege,parentId,areaId,"",placeTypeId,devType);
         addSubscription(mObservable,new SubscriberCallBack<>(new ApiCallback<HttpError>() {
@@ -137,16 +137,16 @@ public class SecurityDevPresenter extends BasePresenter<SecurityDevView> {
                     int errorCode = model.getErrorCode();
                     if(errorCode==0){
                         List<Smoke> smokes = model.getSmoke();
-                        securityFragment.getDataSuccess(smokes,true);
+                        shopInfoFragmentView.getDataSuccess(smokes,true);
                     }else {
-                        mvpView.getDataFail("无数据");
+                        shopInfoFragmentView.getDataFail("无数据");
                         List<Smoke> smokes = new ArrayList<Smoke>();//@@4.27
-                        securityFragment.getDataSuccess(smokes,true);//@@4.27
+                        shopInfoFragmentView.getDataSuccess(smokes,true);//@@4.27
                     }
                 }else{
-                    mvpView.getDataFail("无数据");
+                    shopInfoFragmentView.getDataFail("无数据");
                     List<Smoke> smokes = new ArrayList<Smoke>();//@@4.27
-                    securityFragment.getDataSuccess(smokes,true);//@@4.27
+                    shopInfoFragmentView.getDataSuccess(smokes,true);//@@4.27
                 }
             }
             @Override
@@ -159,7 +159,7 @@ public class SecurityDevPresenter extends BasePresenter<SecurityDevView> {
             }
         }));
     }
-    public void getSmokeSummary(String userId,String privilege,String parentId,String areaId,String placeTypeId,String devType, final ShopInfoFragmentView allDevFragment){
+    public void getSmokeSummary(String userId,String privilege,String parentId,String areaId,String placeTypeId,String devType){
         Observable mObservable = apiStores1.getDevSummary(userId,privilege,parentId,areaId,placeTypeId,devType);
         addSubscription(mObservable,new SubscriberCallBack<>(new ApiCallback<SmokeSummary>() {
             @Override
@@ -179,7 +179,7 @@ public class SecurityDevPresenter extends BasePresenter<SecurityDevView> {
             }
         }));
     }
-    public void getNeedLossSmoke(String userId, String privilege,String parentId, String areaId, String placeTypeId, final String page,String devType, boolean refresh, final int type, final List<Smoke> list, final OfflineSecurityDevFragment offLineDevFragment){
+    public void getNeedLossSmoke(String userId, String privilege,String parentId, String areaId, String placeTypeId, final String page,String devType, boolean refresh, final int type, final List<Smoke> list,ShopInfoFragmentView shopInfoFragmentView){
         if(!refresh){
             mvpView.showLoading();
         }
@@ -192,24 +192,24 @@ public class SecurityDevPresenter extends BasePresenter<SecurityDevView> {
                     List<Smoke> smokeList = model.getSmoke();
                     if(type==1){
                         if(list==null||list.size()==0){
-                            offLineDevFragment.getDataSuccess(smokeList,false);
+                            shopInfoFragmentView.getDataSuccess(smokeList,false);
                         }else if(list!=null&&list.size()>=20){
-                            offLineDevFragment.onLoadingMore(smokeList);
+                            shopInfoFragmentView.onLoadingMore(smokeList);
                         }
                     }else{
-                        offLineDevFragment.getDataSuccess(smokeList,true);
+                        shopInfoFragmentView.getDataSuccess(smokeList,true);
                     }
                 }else{
                     List<Smoke> mSmokeList = new ArrayList<>();
-                    offLineDevFragment.getDataSuccess(mSmokeList,false);
-                    offLineDevFragment.getDataFail("无数据");
+                    shopInfoFragmentView.getDataSuccess(mSmokeList,false);
+                    shopInfoFragmentView.getDataFail("无数据");
                 }
 
             }
 
             @Override
             public void onFailure(int code, String msg) {
-                offLineDevFragment.getDataFail("网络错误");
+                shopInfoFragmentView.getDataFail("网络错误");
             }
 
             @Override

@@ -1,44 +1,38 @@
-package com.smart.cloud.fire.activity.SecurityDev;
+package com.smart.cloud.fire.activity.AlarmButtonDev;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.smart.cloud.fire.activity.AllSmoke.AllSmokePresenter;
-import com.smart.cloud.fire.activity.AllSmoke.AllSmokeView;
 import com.smart.cloud.fire.activity.Map.MapActivity;
+import com.smart.cloud.fire.activity.SecurityDev.OfflineSecurityDevFragment;
+import com.smart.cloud.fire.activity.SecurityDev.SecurityDevActivity;
+import com.smart.cloud.fire.activity.SecurityDev.SecurityDevPresenter;
+import com.smart.cloud.fire.activity.SecurityDev.SecurityDevView;
 import com.smart.cloud.fire.base.ui.MvpActivity;
 import com.smart.cloud.fire.global.Area;
 import com.smart.cloud.fire.global.ConstantValues;
 import com.smart.cloud.fire.global.MyApp;
 import com.smart.cloud.fire.global.ShopType;
 import com.smart.cloud.fire.global.SmokeSummary;
-import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.AllDevFragment.AllDevFragment;
-import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.OffLineDevFragment.OffLineDevFragment;
 import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.Security.SecurityFragment;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.Utils;
 import com.smart.cloud.fire.utils.VolleyHelper;
 import com.smart.cloud.fire.view.AreaChooceListView;
-import com.smart.cloud.fire.view.XCDropDownListViewMapSearch;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,7 +48,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fire.cloud.smart.com.smartcloudfire.R;
 
-public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> implements SecurityDevView {
+public class AlarmButtomActivity extends MvpActivity<SecurityDevPresenter> implements SecurityDevView {
     LinearLayout title_name_rela,title_lose_dev_rela;
     TextView title_name_tv,title_lose_dev_tv;
     Context mContext;
@@ -62,8 +56,8 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
     private String userID;
     private int privilege;
 
-    private SecurityFragment securityFragment;
-    private OfflineSecurityDevFragment offLineDevFragment;
+    private AlarmButtomFragment securityFragment;
+    private OfflineAlarmButtomDevFragment offLineDevFragment;
     private FragmentManager fragmentManager;
     public static final int FRAGMENT_SECURITY = 5;
     public static final int FRAGMENT_FIVE =4;
@@ -75,13 +69,13 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
     private String parentId="";//@@9.1
     private String shopTypeId = "";
 
-//    @Bind(R.id.add_fire)
+    //    @Bind(R.id.add_fire)
 //    ImageView addFire;//显示搜索界面按钮。。
 //    @Bind(R.id.lin1)
 //    LinearLayout lin1;//搜素界面。。
     @Bind(R.id.area_condition)
     AreaChooceListView areaCondition;//区域下拉选择。。
-//    @Bind(R.id.shop_type_condition)
+    //    @Bind(R.id.shop_type_condition)
 //    XCDropDownListViewMapSearch shopTypeCondition;//商铺类型下拉选择。。
 //    @Bind(R.id.smoke_total)
 //    LinearLayout smokeTotal;
@@ -93,7 +87,7 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
     TextView offlineNum;
     @Bind(R.id.mProgressBar)
     ProgressBar mProgressBar;
-//    @Bind(R.id.search_fire)
+    //    @Bind(R.id.search_fire)
 //    ImageView searchFire;//搜索按钮。。
     @Bind(R.id.turn_map_btn)
     TextView turn_map_btn;
@@ -104,7 +98,7 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_all_smoke);
+        setContentView(R.layout.activity_alarm_buttom);
         ButterKnife.bind(this);
 
         //透明状态栏          
@@ -139,7 +133,7 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
                 position=FRAGMENT_FIVE;//@@离线设备
             }
         });
-        title_name_tv.setText("消防物联");
+        title_name_tv.setText("手动报警");
         title_lose_dev_tv.setText("失联设备");
         areaCondition.setActivity(this);//@@12.21
 //        shopTypeCondition.setActivity(this);//@@12.21
@@ -167,7 +161,7 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
                 if (areaCondition.ifShow()) {
                     areaCondition.closePopWindow();
                 } else {
-                    String url=ConstantValues.SERVER_IP_NEW+"/getAreaInfo?userId="+userID+"&privilege="+privilege;
+                    String url= ConstantValues.SERVER_IP_NEW+"/getAreaInfo?userId="+userID+"&privilege="+privilege;
                     VolleyHelper.getInstance(mContext).getStringResponse(url,
                             new Response.Listener<String>() {
                                 @Override
@@ -208,11 +202,11 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
                                     }
                                 }
                             }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("error","error");
-                        }
-                    });
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.e("error","error");
+                                }
+                            });
                     areaCondition.setClickable(false);
                     areaCondition.showLoading();
                 }
@@ -263,13 +257,13 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
                     //判断当前在哪个子fragment。。
 //                    switch (position) {
 //                        case FRAGMENT_SECURITY://@@5.13安防
-                            mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4");
-                            mvpPresenter.getNeedSecurity(userID, privilege + "",parentId, areaId, shopTypeId,"4",securityFragment);//显示设备。。
+                    mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"5");
+                    mvpPresenter.getNeedSecurity(userID, privilege + "",parentId, areaId, shopTypeId,"5",securityFragment);//显示设备。。
 //                            break;
 //                        case FRAGMENT_FIVE://@@6.29
-                            mvpPresenter.getNeedLossSmoke(userID, privilege + "",parentId, areaId, shopTypeId, "","4",false,0,null,offLineDevFragment);
+                    mvpPresenter.getNeedLossSmoke(userID, privilege + "",parentId, areaId, shopTypeId, "","5",false,0,null,securityFragment);
 //                            mvpPresenter.getNeedLossSmoke(userID, privilege + "", areaId, shopTypeId, "", false, offLineDevFragment);
-                            mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4");
+                    mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"5");
 //                            break;
 //                        default:
 //                            break;
@@ -282,7 +276,7 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
                 }
                 break;
             case R.id.turn_map_btn:
-                Intent intent=new Intent(SecurityDevActivity.this, MapActivity.class);
+                Intent intent=new Intent(AlarmButtomActivity.this, MapActivity.class);
                 intent.putExtra("devType","4");
                 startActivity(intent);
                 break;
@@ -326,9 +320,9 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
             case FRAGMENT_SECURITY:
 //                addFire.setVisibility(View.VISIBLE);//@@5.3
                 if (securityFragment == null) {
-                    offLineDevFragment = new OfflineSecurityDevFragment();
+                    offLineDevFragment = new OfflineAlarmButtomDevFragment();
                     ft.add(R.id.fragment_content, offLineDevFragment);
-                    securityFragment = new SecurityFragment();
+                    securityFragment = new AlarmButtomFragment();
                     ft.add(R.id.fragment_content, securityFragment);
                 } else {
                     ft.show(securityFragment);
@@ -337,7 +331,7 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
             case FRAGMENT_FIVE:
 //                addFire.setVisibility(View.VISIBLE);//@@5.3
                 if (offLineDevFragment == null) {
-                    offLineDevFragment = new OfflineSecurityDevFragment();
+                    offLineDevFragment = new OfflineAlarmButtomDevFragment();
                     ft.add(R.id.fragment_content, offLineDevFragment);
                 } else {
                     ft.show(offLineDevFragment);
@@ -360,7 +354,6 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
     @Override
     public void getDataSuccess(List<?> smokeList, boolean research) {
         int a=0;
-        securityFragment.getDataSuccess(smokeList,research);
     }
 
     @Override
@@ -465,11 +458,11 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
             parentId="";
         }
 
-        mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4");
-        mvpPresenter.getNeedSecurity(userID, privilege + "",parentId, areaId, shopTypeId,"4",securityFragment);//显示设备。。
+        mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"5");
+        mvpPresenter.getNeedSecurity(userID, privilege + "",parentId, areaId, shopTypeId,"5",securityFragment);//显示设备。。
 
-        mvpPresenter.getNeedLossSmoke(userID, privilege + "",parentId, areaId, shopTypeId, "","4",false,0,null,offLineDevFragment);
-        mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4");
+        mvpPresenter.getNeedLossSmoke(userID, privilege + "",parentId, areaId, shopTypeId, "","5",false,0,null,offLineDevFragment);
+        mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"5");
 
         mShopType = null;
         mArea = null;

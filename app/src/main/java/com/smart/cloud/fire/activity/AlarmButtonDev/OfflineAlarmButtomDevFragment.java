@@ -1,4 +1,4 @@
-package com.smart.cloud.fire.activity.SecurityDev;
+package com.smart.cloud.fire.activity.AlarmButtonDev;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -12,12 +12,11 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.smart.cloud.fire.activity.Electric.ElectricDevActivity;
-import com.smart.cloud.fire.activity.Electric.ElectricDevPresenter;
+import com.smart.cloud.fire.activity.SecurityDev.OfflineSecurityDevFragment;
+import com.smart.cloud.fire.activity.SecurityDev.SecurityDevActivity;
+import com.smart.cloud.fire.activity.SecurityDev.SecurityDevPresenter;
 import com.smart.cloud.fire.adapter.ShopCameraAdapter;
 import com.smart.cloud.fire.adapter.ShopSmokeAdapter;
 import com.smart.cloud.fire.base.ui.MvpFragment;
@@ -37,10 +36,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import fire.cloud.smart.com.smartcloudfire.R;
 
-/**
- * Created by Rain on 2017/7/19.
- */
-public class OfflineSecurityDevFragment extends MvpFragment<SecurityDevPresenter> implements ShopInfoFragmentView {
+public class OfflineAlarmButtomDevFragment extends MvpFragment<SecurityDevPresenter> implements ShopInfoFragmentView {
 
     @Bind(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -48,7 +44,7 @@ public class OfflineSecurityDevFragment extends MvpFragment<SecurityDevPresenter
     SwipeRefreshLayout swipereFreshLayout;
     @Bind(R.id.mProgressBar)
     ProgressBar mProgressBar;
-//    @Bind(R.id.smoke_total)
+    //    @Bind(R.id.smoke_total)
 //    LinearLayout smokeTotal;//@@9.5
 //    @Bind(R.id.total_num)
 //    TextView totalNum;
@@ -88,8 +84,8 @@ public class OfflineSecurityDevFragment extends MvpFragment<SecurityDevPresenter
 //        smokeTotal.setVisibility(View.VISIBLE);
         list = new ArrayList<>();
         refreshListView();
-        mvpPresenter.getNeedLossSmoke(userID, privilege + "", "","", "", page+"","4",false,1,list,this);
-        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","4");
+        mvpPresenter.getNeedLossSmoke(userID, privilege + "", "","", "", page+"","5",false,1,list,this);
+        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","5");
     }
 
     private void refreshListView() {
@@ -109,7 +105,7 @@ public class OfflineSecurityDevFragment extends MvpFragment<SecurityDevPresenter
             @Override
             public void onRefresh() {
 //                refreshView();
-                ((SecurityDevActivity)getActivity()).refreshView();
+                ((AlarmButtomActivity)getActivity()).refreshView();
             }
         });
 
@@ -131,7 +127,7 @@ public class OfflineSecurityDevFragment extends MvpFragment<SecurityDevPresenter
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && itemCount == count) {
                     if(loadMoreCount>=20){
                         page = page + 1 ;
-                        mvpPresenter.getNeedLossSmoke(userID, privilege + "","", "", "", page+"","4",false,1,list,OfflineSecurityDevFragment.this);
+                        mvpPresenter.getNeedLossSmoke(userID, privilege + "","", "", "", page+"","4",false,1,list,OfflineAlarmButtomDevFragment.this);
                     }else{
                         T.showShort(mContext,"已经没有更多数据了");
                     }
@@ -150,7 +146,7 @@ public class OfflineSecurityDevFragment extends MvpFragment<SecurityDevPresenter
     @Override
     protected SecurityDevPresenter createPresenter() {
 //        mShopInfoFragmentPresenter = new ShopInfoFragmentPresenter(this,(ShopInfoFragment)getParentFragment());
-        mShopInfoFragmentPresenter = new SecurityDevPresenter((SecurityDevActivity)getActivity());
+        mShopInfoFragmentPresenter = new SecurityDevPresenter((AlarmButtomActivity)getActivity());
         return mShopInfoFragmentPresenter;
     }
 
@@ -231,8 +227,8 @@ public class OfflineSecurityDevFragment extends MvpFragment<SecurityDevPresenter
     public void refreshView() {
         page = 1;
         list.clear();
-        mvpPresenter.getNeedLossSmoke(userID, privilege + "", "","", "", page+"","4",true,1,list,this);
-        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","4");
+        mvpPresenter.getNeedLossSmoke(userID, privilege + "", "","", "", page+"","5",true,1,list,this);
+        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","5");
     }
 
     @Override

@@ -7,8 +7,9 @@
     <ImageView
         android:id="@+id/login_image"
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:background="@drawable/login_banner3"/>
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:src="@drawable/login_banner3"/>
 
     <RelativeLayout
         android:id="@+id/login_rela"

@@ -9,7 +9,7 @@
 
 
     <!--登录-->
-    <string name="user_num">手机号</string>
+    <string name="user_num">账号</string>
     <string name="pwd">密码</string>
     <string name="login">登录</string>
     <string name="register">注册</string>
@@ -40,7 +40,7 @@
 
     <!--账号栏-->
     <string name="app_update_tv">检查更新</string>
-    <string name="about">关于智能云消防</string>
+    <string name="about">关于</string>
     <string name="help">配置摄像头</string>
     <string name="bind_camera">绑定摄像头</string>
     <string name="exit">注销</string>

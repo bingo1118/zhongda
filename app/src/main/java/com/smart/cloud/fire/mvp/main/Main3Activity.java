@@ -24,6 +24,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.igexin.sdk.PushManager;
 import com.p2p.core.P2PHandler;
 import com.smart.cloud.fire.activity.AddDev.ChioceDevTypeActivity;
+import com.smart.cloud.fire.activity.AlarmButtonDev.AlarmButtomActivity;
 import com.smart.cloud.fire.activity.AlarmDevDetail.AlarmDevDetailActivity;
 import com.smart.cloud.fire.activity.AlarmDeviceByType.AlarmDeviceByTypeActivity;
 import com.smart.cloud.fire.activity.AlarmHistory.AlarmHistoryActivity;
@@ -203,6 +204,9 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
                     case 8:
                         intent=new Intent(mContext, InspectionMainActivity.class);
                         break;
+                    case 9:
+                        intent=new Intent(mContext, AlarmButtomActivity.class);
+                        break;
                     case 11:
                         intent=new Intent(mContext, FunctionsActivity.class);
                         break;
@@ -214,7 +218,7 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
 
         recyclerView = (RecyclerView) findViewById(R.id.message_notice_list_item);
         //纵向线性布局
-        GridLayoutManager layoutManager = new GridLayoutManager(this,4);
+        GridLayoutManager layoutManager = new GridLayoutManager(this,3);
         recyclerView.addItemDecoration(new ItemDivider().setDividerWith(2).setDividerColor(0xe5e5e5));
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(myAdapte1r);

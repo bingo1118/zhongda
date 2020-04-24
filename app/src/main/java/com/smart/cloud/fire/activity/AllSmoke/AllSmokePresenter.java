@@ -104,9 +104,9 @@ public class AllSmokePresenter extends BasePresenter<AllSmokeView> {
 
 
     public void getAlarmDeviceByType(String userId, String privilege, String page,String type,  boolean refresh){
-        if(!refresh){
+//        if(!refresh){
             mvpView.showLoading();
-        }
+//        }
         Observable mObservable;
         mObservable = apiStores1.getNeedAlarmDevice(userId,privilege,page,type);
 
