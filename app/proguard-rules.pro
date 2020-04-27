@@ -311,3 +311,7 @@ public void xxxxxx(**);
 -keep interface android.support.design.** { *; }
 -keep public class android.support.design.R$* { *; }
 
+
+-keep class com.mob.**{*;}
+-keep class cn.smssdk.**{*;}
+-dontwarn com.mob.**

@@ -1,8 +1,11 @@
 package com.smart.cloud.fire.mvp.register;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -16,11 +19,13 @@ import com.smart.cloud.fire.mvp.login.LoginActivity;
 import com.smart.cloud.fire.mvp.login.SplashActivity;
 import com.smart.cloud.fire.mvp.register.presenter.RegisterPresenter;
 import com.smart.cloud.fire.mvp.register.view.RegisterView;
+import com.smart.cloud.fire.sms.SmssdkHelper;
 import com.smart.cloud.fire.utils.T;
 
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
+import cn.smssdk.SMSSDK;
 import fire.cloud.smart.com.smartcloudfire.R;
 import rx.functions.Action1;
 
@@ -43,9 +48,12 @@ public class RegisterPhoneActivity extends MvpActivity<RegisterPresenter> implem
     Button register_btn_phone;
     @Bind(R.id.register_old_user_tv)
     TextView register_old_user_tv;
+    @Bind(R.id.title_tv)
+    TextView title_tv;
     @Bind(R.id.mProgressBar)
     ProgressBar mProgressBar;
     private String phoneNO;
+    String pwd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +61,28 @@ public class RegisterPhoneActivity extends MvpActivity<RegisterPresenter> implem
         setContentView(R.layout.activity_register_phone);
         mContext=this;
         doAction();
+        boolean ifreset=getIntent().getBooleanExtra("isReset",false);
+        if(ifreset){
+            register_btn_phone.setText("提交");
+            title_tv.setText("注册账号");
+        }else{
+            title_tv.setText("重设密码");
+        }
     }
+
+    @SuppressLint("HandlerLeak")
+    Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 0:
+                    mvpPresenter.addUser(phoneNO,pwd,mContext);
+                    break;
+                case 1:
+                    T.showShort(mContext,msg.obj.toString());
+            }
+
+        }
+    };
 
     private void doAction() {
         //获取验证码
@@ -62,7 +91,35 @@ public class RegisterPhoneActivity extends MvpActivity<RegisterPresenter> implem
                     @Override
                     public void call(Void aVoid) {
                         phoneNO = register_user.getText().toString().trim();
-                        mvpPresenter.getMesageCode(phoneNO);
+//                        mvpPresenter.getMesageCode(phoneNO);
+                        SmssdkHelper.getCode(handler,phoneNO);
+                        register_get_code.setClickable(false);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                for(int i=60;i>0;i--){
+                                    final int finalI = i;
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            register_get_code.setText(finalI +"秒后重新获取");
+                                        }
+                                    });
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        register_get_code.setText("重新获取");
+                                        register_get_code.setClickable(true);
+                                    }
+                                });
+                            }
+                        }).start();
                     }
                 });
         RxView.clicks(register_btn_phone).throttleFirst(2, TimeUnit.SECONDS)
@@ -73,8 +130,8 @@ public class RegisterPhoneActivity extends MvpActivity<RegisterPresenter> implem
                         if(imm.isActive()){
                             imm.hideSoftInputFromWindow(register_btn_phone.getWindowToken(),0);//隐藏输入软键盘@@4.28
                         }
-                        String phoneNO = register_user.getText().toString().trim();
-                        String pwd = register_pwd.getText().toString().trim();
+                        phoneNO = register_user.getText().toString().trim();
+                        pwd = register_pwd.getText().toString().trim();
                         String rePwd = register_comfire_pwd.getText().toString().trim();
                         String code = register_code.getText().toString().trim();
                         if(phoneNO.length()==0){
@@ -89,7 +146,8 @@ public class RegisterPhoneActivity extends MvpActivity<RegisterPresenter> implem
                             T.showShort(mContext,"请再次输入注册密码");
                             return;
                         };
-                        mvpPresenter.register(phoneNO,pwd,rePwd,code,mContext);
+                        SMSSDK.submitVerificationCode("86", phoneNO, code);
+//                        mvpPresenter.register(phoneNO,pwd,rePwd,code,mContext);
                     }
                 });
         RxView.clicks(register_old_user_tv).throttleFirst(2, TimeUnit.SECONDS)

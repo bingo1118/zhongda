@@ -16,6 +16,7 @@ import android.widget.RemoteViews;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.hikvision.open.hikvideoplayer.HikVideoPlayerFactory;
+import com.mob.MobSDK;
 import com.p2p.core.P2PHandler;
 import com.p2p.core.update.UpdateManager;
 import com.smart.cloud.fire.activity.Functions.constant.Constant;
@@ -78,6 +79,8 @@ public class MyApp extends Application {
         HikVideoPlayerFactory.initLib(null, true);
 //        AutoScreenUtils.AdjustDensity(this);//屏幕适配
         ZXingLibrary.initDisplayOpinion(this);
+        MobSDK.init(this,"m2efb245f9ef5e","9380ce616f2726beec68851a03b6f8ca");//测试
+//        MobSDK.init(this,"m2efaa2323a73c","5c3b5136396cbfc63c2fe8d4fb198fdf");//正式
     }
 
 

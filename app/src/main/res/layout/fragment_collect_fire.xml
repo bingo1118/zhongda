@@ -16,7 +16,7 @@
             android:id="@+id/title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
+            android:text="报警历史记录"
             android:textColor="#ffffff"
             android:layout_centerInParent="true"
             android:textSize="18sp"

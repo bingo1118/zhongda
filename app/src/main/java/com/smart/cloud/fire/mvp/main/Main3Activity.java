@@ -156,15 +156,17 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
             list = (ArrayList<ApplyTable>) ApplyTableManager.loadNewsChannelsStatic(privilege);
             ACache.get(MyApp.app).put(Constant.APPLY_MINE, list);
         }
-        if (privilege == 31 || privilege == 32 || privilege == 4 || privilege == 6 || privilege == 61 || privilege == 7) {
-//            ApplyTable editModel=new ApplyTable("更多功能","11",11,false, "bianji.png",1);
-//            list.add(editModel);
-            scan_btn.setVisibility(View.VISIBLE);
-            circleProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            circleProgressBar.setVisibility(View.INVISIBLE);
-            scan_btn.setVisibility(View.GONE);
-        }
+        scan_btn.setVisibility(View.VISIBLE);
+        circleProgressBar.setVisibility(View.VISIBLE);
+//        if (privilege == 31 || privilege == 32 || privilege == 4 || privilege == 6 || privilege == 61 || privilege == 7) {
+////            ApplyTable editModel=new ApplyTable("更多功能","11",11,false, "bianji.png",1);
+////            list.add(editModel);
+//            scan_btn.setVisibility(View.VISIBLE);
+//            circleProgressBar.setVisibility(View.VISIBLE);
+//        } else {
+//            circleProgressBar.setVisibility(View.INVISIBLE);
+//            scan_btn.setVisibility(View.GONE);
+//        }
 
 
         myAdapte1r = new MyRecyclerViewAdapter(list);
@@ -221,7 +223,6 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
 
                 }
                 startActivity(intent);
-                MyApp.a = System.currentTimeMillis();
             }
         });
 
