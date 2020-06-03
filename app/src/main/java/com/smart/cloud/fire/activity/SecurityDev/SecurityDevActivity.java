@@ -140,7 +140,7 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
             }
         });
         title_name_tv.setText("消防物联");
-        title_lose_dev_tv.setText("离线设备");
+        title_lose_dev_tv.setText("失联设备");
         areaCondition.setActivity(this);//@@12.21
 //        shopTypeCondition.setActivity(this);//@@12.21
         areaCondition.setHintTextColor("#ffffffff");
@@ -263,13 +263,13 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
                     //判断当前在哪个子fragment。。
 //                    switch (position) {
 //                        case FRAGMENT_SECURITY://@@5.13安防
-                            mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4",securityFragment);
-                            mvpPresenter.getNeedSecurity(userID, privilege + "",parentId, areaId, shopTypeId,"4", securityFragment);//显示设备。。
+                            mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4");
+                            mvpPresenter.getNeedSecurity(userID, privilege + "",parentId, areaId, shopTypeId,"4",securityFragment);//显示设备。。
 //                            break;
 //                        case FRAGMENT_FIVE://@@6.29
                             mvpPresenter.getNeedLossSmoke(userID, privilege + "",parentId, areaId, shopTypeId, "","4",false,0,null,offLineDevFragment);
 //                            mvpPresenter.getNeedLossSmoke(userID, privilege + "", areaId, shopTypeId, "", false, offLineDevFragment);
-                            mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4",offLineDevFragment);
+                            mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4");
 //                            break;
 //                        default:
 //                            break;
@@ -366,7 +366,7 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
     public void getSmokeSummary(SmokeSummary smokeSummary) {
 //        totalNum.setText(smokeSummary.getAllSmokeNumber()+"");
         onlineNum.setText("总数:"+smokeSummary.getAllSmokeNumber()+"");
-        offlineNum.setText("离线:"+smokeSummary.getLossSmokeNumber()+"");
+        offlineNum.setText("失联:"+smokeSummary.getLossSmokeNumber()+"");
     }
 
     @Override
@@ -464,11 +464,11 @@ public class SecurityDevActivity extends MvpActivity<SecurityDevPresenter> imple
             parentId="";
         }
 
-        mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4",securityFragment);
-        mvpPresenter.getNeedSecurity(userID, privilege + "",parentId, areaId, shopTypeId,"4", securityFragment);//显示设备。。
+        mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4");
+        mvpPresenter.getNeedSecurity(userID, privilege + "",parentId, areaId, shopTypeId,"4",securityFragment);//显示设备。。
 
         mvpPresenter.getNeedLossSmoke(userID, privilege + "",parentId, areaId, shopTypeId, "","4",false,0,null,offLineDevFragment);
-        mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4",offLineDevFragment);
+        mvpPresenter.getSmokeSummary(userID,privilege+"",parentId,areaId,shopTypeId,"4");
 
         mShopType = null;
         mArea = null;

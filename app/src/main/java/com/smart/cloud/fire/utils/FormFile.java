@@ -1,4 +1,4 @@
-package com.smart.cloud.fire.activity.UploadNFCInfo;
+package com.smart.cloud.fire.utils;
 
 import java.io.File;
 import java.io.FileInputStream;

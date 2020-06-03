@@ -11,6 +11,7 @@ import java.util.List;
  * Created by Rain on 2017/7/19.
  */
 public interface SecurityDevView {
+
     void getDataSuccess(List<?> smokeList, boolean research);
     void getSmokeSummary(SmokeSummary smokeSummary);
     void showLoading();

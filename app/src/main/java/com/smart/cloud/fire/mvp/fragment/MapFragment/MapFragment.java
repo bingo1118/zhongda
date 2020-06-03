@@ -47,6 +47,7 @@ import com.smart.cloud.fire.view.AreaChooceListView;
 import com.smart.cloud.fire.view.ShowAlarmDialog;
 import com.smart.cloud.fire.view.ShowSmokeDialog;
 import com.smart.cloud.fire.view.XCDropDownListViewMapSearch;
+import com.smart.cloud.fire.view.ZDAreaChooseListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,20 +72,12 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
     ProgressBar mProgressBar;
     @Bind(R.id.bmapView)
     MapView mMapView;
-//    @Bind(R.id.lin1)
-//    LinearLayout lin1;
-    @Bind(R.id.search_fire)
-    ImageView search_fire;
     @Bind(R.id.search_fire_btn)
     Button search_fire_btn;
     @Bind(R.id.add_fire)
     ImageView add_fire;
     @Bind(R.id.area_condition1)
-    AreaChooceListView areaCondition;
-//    @Bind(R.id.shop_type_condition)
-//    XCDropDownListViewMapSearch shopTypeCondition;
-//    @Bind(R.id.spinner)
-//    Spinner spinner;//@@9.12
+    ZDAreaChooseListView areaCondition;
     @Bind(R.id.area_search)
     EditText area_search;//@@
     @Bind(R.id.lin_search)
@@ -93,15 +86,13 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
     private Context mContext;
     private String userID;
     private int privilege;
-    private ShopType mShopType;
     private Area mArea;
+    private String parentId="";
     private String areaId = "";
-    private String shopTypeId = "";
     private MapFragmentPresenter mMapFragmentPresenter;
     private String devType;//@@7.21
 
     List<Area> parent = null;//@@9.12
-    Map<String, List<Area>> map = null;//@@9.12
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -116,15 +107,12 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mContext = getActivity();
-        userID = SharedPreferencesManager.getInstance().getData(mContext,
-                SharedPreferencesManager.SP_FILE_GWELL,
-                SharedPreferencesManager.KEY_RECENTNAME);
+        userID = MyApp.getUserID();
         privilege = MyApp.app.getPrivilege();
         devType=getActivity().getIntent().getStringExtra("devType");//@@7.21
         if(devType.equals("7")){
             areaCondition.setIfHavaChooseAll(false);
         }//@@11.06
-//        mvpPresenter.getPlaceTypeId(userID, privilege + "", 3);//@@9.12
         if (privilege == 1) {
             add_fire.setVisibility(View.GONE);//权限为1时没有搜索功能。。
             areaCondition.setVisibility(View.GONE);//@@9.29
@@ -133,11 +121,30 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
             add_fire.setVisibility(View.VISIBLE);
             add_fire.setImageResource(R.drawable.search);
         }
-        areaCondition.seteditTextColor("#ffffffff");//@@9.12
-        areaCondition.setEditText("区域");//@@9.12
-        areaCondition.setclear_choice(null,false);//@@9.12
-        areaCondition.setActivity(getActivity());//@@12.21
-//        mvpPresenter.getAllSmoke(userID, privilege + "");//获取所有设备并显示。。
+        areaCondition.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                areaCondition.showPopWindow();
+            }
+        });
+        areaCondition.setOnChildAreaChooceClickListener(new AreaChooceListView.OnChildAreaChooceClickListener() {
+            @Override
+            public void OnChildClick(Area info) {
+                if (info != null && info.getAreaId() != null) {
+                    if(info.getIsParent()==1){
+                        parentId= info.getAreaId();//@@9.1
+                        areaId="";
+                    }else{
+                        areaId = info.getAreaId();
+                        parentId="";
+                    }
+                } else {
+                    areaId = "";
+                    parentId="";
+                }
+                initLastMap();
+            }
+        });
         initLastMap();
     }
 
@@ -156,16 +163,6 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
     public void onDestroyView() {
         mMapView.onDestroy();
         super.onDestroyView();
-//        if(shopTypeCondition!=null){
-//            if(shopTypeCondition.ifShow()){
-//                shopTypeCondition.closePopWindow();
-//            }
-//        }
-        if(areaCondition!=null){
-            if(areaCondition.ifShow()){
-                areaCondition.closePopWindow();
-            }
-        }
         ButterKnife.unbind(this);
     }
 
@@ -334,129 +331,6 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
         mProgressBar.setVisibility(View.GONE);
     }
 
-    /**
-     * 显示商铺类型列表。。
-     * @param shopTypes
-     */
-    @Override
-    public void getShopType(ArrayList<Object> shopTypes) {
-//        shopTypeCondition.setItemsData(shopTypes,mMapFragmentPresenter);
-//        shopTypeCondition.showPopWindow();
-//        shopTypeCondition.setClickable(true);
-//        shopTypeCondition.closeLoading();
-    }
-
-    @Override
-    public void getShopTypeFail(String msg) {
-        T.showShort(mContext, msg);
-//        shopTypeCondition.setClickable(true);
-//        shopTypeCondition.closeLoading();
-    }
-
-    /**
-     *显示区域列表。。
-     * @param shopTypes
-     */
-    @Override
-    public void getAreaType(ArrayList<Object> shopTypes) {
-        areaCondition.setItemsData(shopTypes,mMapFragmentPresenter);
-        areaCondition.showPopWindow();
-        areaCondition.setClickable(true);
-        areaCondition.closeLoading();
-    }
-
-    ArrayList<Object> arealist;//@@
-    //@@获取区域列表。。//9.12改为二级区域
-    @Override
-    public void getAreaList(ArrayList<Object> shopTypes) {
-//        arealist=shopTypes;
-//        String[] mItems=new String[shopTypes.size()];
-//        for(int i=0;i<arealist.size();i++){
-//            mItems[i]=((Area)arealist.get(i)).getAreaName();
-//        }
-//        ArrayAdapter<String> adapter=new ArrayAdapter<String>(mContext,android.R.layout.simple_spinner_dropdown_item, mItems);
-//        //绑定 Adapter到控件
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinner.setAdapter(adapter);
-//        int selectedAreaId=SharedPreferencesManager.getInstance().getIntData(mContext,"selectedAreaId");
-//        if(selectedAreaId>=arealist.size()){
-//            selectedAreaId=0;//@@5.27切换帐号的时候区域数目不一样会闪退
-//        }
-//        spinner.setSelection(selectedAreaId);
-//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                if(devType.equals("7")){
-//                    mvpPresenter.getNeedNFC(userID, privilege + "", ((Area)arealist.get(position)).getAreaId(), "",devType);//@@8.18
-//                }else{
-//                    mvpPresenter.getNeedSmoke(userID, privilege + "", ((Area)arealist.get(position)).getAreaId(), "",devType);//获取按照要求获取设备。。
-//                }
-//                SharedPreferencesManager.getInstance().putData(mContext,"selectedAreaId",position);
-//                SharedPreferencesManager.getInstance().putData(mContext,"selectedAreaNum",((Area)arealist.get(position)).getAreaId());//@@5.18
-//                TextView tv=(TextView)view;
-//                tv.setTextColor(mContext.getResources().getColor(R.color.white));
-//            }
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//            }
-//        });
-    }
-
-    @Override
-    public void getAreaTypeFail(String msg) {
-        T.showShort(mContext, msg);
-        mBaiduMap.clear();//@@5.27无数据时清除所有标记
-        areaCondition.setClickable(true);
-        areaCondition.closeLoading();
-    }
-
-    @Override
-    public void openCamera(Camera camera) {
-        Contact mContact = new Contact();
-        mContact.contactType = 0;
-        mContact.contactId = camera.getCameraId();
-        mContact.contactPassword = camera.getCameraPwd();
-        mContact.contactName = camera.getCameraName();
-        mContact.apModeState = 1;
-        Intent monitor = new Intent();
-        monitor.setClass(mContext, ApMonitorActivity.class);
-        monitor.putExtra("contact", mContact);
-        monitor.putExtra("connectType", ConstantValues.ConnectType.P2PCONNECT);
-        monitor.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mContext.startActivity(monitor);
-    }
-
-    @Override
-    public void getChoiceArea(Area area) {
-//        mArea = area;
-//        if (mArea != null && mArea.getAreaId() != null) {
-//            add_fire.setVisibility(View.GONE);
-//            search_fire.setVisibility(View.VISIBLE);
-//        }
-//        if (mArea.getAreaId() == null && mShopType == null) {
-//            add_fire.setVisibility(View.VISIBLE);
-//            search_fire.setVisibility(View.GONE);
-//        } else if (mArea.getAreaId() == null && mShopType != null && mShopType.getPlaceTypeId() == null) {
-//            add_fire.setVisibility(View.VISIBLE);
-//            search_fire.setVisibility(View.GONE);
-//        }
-    }
-
-    @Override
-    public void getChoiceShop(ShopType shopType) {
-        mShopType = shopType;
-        if (mShopType != null && mShopType.getPlaceTypeId() != null) {
-            add_fire.setVisibility(View.GONE);
-            search_fire.setVisibility(View.VISIBLE);
-        }
-        if (mShopType.getPlaceTypeId() == null && mArea == null) {
-            add_fire.setVisibility(View.VISIBLE);
-            search_fire.setVisibility(View.GONE);
-        } else if (mShopType.getPlaceTypeId() == null && mArea != null && mArea.getAreaId() == null) {
-            add_fire.setVisibility(View.VISIBLE);
-            search_fire.setVisibility(View.GONE);
-        }
-    }
 
     @Override
     public void showSmokeDialog(Smoke smoke) {
@@ -481,7 +355,7 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
 
     private boolean visibility = false;
 
-    @OnClick({R.id.search_fire_btn,R.id.search_fire, R.id.add_fire, R.id.area_condition1,R.id.text})
+    @OnClick({R.id.search_fire_btn, R.id.add_fire, R.id.area_condition1,R.id.text})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.search_fire_btn://@@4.27
@@ -498,32 +372,6 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
                     T.show(mContext,"查询内容不能为空",Toast.LENGTH_SHORT);
                 }
                 break;
-            case R.id.search_fire:
-//                if (shopTypeCondition.ifShow()) {
-//                    shopTypeCondition.closePopWindow();
-//                }
-                if (areaCondition.ifShow()) {
-                    areaCondition.closePopWindow();
-                }
-                if ((mShopType != null && mShopType.getPlaceTypeId() != null) || (mArea != null && mArea.getAreaId() != null)) {
-                    lin_search.setVisibility(View.GONE);
-                    search_fire.setVisibility(View.GONE);
-                    add_fire.setVisibility(View.VISIBLE);
-                    areaCondition.searchClose();
-//                    shopTypeCondition.searchClose();
-                    visibility = false;
-                    if (mArea != null && mArea.getAreaId() != null) {
-                        areaId = mArea.getAreaId();
-                    } else {
-                        areaId = "";
-                    }
-                    if (mShopType != null && mShopType.getPlaceTypeId() != null) {
-                        shopTypeId = mShopType.getPlaceTypeId();
-                    } else {
-                        shopTypeId = "";
-                    }
-                }
-                break;
             case R.id.add_fire:
                 if (visibility) {
                     visibility = false;
@@ -531,108 +379,10 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
                     if (areaCondition.ifShow()) {
                         areaCondition.closePopWindow();
                     }
-//                    if (shopTypeCondition.ifShow()) {
-//                        shopTypeCondition.closePopWindow();
-//                    }
                 } else {
                     visibility = true;
-                    areaCondition.setEditText("");
-//                    shopTypeCondition.setEditText("");
-                    areaCondition.setEditTextHint("区域");
-//                    shopTypeCondition.setEditTextHint("类型");
+                    areaCondition.clearView();
                     lin_search.setVisibility(View.VISIBLE);
-                }
-                break;
-//            case R.id.shop_type_condition:
-//                if (shopTypeCondition.ifShow()) {
-//                    shopTypeCondition.closePopWindow();
-//                } else {
-//                    mvpPresenter.getPlaceTypeId(userID, privilege + "", 1);
-//                    shopTypeCondition.setClickable(false);
-//                    shopTypeCondition.showLoading();
-//                }
-//                break;
-//            case R.id.area_condition:
-//                if (areaCondition.ifShow()) {
-//                    areaCondition.closePopWindow();
-//                } else {
-//                    mvpPresenter.getPlaceTypeId(userID, privilege + "", 2);
-//                    areaCondition.setClickable(false);
-//                    areaCondition.showLoading();
-//                }
-//                break;
-            case R.id.text://@@11.13
-            case R.id.area_condition1:
-                if (areaCondition.ifShow()) {
-                    areaCondition.closePopWindow();
-                } else {
-                    String url= ConstantValues.SERVER_IP_NEW+"getAreaInfo?userId="+userID+"&privilege="+privilege;
-                    VolleyHelper.getInstance(mContext).getStringResponse(url,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    try {
-                                        JSONObject jsonObject=new JSONObject(response);
-                                        if(jsonObject.getInt("errorCode")==0){
-                                            parent = new ArrayList<>();
-                                            map = new HashMap<>();
-                                            JSONArray jsonArrayParent=jsonObject.getJSONArray("areas");
-                                            for(int i=0;i<jsonArrayParent.length();i++){
-                                                JSONObject tempParent= jsonArrayParent.getJSONObject(i);
-                                                Area tempArea=new Area();
-                                                tempArea.setAreaId(tempParent.getString("areaId"));
-                                                tempArea.setAreaName(tempParent.getString("areaName"));
-                                                tempArea.setIsParent(1);
-                                                parent.add(tempArea);
-                                                List<Area> child = new ArrayList<>();
-                                                JSONArray jsonArrayChild=tempParent.getJSONArray("areas");
-                                                for(int j=0;j<jsonArrayChild.length();j++){
-                                                    JSONObject tempChild= jsonArrayChild.getJSONObject(j);
-                                                    Area tempAreaChild=new Area();
-                                                    tempAreaChild.setAreaId(tempChild.getString("areaId"));
-                                                    tempAreaChild.setAreaName(tempChild.getString("areaName"));
-                                                    tempAreaChild.setIsParent(0);
-                                                    child.add(tempAreaChild);
-                                                }
-                                                map.put(tempParent.getString("areaName"),child);
-                                            }
-                                        }
-                                        areaCondition.setItemsData2(parent,map,mvpPresenter);
-                                        areaCondition.setOnChildAreaChooceClickListener(new AreaChooceListView.OnChildAreaChooceClickListener() {
-                                            @Override
-                                            public void OnChildClick(Area info) {
-                                                if(devType.equals("7")){
-                                                    mvpPresenter.getNeedNFC(userID, privilege + "", info.getAreaId(), "",devType);//@@8.18
-                                                }else{
-                                                    mvpPresenter.getNeedSmoke(userID, privilege + "", info.getAreaId(), "",devType,info.getIsParent());//获取按照要求获取设备。。
-                                                }
-                                                SharedPreferencesManager.getInstance().putData(mContext,
-                                                        "LASTAREANAME",
-                                                        devType,info.getAreaName());//@@11.13
-                                                SharedPreferencesManager.getInstance().putData(mContext,
-                                                        "LASTAREAID",
-                                                        devType,info.getAreaId());//@@11.13
-                                                SharedPreferencesManager.getInstance().putIntData(mContext,
-                                                        "LASTAREAISPARENT",
-                                                        devType,info.getIsParent());//@@11.13
-                                            }
-                                        });
-                                        areaCondition.showPopWindow();
-                                        areaCondition.setClickable(true);
-                                        areaCondition.closeLoading();
-//                                        mvpPresenter.getPlaceTypeId(userID, privilege + "", 2);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.e("error","error");
-                        }
-                    });
-                    areaCondition.setClickable(false);
-                    areaCondition.showLoading();
                 }
                 break;
             default:
@@ -641,24 +391,22 @@ public class MapFragment extends MvpFragment<MapFragmentPresenter> implements Ma
     }
 
     private void initLastMap(){
-        String area_name=SharedPreferencesManager.getInstance().getData(mContext,
-                "LASTAREANAME",
-                devType);//@@11.13
-        String area_id=SharedPreferencesManager.getInstance().getData(mContext,
-                "LASTAREAID",
-                devType);//@@11.13
-        int isParent=SharedPreferencesManager.getInstance().getIntData(mContext,
-                "LASTAREAISPARENT",
-                devType);//@@11.13
-        if(area_name.length()>0){
+//        String area_name=SharedPreferencesManager.getInstance().getData(mContext,
+//                "LASTAREANAME",
+//                devType);//@@11.13
+//        String area_id=SharedPreferencesManager.getInstance().getData(mContext,
+//                "LASTAREAID",
+//                devType);//@@11.13
+//        int isParent=SharedPreferencesManager.getInstance().getIntData(mContext,
+//                "LASTAREAISPARENT",
+//                devType);//@@11.13
+//        if(area_name.length()>0){
             if(devType.equals("7")){
-                mvpPresenter.getNeedNFC(userID, privilege + "", area_id, "","");//@@8.18
+                mvpPresenter.getNeedNFC(userID, privilege + "", areaId, "","");//@@8.18
             }else{
-                mvpPresenter.getNeedSmoke(userID, privilege + "", area_id, "",devType,isParent);//获取按照要求获取设备。。
-//                areaCondition.setEditText(area_name);
+                mvpPresenter.getNeedSmoke(userID, privilege + "", parentId,areaId, "",devType);//获取按照要求获取设备。。
             }
-            areaCondition.setEditText(area_name);
-        }
+//        }
     }
 
 }

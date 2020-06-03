@@ -11,7 +11,7 @@ import java.util.List;
  * Created by Rain on 2017/7/15.
  */
 public interface AllSmokeView {
-    void getDataSuccess(List<?> smokeList,boolean research);
+    void getDataSuccess(List<?> smokeList,int sum,boolean research);
     void getSmokeSummary(SmokeSummary smokeSummary);
     void showLoading();
     void hideLoading();

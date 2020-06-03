@@ -21,25 +21,10 @@ public interface MapFragmentView {
 
     void hideLoading();
 
-    void getShopType(ArrayList<Object> shopTypes);
-
-    void getShopTypeFail(String msg);
-
-    void getAreaType(ArrayList<Object> shopTypes);
-
-    void getAreaTypeFail(String msg);
-
     void showSmokeDialog(Smoke smoke);
 
     void showNFCDialog(NFCRecordBean smoke);//@@8.18
 
     void showAlarmDialog(Smoke smoke);
 
-    void openCamera(Camera camera);
-
-    void getChoiceArea(Area area);
-
-    void getChoiceShop(ShopType shopType);
-
-    void getAreaList(ArrayList<Object> shopTypes);//@@
 }

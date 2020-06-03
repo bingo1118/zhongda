@@ -144,7 +144,8 @@ public class RegisterPresenter  extends BasePresenter<RegisterView> {
                 }));
     }
 
-    private void addUser(final String phoneNo, final String pwd, final Context mContext) {
+    public void addUser(final String phoneNo, final String pwd, final Context mContext) {
+        mvpView.showLoading();
         String url= ConstantValues.SERVER_IP_NEW+"AddUserAction?userId="+phoneNo+"&pwd="+pwd;
         VolleyHelper.getInstance(mContext).getStringResponse(url,
                 new Response.Listener<String>() {
@@ -161,6 +162,7 @@ public class RegisterPresenter  extends BasePresenter<RegisterView> {
                                         SharedPreferencesManager.SP_FILE_GWELL,
                                         SharedPreferencesManager.KEY_RECENTNAME,
                                         phoneNo);
+//                                T.showLong(mContext,"操作成功，自动登陆");
                                 mvpView.register();//注册成功后跳转到欢迎页
                             }else{
                                 T.showShort(mContext,"注册错误");
@@ -168,6 +170,8 @@ public class RegisterPresenter  extends BasePresenter<RegisterView> {
                         } catch (JSONException e) {
                             T.showShort(mContext,"注册错误");
                             e.printStackTrace();
+                        }finally {
+                            mvpView.hideLoading();
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -175,6 +179,7 @@ public class RegisterPresenter  extends BasePresenter<RegisterView> {
             public void onErrorResponse(VolleyError error) {
                 T.showShort(mContext,"注册错误");
                 Log.e("error","error");
+                mvpView.hideLoading();
             }
         });
     }

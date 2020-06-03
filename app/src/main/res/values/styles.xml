@@ -144,4 +144,9 @@
         <item name="android:windowAnimationStyle">@null</item><!-- 进入和退出动画 -->
     </style>
 
+    <style name="pop_animation" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/top_in</item>
+        <item name="android:windowExitAnimation">@anim/top_gone</item>
+    </style>
+
 </resources>

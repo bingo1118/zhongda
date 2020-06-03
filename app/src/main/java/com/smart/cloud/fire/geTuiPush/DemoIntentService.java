@@ -305,6 +305,8 @@ public class DemoIntentService extends GTIntentService {
                                 message="电量低，请更换电池";
                             }else if(alarmType==194){
                                 message="低电压已恢复";
+                            }else if(alarmType==404){
+                                message="设备失联";
                             }else{
                                 message="发生未知类型报警";
                             }
@@ -329,6 +331,8 @@ public class DemoIntentService extends GTIntentService {
                                 message="发生通信故障";
                             }else if(alarmType==36){
                                 message="发生故障";
+                            }else if(alarmType==404){
+                                message="设备失联";
                             }else{
                                 message="发生未知类型报警";
                             }
@@ -396,6 +400,8 @@ public class DemoIntentService extends GTIntentService {
                                 message="发生传感器故障";
                             }else if(alarmType==77){
                                 message="发生串口通讯故障";
+                            }else if(alarmType==404){
+                                message="设备失联";
                             }else{
                                 message="燃气发生泄漏";
                             }
@@ -408,6 +414,8 @@ public class DemoIntentService extends GTIntentService {
                         case 8:
                             if(alarmType==193){
                                 message="低电压报警";
+                            }else if(alarmType==404){
+                                message="设备失联";
                             }else{
                                 message="手动报警";
                             }
@@ -468,6 +476,8 @@ public class DemoIntentService extends GTIntentService {
                                 message="发生故障";
                             }else if(alarmType==193){
                                 message="电量低，请更换电池";
+                            }else if(alarmType==404){
+                                message="设备失联";
                             }else{
                                 message="发生未知类型报警";
                             }
@@ -505,6 +515,12 @@ public class DemoIntentService extends GTIntentService {
                     int alarmFamily = pushAlarmMsg1.getAlarmFamily();
                     String alarmMsg = null;
                     switch (alarmFamily){
+                        case 404:
+                            alarmMsg="设备失联";
+                            break;
+                        case 400:
+                            alarmMsg="装置掉电报警";
+                            break;
                         case 162:
                             alarmMsg = "电气探测器发出：错相";
                             break;
@@ -694,6 +710,10 @@ public class DemoIntentService extends GTIntentService {
                         default:
                             alarmMsg = "电气探测器发出：无该报警类型（测试）";
                             break;
+                    }
+                    int alarmFamilyTemp = pushAlarmMsg1.getAlarmFamily();
+                    if(alarmFamilyTemp==404){
+                        alarmMsg = "设备发出：失联报警";
                     }
                     Random random = new Random();
                     showDownNotification(context,alarmMsg,pushAlarmMsg1,random.nextInt(),AlarmActivity.class);

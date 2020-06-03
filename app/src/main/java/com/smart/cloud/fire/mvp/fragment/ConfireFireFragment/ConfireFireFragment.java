@@ -1,18 +1,17 @@
 package com.smart.cloud.fire.mvp.fragment.ConfireFireFragment;
 
-import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -24,13 +23,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.jakewharton.rxbinding.view.RxView;
 import com.smart.cloud.fire.GetLocationActivity;
-import com.smart.cloud.fire.activity.UploadNFCInfo.FileUtil;
-import com.smart.cloud.fire.activity.UploadNFCInfo.FormFile;
+import com.smart.cloud.fire.utils.FileUtil;
+import com.smart.cloud.fire.utils.FormFile;
 import com.smart.cloud.fire.base.ui.MvpFragment;
 import com.smart.cloud.fire.global.Area;
 import com.smart.cloud.fire.global.ConstantValues;
@@ -39,13 +37,13 @@ import com.smart.cloud.fire.global.ShopType;
 import com.smart.cloud.fire.mvp.fragment.MapFragment.Camera;
 import com.smart.cloud.fire.mvp.fragment.MapFragment.Smoke;
 import com.smart.cloud.fire.rqcode.Capture2Activity;
-import com.smart.cloud.fire.utils.DeviceTypeUtils;
-import com.smart.cloud.fire.utils.IntegerTo16;
-import com.smart.cloud.fire.utils.JsonUtils;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.Utils;
+import com.smart.cloud.fire.view.TakePhotoView;
 import com.smart.cloud.fire.view.XCDropDownListView;
+import com.yuyh.library.imgsel.ISNav;
+import com.yuyh.library.imgsel.config.ISCameraConfig;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -61,6 +59,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fire.cloud.smart.com.smartcloudfire.R;
 import rx.functions.Action1;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Administrator on 2016/9/21.
@@ -113,7 +113,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
     @Bind(R.id.device_type_name)
     TextView device_type_name;
     @Bind(R.id.photo_image)
-    ImageView photo_image;//@@拍照上传
+    TakePhotoView photo_image;//@@拍照上传
     @Bind(R.id.tip_line)
     LinearLayout tip_line;
     @Bind(R.id.clean_all)
@@ -132,20 +132,14 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
 
     String mac="";
     String devType="0";
+    String oldImage="";
 
-    private String uploadTime;
-    private String imageFilePath;
-    File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/devimage.jpg");//@@9.30
-
+    Fragment mFramgent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_add_fire, null);
         ButterKnife.bind(this, view);
-
-        if(f.exists()){
-            f.delete();
-        }//@@9.30
         return view;
     }
 
@@ -153,6 +147,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mContext = getActivity();
+        mFramgent=this;
         userID = SharedPreferencesManager.getInstance().getData(mContext,
                 SharedPreferencesManager.SP_FILE_GWELL,
                 SharedPreferencesManager.KEY_RECENTNAME);
@@ -164,6 +159,12 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
         Intent intent=getActivity().getIntent();
         String mac=intent.getStringExtra("mac");
         devType=intent.getStringExtra("devType");
+        oldImage=intent.getStringExtra("oldImage");
+        if(oldImage!=null&&oldImage.length()>0){
+            String path=ConstantValues.NFC_IMAGES+"devimages/"+oldImage;
+            photo_image.displayOldImage(mContext,path);
+        }
+
         if(devType==null){
             devType="";
         }
@@ -208,23 +209,14 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
             device_type_name.setText("设备类型:"+devType);
             mvpPresenter.getOneSmoke(userID, privilege + "", mac);
         }
-        photo_image.setOnClickListener(new View.OnClickListener() {
+        photo_image.setmIvClickListener(new TakePhotoView.IvClickListener() {
             @Override
-            public void onClick(View v) {
-                imageFilePath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/devimage.jpg";
-                File temp = new File(imageFilePath);
-                if(!temp.exists()){
-                    Uri imageFileUri = Uri.fromFile(temp);//获取文件的Uri
-                    Intent it = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//跳转到相机Activity
-                    it.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageFileUri);//告诉相机拍摄完毕输出图片到指定的Uri
-                    startActivityForResult(it, REQUEST_CODE_CAMERA);
-                }else{
-                    //使用Intent
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.fromFile(temp), "image/*");
-                    startActivity(intent);
-                }
-
+            public void onClick() {
+                ISNav.getInstance().init(photo_image);
+                ISCameraConfig config = new ISCameraConfig.Builder()
+                        .needCrop(false) // 裁剪
+                        .build();
+                ISNav.getInstance().toCameraActivity(mFramgent, config, 666);
             }
         });
 
@@ -274,49 +266,13 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
         new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean isSuccess=false;
-                boolean isHavePhoto=false;
-                uploadTime=System.currentTimeMillis()+"";
-                if(imageFilePath!=null){
-                    File file = new File(imageFilePath); //这里的path就是那个地址的全局变量
-                    if(f.exists()){
-                        isHavePhoto=true;
-                    }else{
-                        isHavePhoto=false;
-                    }
-                    if(isHavePhoto){
-                        isSuccess=uploadFile(file,userID,areaId,uploadTime, DeviceTypeUtils.getDevType(smokeMac,repeater).getMac(),"devimages");
-                        if(isSuccess){
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    T.showShort(mContext,"图片上传成功");
-                                }
-                            });
-                        }else{
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    T.showShort(mContext,"图片上传失败");
-                                }
-                            });
-                        }
-                    }
-
-
-                    if(f.exists()){
-                        f.delete();
-                    }//@@9.30
-                }
+                File f=photo_image.getPath()==null?null:new File(photo_image.getPath());
                 mvpPresenter.addSmoke(userID, privilege + "", smokeName, smokeMac, address, longitude,
                         latitude, placeAddress, shopTypeId, principal1, principal1Phone, principal2,
-                        principal2Phone, areaId, repeater, camera,isSuccess);
+                        principal2Phone, areaId, repeater, camera , f,devType,photo_image.getOldImage());
             }
         }).start();
 
-//        mvpPresenter.addSmoke(userID, privilege + "", smokeName, smokeMac, address, longitude,
-//                latitude, placeAddress, shopTypeId, principal1, principal1Phone, principal2,
-//                principal2Phone, areaId, repeater, camera);
     }
 
     @Override
@@ -339,7 +295,9 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
         if (addFireType.ifShow()) {
             addFireType.closePopWindow();
         }
+        cleanAllView();
         ButterKnife.unbind(this);
+
     }
 
     @Override
@@ -448,6 +406,12 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
             addCameraName.setText(mCamera.getCameraId());
         }
         addRepeaterMac.setText(smoke.getRepeater().trim());
+
+        oldImage=smoke.getImage();
+        if(oldImage!=null&&oldImage.length()>0){
+            String path=ConstantValues.NFC_IMAGES+"devimages/"+oldImage;
+            photo_image.displayOldImage(mContext,path);
+        }
     }
 
     @Override
@@ -487,16 +451,14 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    T.showShort(mContext,"添加成功");
+                    T.showShort(mContext,msg);
                 }
             });
         }else{
-            imageFilePath=null;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     T.showShort(mContext,msg);
-                    photo_image.setImageResource(R.drawable.add_photo);
                 }
             });
         }
@@ -532,6 +494,12 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode){
+            case 666:
+                if ( resultCode == RESULT_OK && data != null) {
+                    String path = data.getStringExtra("result"); // 图片地址
+                    ISNav.getInstance().displayImage(mContext,path,null);
+                }
+                break;
             case REQUEST_CODE_SCAN_REPEATER:
                 if (resultCode == getActivity().RESULT_OK) {
                     Bundle bundle = data.getExtras();
@@ -563,55 +531,6 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
                     }
                 }
                 break;
-            case REQUEST_CODE_CAMERA:
-                if (resultCode == Activity.RESULT_OK) {
-                    Bitmap bmp = BitmapFactory.decodeFile(imageFilePath);
-                    try {
-                        saveFile(compressBySize(Environment.getExternalStorageDirectory().getAbsolutePath()+"/devimage.jpg",1500,2000),Environment.getExternalStorageDirectory().getAbsolutePath()+"/devimage.jpg");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    DisplayMetrics dm = new DisplayMetrics();
-                    getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-                    int screenWidth=dm.widthPixels;
-                    if(bmp.getWidth()<=screenWidth){
-                        photo_image.setImageBitmap(bmp);
-                    }else{
-                        Bitmap mp=Bitmap.createScaledBitmap(bmp, screenWidth, bmp.getHeight()*screenWidth/bmp.getWidth(), true);
-                        photo_image.setImageBitmap(mp);
-                    }
-//                    photo_image.setImageBitmap(bmp);
-                }
-                break;
-            case 103:
-                Bitmap bm = null;
-                // 外界的程序访问ContentProvider所提供数据 可以通过ContentResolver接口
-                ContentResolver resolver = getActivity().getContentResolver();
-
-                try {
-                    Uri originalUri = data.getData(); // 获得图片的uri
-
-                    bm = MediaStore.Images.Media.getBitmap(resolver, originalUri); // 显得到bitmap图片
-
-                    // 这里开始的第二部分，获取图片的路径：
-
-                    String[] proj = {MediaStore.Images.Media.DATA};
-
-                    // 好像是android多媒体数据库的封装接口，具体的看Android文档
-                    @SuppressWarnings("deprecation")
-                    Cursor cursor = getActivity().managedQuery(originalUri, proj, null, null, null);
-                    // 按我个人理解 这个是获得用户选择的图片的索引值
-                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    // 将光标移至开头 ，这个很重要，不小心很容易引起越界
-                    cursor.moveToFirst();
-                    // 最后根据索引值获取图片路径
-                    String path = cursor.getString(column_index);
-                    photo_image.setImageURI(originalUri);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
         }
 
     }
@@ -631,82 +550,7 @@ public class ConfireFireFragment extends MvpFragment<ConfireFireFragmentPresente
         addFireZjq.setEditTextData("");
         addFireType.setEditTextData("");
         addCameraName.setText("");
-        photo_image.setImageResource(R.drawable.add_photo);
-        imageFilePath=null;
-    }
-
-    public static boolean uploadFile(File imageFile,String userId,String areaId,String uploadtime) {
-        try {
-            String requestUrl = ConstantValues.SERVER_IP_NEW+"UploadFileAction";
-            Map<String, String> params = new HashMap<String, String>();
-            params.put("username", userId);
-            params.put("areaId", areaId);
-            params.put("time", uploadtime);
-            FormFile formfile = new FormFile(imageFile.getName(), imageFile, "image", "application/octet-stream");
-            FileUtil.post(requestUrl, params, formfile);
-            System.out.println("Success");
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Fail");
-            return false;
-        }
-    }
-
-    public static boolean uploadFile(File imageFile,String userId,String areaId,String uploadtime,String mac,String location) {
-        try {
-            String requestUrl = ConstantValues.SERVER_IP_NEW+"UploadFileAction";
-            Map<String, String> params = new HashMap<String, String>();
-            params.put("username", userId);
-            params.put("areaId", areaId);
-            params.put("time", uploadtime);
-            params.put("mac", mac);
-            params.put("location", location);
-            FormFile formfile = new FormFile(imageFile.getName(), imageFile, "image", "application/octet-stream");
-            FileUtil.post(requestUrl, params, formfile);
-            System.out.println("Success");
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Fail");
-            return false;
-        }
-    }
-
-    //@@10.12存储文件到sd卡
-    public void saveFile(Bitmap bm, String fileName) throws Exception {
-        File dirFile = new File(fileName);//检测图片是否存在
-        if(dirFile.exists()){
-            dirFile.delete();  //删除原图片
-        }
-        File myCaptureFile = new File(fileName);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(myCaptureFile));//100表示不进行压缩，70表示压缩率为30%
-        bm.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-        bos.flush();
-        bos.close();
-    }
-
-    //@@10.12压缩图片尺寸
-    public Bitmap compressBySize(String pathName, int targetWidth,
-                                 int targetHeight) {
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inJustDecodeBounds = true;// 不去真的解析图片，只是获取图片的头部信息，包含宽高等；
-        Bitmap bitmap = BitmapFactory.decodeFile(pathName, opts);// 得到图片的宽度、高度；
-        float imgWidth = opts.outWidth;
-        float imgHeight = opts.outHeight;// 分别计算图片宽度、高度与目标宽度、高度的比例；取大于等于该比例的最小整数；
-        int widthRatio = (int) Math.ceil(imgWidth / (float) targetWidth);
-        int heightRatio = (int) Math.ceil(imgHeight / (float) targetHeight);
-        opts.inSampleSize = 1;
-        if (widthRatio > 1 || widthRatio > 1) {
-            if (widthRatio > heightRatio) {
-                opts.inSampleSize = widthRatio;
-            } else {
-                opts.inSampleSize = heightRatio;
-            }
-        }//设置好缩放比例后，加载图片进内容；
-        opts.inJustDecodeBounds = false;
-        bitmap = BitmapFactory.decodeFile(pathName, opts);
-        return bitmap;
+        photo_image.clear();
     }
 
 

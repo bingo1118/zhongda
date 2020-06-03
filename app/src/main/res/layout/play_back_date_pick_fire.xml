@@ -1,12 +1,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/date_pick"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#ffffff"
-		android:visibility="gone"
-        android:orientation="vertical"
-        >
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/date_pick"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:layout_alignParentBottom="true"
+	android:background="#ffffff"
+	android:visibility="gone"
+	android:orientation="vertical">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -40,6 +40,13 @@
 	            android:background="@drawable/timer_selector_btn"
 	            />
         </RelativeLayout>
+
+		<com.smart.cloud.fire.view.ZDAreaChooseListView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/zd_area"
+			app:hint_Text="区域"
+			android:layout_margin="5dp"></com.smart.cloud.fire.view.ZDAreaChooseListView>
 
 		<LinearLayout
 			android:id="@+id/type_lin"

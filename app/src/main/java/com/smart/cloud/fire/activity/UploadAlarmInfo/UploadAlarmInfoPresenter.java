@@ -1,7 +1,5 @@
 package com.smart.cloud.fire.activity.UploadAlarmInfo;
 
-import com.android.volley.Response;
-import com.smart.cloud.fire.activity.UploadNFCInfo.FormFile;
 import com.smart.cloud.fire.base.presenter.BasePresenter;
 import com.smart.cloud.fire.global.ConstantValues;
 import com.smart.cloud.fire.mvp.fragment.MapFragment.HttpError;

@@ -2,6 +2,7 @@ package com.smart.cloud.fire.mvp.LineChart;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -96,6 +97,8 @@ public class LineChartActivity extends MvpActivity<LineChartPresenter> implement
 
     Window win;
 
+    int pageNum=6;//每页数
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +115,11 @@ public class LineChartActivity extends MvpActivity<LineChartPresenter> implement
         devType=getIntent().getExtras().getInt("devType");
         electricBeen = new ArrayList<>();
 
+        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            pageNum=6;
+        }else{
+            pageNum=12;
+        }
         getData();
         initListener();
     }
@@ -120,7 +128,7 @@ public class LineChartActivity extends MvpActivity<LineChartPresenter> implement
         switch (isWater){
             case 0:
             case LochoLineChartView.TYPE_ELECTRIC:
-                mvpPresenter.getElectricTypeInfo(userID, privilege + "", electricMac, electricType, electricNum, page + "", false,devType);
+                mvpPresenter.getElectricTypeInfo(userID, privilege + "", electricMac, electricType, electricNum, page + "", false,devType,pageNum);
                 switch (electricType) {
                     case "6":
                         axisYText="电压值(V)";
@@ -385,12 +393,12 @@ public class LineChartActivity extends MvpActivity<LineChartPresenter> implement
     @Override
     public void getDataSuccess(List<TemperatureTime.ElectricBean> temperatureTimes) {
         int len = temperatureTimes.size();
-        if (len == 6) {
+        if (len == pageNum) {
             btnNext.setClickable(true);
             btnNext.setBackgroundResource(R.drawable.next_selector);
             electricBeen.clear();
             electricBeen.addAll(temperatureTimes);
-        } else if (len < 6&&electricBeen.size()>0) {
+        } else if (len < pageNum&&electricBeen.size()>0) {
             btnNext.setClickable(false);
             btnNext.setBackgroundResource(R.mipmap.next_an);
             for (int i = 0; i < len; i++) {

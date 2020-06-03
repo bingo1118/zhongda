@@ -59,7 +59,7 @@
                     android:layout_marginTop="5dp"
                     android:textSize="14sp"
                     android:textColor="#000"
-                    android:text="离线设备" />
+                    android:text="失联设备" />
                 <TextView
                     android:id="@+id/offline_num"
                     android:layout_width="wrap_content"

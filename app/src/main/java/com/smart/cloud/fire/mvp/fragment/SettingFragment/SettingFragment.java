@@ -29,36 +29,17 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fire.cloud.smart.com.smartcloudfire.R;
 
-/**
- * Created by Administrator on 2016/9/21.
- */
+
 public class SettingFragment extends MvpFragment<SettingFragmentPresenter> implements SettingFragmentView {
     @Bind(R.id.setting_user_id)
     TextView settingUserId;
     @Bind(R.id.setting_user_code)
     TextView settingUserCode;
-    @Bind(R.id.setting_help_rela)
-    RelativeLayout settingHelpRela;
-    @Bind(R.id.setting_webserver)
-    RelativeLayout setting_webserver;
     @Bind(R.id.mProgressBar)
     ProgressBar mProgressBar;
-    @Bind(R.id.setting_camera_relative)
-    RelativeLayout settingCameraRelative;
-    @Bind(R.id.nfc_mac_add)
-    RelativeLayout nfc_mac_add;//@@11.17
     @Bind(R.id.line_state)
     TextView lineState;
-    @Bind(R.id.nfc_radiogroup)
-    RadioGroup nfc_radiogroup;
-    @Bind(R.id.everymonth)
-    RadioButton everymonth;
-    @Bind(R.id.everyweek)
-    RadioButton everyweek;
-    @Bind(R.id.everyday)
-    RadioButton everyday;
-    @Bind(R.id.setting_help_wifi)
-    RelativeLayout setting_help_wifi;//@@2018.05.14 WiFi设置
+
     private Context mContext;
 
     @Bind(R.id.setting_pay)
@@ -86,21 +67,7 @@ public class SettingFragment extends MvpFragment<SettingFragmentPresenter> imple
         String username = SharedPreferencesManager.getInstance().getData(mContext,
                 SharedPreferencesManager.SP_FILE_GWELL,
                 SharedPreferencesManager.KEY_RECENTNAME);
-        int peroid=SharedPreferencesManager.getInstance().getIntData(mContext,"NFC_period");//@@10.24
-        switch (peroid){
-            case 0:
-                everymonth.setChecked(true);
-                break;
-            case 1:
-                everyweek.setChecked(true);
-                break;
-            case 2:
-                everyday.setChecked(true);
-                break;
-            default:
-                everymonth.setChecked(true);
-                break;
-        }//@@10.24
+
         settingUserId.setText(userID);
         settingUserCode.setText(username);
         String state = MyApp.app.getPushState();
@@ -109,93 +76,28 @@ public class SettingFragment extends MvpFragment<SettingFragmentPresenter> imple
                 lineState.setText("在线");
             }
             if(state.equals("Offline")){
-                lineState.setText("离线");
+                lineState.setText("失联");
             }
         }
-        int privilege = MyApp.app.getPrivilege();
-        if (privilege == 3) {
-            settingHelpRela.setVisibility(View.VISIBLE);//显示添加摄像机。。
-            settingCameraRelative.setVisibility(View.VISIBLE);//显示绑定摄像机。。
-        }
-        if (privilege == 4) {
-            setting_webserver.setVisibility(View.VISIBLE);
-            nfc_mac_add .setVisibility(View.VISIBLE);
-        }
-        nfc_radiogroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                int period=0;
-                switch (checkedId){
-                    case R.id.everymonth:
-                        period=0;
-                        break;
-                    case R.id.everyweek:
-                        period=1;
-                        break;
-                    case R.id.everyday:
-                        period=2;
-                        break;
-                    default:
-                        period=0;
-                        break;
-                }
-                SharedPreferencesManager.getInstance().putData(mContext,"NFC_period",period);
-                T.showShort(mContext,"设置成功");
-            }
-        });
     }
 
-    @OnClick({R.id.app_update, R.id.setting_help_about, R.id.setting_help_rela, R.id.setting_help_exit,
-            R.id.setting_camera_relative,R.id.setting_nfc,R.id.nfc_mac_add,R.id.setting_pay,R.id.setting_help_wifi
-            ,R.id.setting_image,R.id.setting_webserver})
+    @OnClick({R.id.app_update, R.id.setting_help_about, R.id.setting_help_rela, R.id.setting_help_exit})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.setting_webserver:
-                Intent intent11=new Intent(getActivity(), WebServerActivity.class);
-                getActivity().startActivity(intent11);
-                break;
             case R.id.app_update:
-                if(ConstantValues.SERVER_IP_NEW.contains("119.29.155.148")
-                        ||ConstantValues.SERVER_IP_NEW.contains("193.112.150.195")){
-                    mvpPresenter.checkUpdate(mContext);
-                }else{
-                    T.showShort(mContext,"该版本不支持版本更新");
-                }
-//                getActivity().finish();//@@7.13
+                mvpPresenter.checkUpdate(mContext);
                 break;
-//            case R.id.setting_pay:
-//                Intent intent9 = new Intent(mContext, PayActivity.class);
-//                startActivity(intent9);
-//                break;
             case R.id.setting_help_about:
                 Intent intent = new Intent(mContext, AboutActivity.class);
                 startActivity(intent);
                 break;
-            case R.id.setting_help_wifi:
-                Intent intent_wifi = new Intent(mContext, ChuanganWifiStep1Activity.class);
-                startActivity(intent_wifi);
-                break;
-            case R.id.setting_help_rela:
-                Intent intent2 = new Intent(mContext, AddCameraFirstActivity.class);
-                startActivity(intent2);
-                break;
             case R.id.setting_help_exit:
+                showLoading();
                 Intent in = new Intent();
                 in.setAction("APP_EXIT");
-                in.setPackage("fire.cloud.smart.com.smartcloudfire");//@@7.13只传当前应用
+                in.setPackage(MyApp.getAppProcessName(mContext));//@@7.13只传当前应用
                 mContext.sendBroadcast(in);
                 getActivity().finish();//@@7.17
-                break;
-            case R.id.setting_camera_relative:
-                mvpPresenter.bindDialog(mContext);
-                break;
-            case R.id.setting_nfc:
-                Intent intent3 = new Intent(mContext, UploadNFCInfoActivity.class);
-                startActivity(intent3);
-                break;
-            case R.id.nfc_mac_add:
-                Intent intent6 = new Intent(mContext, AddNFCMacActivity.class);
-                startActivity(intent6);
                 break;
             default:
                 break;
@@ -216,6 +118,7 @@ public class SettingFragment extends MvpFragment<SettingFragmentPresenter> imple
     @Override
     public void onDestroy() {
         ButterKnife.unbind(this);
+        hideLoading();
         super.onDestroy();
     }
 
@@ -232,7 +135,9 @@ public class SettingFragment extends MvpFragment<SettingFragmentPresenter> imple
 
     @Override
     public void hideLoading() {
-        mProgressBar.setVisibility(View.GONE);
+        if(mProgressBar!=null){
+            mProgressBar.setVisibility(View.GONE);
+        }
     }
 
     @Override

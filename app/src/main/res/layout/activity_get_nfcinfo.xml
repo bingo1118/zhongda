@@ -164,7 +164,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:visibility="gone">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -197,7 +198,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                android:visibility="gone">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -307,17 +309,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:text="拍照上传"/>
+                    android:text="图片"/>
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="80dp"
+                    android:layout_marginLeft="50dp"
                     android:background="@drawable/edit_view_bg">
-                    <ImageView
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:id="@+id/photo_image"
-                        android:background="@drawable/add_photo"/>
+                    <com.smart.cloud.fire.view.TakePhotoView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/photo_image"/>
                 </RelativeLayout>
 
             </RelativeLayout>

@@ -16,8 +16,8 @@
              android:id="@+id/swipere_fresh_layout"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:scrollbars="vertical"
-             >
+             android:scrollbars="vertical">
+
              <android.support.v7.widget.RecyclerView
                  android:id="@+id/recycler_view"
                  android:layout_width="match_parent"
@@ -26,6 +26,14 @@
                  ></android.support.v7.widget.RecyclerView>
          </android.support.v4.widget.SwipeRefreshLayout>
         <include layout="@layout/progress_bar"/>
+         <ImageButton
+             android:id="@+id/return_top_ib"
+             android:layout_width="40dp"
+             android:layout_height="40dp"
+             android:layout_alignParentRight="true"
+             android:layout_margin="10dp"
+             android:visibility="gone"
+             android:background="@drawable/return_to_top"/>
     </RelativeLayout>
 
 </LinearLayout>

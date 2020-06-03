@@ -125,9 +125,14 @@ public class LoginActivity extends MvpActivity<LoginPresenter> implements LoginV
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        Uri uri = Uri.parse(ConstantValues.FORGET_PASSWORD_URL);
-                        Intent open_web = new Intent(Intent.ACTION_VIEW, uri);
-                        startActivity(open_web);
+                        Intent intent = new Intent(mContext, RegisterPhoneActivity.class);
+                        intent.putExtra("isReset",true);
+                        startActivity(intent);
+                        finish();
+                        overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right);
+//                        Uri uri = Uri.parse(ConstantValues.FORGET_PASSWORD_URL);
+//                        Intent open_web = new Intent(Intent.ACTION_VIEW, uri);
+//                        startActivity(open_web);
                     }
                 });
     }

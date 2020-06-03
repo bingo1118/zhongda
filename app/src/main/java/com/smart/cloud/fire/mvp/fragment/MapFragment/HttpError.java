@@ -28,6 +28,7 @@ public class HttpError<T> {
 
     private String error;
     private int errorCode;
+    private int allDevCount;//所有设备数
     private  String state;
     private List<Smoke> smoke;
     private List<Camera> camera;
@@ -210,5 +211,13 @@ public class HttpError<T> {
 
     public void setList(ArrayList<User> list) {
         this.list = list;
+    }
+
+    public int getAllDevCount() {
+        return allDevCount;
+    }
+
+    public void setAllDevCount(int allDevCount) {
+        this.allDevCount = allDevCount;
     }
 }

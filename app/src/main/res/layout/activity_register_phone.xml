@@ -120,6 +120,7 @@
             android:layout_marginLeft="10dp"
             android:text="@string/code"
             android:textColor="#ffffff"
+            android:textSize="10sp"
             android:background="@drawable/register_btn_selector"
             />
     </RelativeLayout>

@@ -172,6 +172,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/Temp2_line"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -197,10 +198,11 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:textSize="10sp"
-                        android:text="(0-1000℃)"/>
+                        android:text="(0-145℃)"/>
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/Temp3_line"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -226,7 +228,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:textSize="10sp"
-                        android:text="(0-1000℃)"/>
+                        android:text="(0-145℃)"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -240,7 +242,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1.2"
                         android:gravity="center"
-                        android:text="温度D阈值(℃):"/>
+                        android:text="温度N阈值(℃):"/>
                     <EditText
                         android:id="@+id/Temp4_value"
                         android:layout_width="0dp"
@@ -255,7 +257,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:textSize="10sp"
-                        android:text="(0-1000℃)"/>
+                        android:text="(0-145℃)"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

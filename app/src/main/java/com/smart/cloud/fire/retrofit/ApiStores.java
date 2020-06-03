@@ -17,6 +17,7 @@ import com.smart.cloud.fire.mvp.register.model.RegisterModel;
 import java.util.List;
 
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.adapter.rxjava.Result;
 import retrofit2.http.Field;
@@ -192,6 +193,11 @@ public interface ApiStores {
                                      @Query("areaId") String areaId,@Query("page") String page,
                                      @Query("placeTypeId") String placeTypeId,@Query("devType") String devType);
 
+    @GET("getNeedAlarmDevice")
+    @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
+    Observable<HttpError> getNeedAlarmDevice(@Query("userId") String userId, @Query("privilege") String privilege,
+                                     @Query("page") String page,@Query("type") String type);
+
     //根据条件查询用户设备@@9.1 添加区域分级查询
     @GET("getNeedDev")
     @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
@@ -256,6 +262,19 @@ public interface ApiStores {
                                           @Field("repeater") String repeater,@Field("camera") String camera,@Field("deviceType") String deviceType,
                                           @Field("electrState") String electrState,@Field("image") String image);
 
+    @Multipart
+    @POST("addNFCRecordWithImage")
+    Observable<HttpError> addNFCRecordWithImage(@Part List<MultipartBody.Part> requestBodyMap);
+
+    @Multipart
+    @POST("addSmokeWithImage")
+    Observable<ConfireFireModel> addSmokeWithImage(@Part List<MultipartBody.Part> requestBodyMap);
+
+    @Multipart
+    @POST("addNFCWithImage")
+    Observable<ConfireFireModel> addNFCWithImage(@Part List<MultipartBody.Part> requestBodyMap);
+
+
     //添加烟感
     @FormUrlEncoded
     @POST("addHeiMenSmoke")
@@ -307,7 +326,19 @@ public interface ApiStores {
     Observable<HttpError> getNeedAlarm(@Query("userId") String userId, @Query("privilege") String privilege
             ,@Query("startTime") String startTime,@Query("endTime") String endTime
             ,@Query("areaId") String areaId,@Query("placeTypeId") String placeTypeId
-            ,@Query("page") String page,@Query("parentId") String parentId);
+            ,@Query("page") String page,@Query("parentId") String parentId,@Query("alarmType") String alarmType);
+
+    //条件查询获取用户报警设备
+    @GET("getNeedAlarmDev")
+    @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
+    Observable<HttpError> getNeedAlarmDev(@Query("userId") String userId, @Query("privilege") String privilege
+            ,@Query("page") String page,@Query("type") String type);
+
+    @GET("getNeedAlarmByMac")
+    @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
+    Observable<HttpError> getNeedAlarmByMac(@Query("mac") String mac,@Query("page") String page);
+
+
 
     //条件查询获取用户报警任务
     @GET("getNeedAlarmMessage")
@@ -411,7 +442,8 @@ public interface ApiStores {
     @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
     Observable<TemperatureTime> getElectricTypeInfo(@Query("userId") String userId, @Query("privilege") String privilege,
                                                     @Query("smokeMac") String smokeMac, @Query("electricType") String electricType,
-                                                    @Query("electricNum") String electricNum, @Query("page") String page, @Query("devType") int devType);
+                                                    @Query("electricNum") String electricNum, @Query("page") String page
+                                                    , @Query("devType") int devType, @Query("pageNum") int pageNum);
 
     @GET("getChuanganHistoryInfo")
     @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")

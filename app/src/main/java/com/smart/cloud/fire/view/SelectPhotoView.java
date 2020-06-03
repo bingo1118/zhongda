@@ -1,7 +1,6 @@
 package com.smart.cloud.fire.view;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,25 +19,13 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.smart.cloud.fire.activity.UploadNFCInfo.FileUtil;
-import com.smart.cloud.fire.activity.UploadNFCInfo.FormFile;
-import com.smart.cloud.fire.global.ConstantValues;
-import com.smart.cloud.fire.mvp.register.RegisterPhoneActivity;
-import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.UploadUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import fire.cloud.smart.com.smartcloudfire.R;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class SelectPhotoView extends FrameLayout {
 

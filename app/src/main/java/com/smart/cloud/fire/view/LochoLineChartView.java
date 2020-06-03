@@ -55,7 +55,7 @@ public class LochoLineChartView extends LineChartView {
 
     /*=========== 其他相关 ==========*/
     private ValueShape pointsShape = ValueShape.CIRCLE; //点的形状(圆/方/菱形)
-    float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints]; //将线上的点放在一个数组中
+    float[][] randomNumbersTab ; //将线上的点放在一个数组中
     private Map<Integer, String> data = new HashMap<>();
     private String electricType;
     private int isWater;
@@ -73,6 +73,8 @@ public class LochoLineChartView extends LineChartView {
     }
 
     public void initChartView(String axisYtext,List<TemperatureTime.ElectricBean> list,String electricType,int isWater){
+        numberOfPoints=list.size()+2;
+        randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
         this.electricType=electricType;
         this.isWater=isWater;
         initView();
@@ -103,7 +105,7 @@ public class LochoLineChartView extends LineChartView {
             //节点的值
             List<PointValue> values = new ArrayList<>();
             for (int j = 0; j < (list.size()+1); ++j) {
-                if (j > 0 && j < 7) {
+                if (j > 0 && j < (list.size()+1)) {
                     values.add(new PointValue(j, randomNumbersTab[i][j]));
                     axisValuesX.add(new AxisValue(j).setLabel(getTime(list.get(j-1).getElectricTime())));
                 }
@@ -164,7 +166,7 @@ public class LochoLineChartView extends LineChartView {
         data.clear();
         for (int i = 0; i < maxNumberOfLines; ++i) {
             for (int j = 0; j < (list.size()+1); ++j) {
-                if (j > 0 && j < 7) {
+                if (j > 0 && j < list.size()+1) {
                     String str = list.get(j - 1).getElectricValue();
                     if (electricType.equals("7")) {
                         data.put(j, str);

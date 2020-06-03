@@ -34,6 +34,11 @@ public class SplashActivity extends MvpActivity<LoginPresenter> implements Login
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
         mContext = this;
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         mvpPresenter.autoLogin(this);
     }
 

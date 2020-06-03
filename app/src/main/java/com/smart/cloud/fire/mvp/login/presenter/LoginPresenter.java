@@ -54,9 +54,9 @@ public class LoginPresenter extends BasePresenter<LoginView> {
             if(userinfo!=null){
                 if(User.equals(userinfo.getUserid())&& Pwd.equals(userinfo.getPsw())){
                     login_success(userinfo.getUserid(),userinfo.getPsw(),userinfo.getPrivilege(),userinfo.getName());
-                    T.showShort(MyApp.app,"离线登陆成功");
+                    T.showShort(MyApp.app,"失联登陆成功");
                 }else {
-                    T.showShort(MyApp.app,"离线登陆失败");
+                    T.showShort(MyApp.app,"失联登陆失败");
                 }
                 return;
             }

@@ -200,8 +200,8 @@ public class  Main2Activity extends MvpActivity<MainPresenter> implements MainVi
 
     @Override
     public void getOnlineSummary(SmokeSummary model) {
-        scan_result_text.setText("您一共"+model.getAllSmokeNumber()+"个设备，离线设备有"+model.getLossSmokeNumber()
-                +"个，离线率："+model.getLossSmokeNumber()*100/model.getAllSmokeNumber()
+        scan_result_text.setText("您一共"+model.getAllSmokeNumber()+"个设备，失联设备有"+model.getLossSmokeNumber()
+                +"个，失联率："+model.getLossSmokeNumber()*100/model.getAllSmokeNumber()
                 +"%；低电压设备"+model.getLowVoltageNumber() +"个");
     }
 

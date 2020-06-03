@@ -32,6 +32,7 @@ import com.smart.cloud.fire.utils.BingoDialog;
 import com.smart.cloud.fire.utils.SharedPreferencesManager;
 import com.smart.cloud.fire.utils.T;
 import com.smart.cloud.fire.utils.VolleyHelper;
+import com.smart.cloud.fire.view.SingleLineZoomTextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -108,8 +109,8 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             final AlarmMessageModel mNormalAlarmMessage = messageModelList.get(position);
             final int alarmType = mNormalAlarmMessage.getAlarmType();
             int ifDeal = mNormalAlarmMessage.getIfDealAlarm();
-            ((ItemViewHolder) holder).smokeMac.setTextColor(mContext.getResources().getColor(R.color.hj_color_text));
-            ((ItemViewHolder) holder).smokeMacTv.setTextColor(mContext.getResources().getColor(R.color.hj_color_text));
+//            ((ItemViewHolder) holder).smokeMac.setTextColor(mContext.getResources().getColor(R.color.hj_color_text));
+//            ((ItemViewHolder) holder).smokeMacTv.setTextColor(mContext.getResources().getColor(R.color.hj_color_text));
             ((ItemViewHolder) holder).alarmTimeTv.setText(mNormalAlarmMessage.getAlarmTime());
             ((ItemViewHolder) holder).smokeMacTv.setText(mNormalAlarmMessage.getName());
             ((ItemViewHolder) holder).repeaterAddressTv.setText("地址:"+mNormalAlarmMessage.getAddress());
@@ -398,6 +399,7 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
                     }
                     break;
+                case 113:
                 case 107:
                 case 105://中电Lora
                 case 91:
@@ -414,6 +416,9 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                     ((ItemViewHolder) holder).smokeMac.setText("电气火灾探测器:");
                     int alarmFamily = mNormalAlarmMessage.getAlarmFamily();
                     switch (alarmType){
+                        case 400:
+                            ((ItemViewHolder) holder).alarmMarkImage.setText(R.string.diaodian);
+                            break;
                         case 204:
                             ((ItemViewHolder) holder).alarmMarkImage.setText(R.string.shoubao);
                             break;
@@ -578,6 +583,9 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                     ((ItemViewHolder) holder).alarmMarkImage.setText(R.string.baojing);//@@8.10
                     break;
             }
+            if(alarmType==404){
+                ((ItemViewHolder) holder).alarmMarkImage.setText(R.string.shilian);
+            }
             RxView.clicks(((ItemViewHolder) holder).actionNowTv).throttleFirst(2, TimeUnit.SECONDS).subscribe(new Action1<Void>() {
                 @Override
                 public void call(Void aVoid) {
@@ -671,7 +679,7 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         @Bind(R.id.smoke_mac)
         TextView smokeMac;
         @Bind(R.id.smoke_mac_tv)
-        TextView smokeMacTv;
+        SingleLineZoomTextView smokeMacTv;
         @Bind(R.id.alarm_mark_image)
         TextView alarmMarkImage;
         @Bind(R.id.repeater_address_tv)
@@ -754,6 +762,7 @@ public class RefreshRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     //@@5.18
     public void setList(int index) {
         this.messageModelList.get(index).setIfDealAlarm(1);//@@5.19
+//        messageModelList.remove(index);
         notifyDataSetChanged();//@@5.19
     }
 }

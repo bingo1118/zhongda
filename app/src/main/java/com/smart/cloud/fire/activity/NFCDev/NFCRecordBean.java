@@ -19,6 +19,26 @@ public class NFCRecordBean implements Serializable{
     String addTime;
     String deviceTypeName;
     String userId;
+    String photo1;
+    String model;//型号
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+
+    public String getPhoto1() {
+        return photo1;
+    }
+
+    public void setPhoto1(String photo1) {
+        this.photo1 = photo1;
+    }
+
 
     public String getUserId() {
         return userId;

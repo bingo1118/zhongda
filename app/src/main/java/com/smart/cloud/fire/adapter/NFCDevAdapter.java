@@ -12,7 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.smart.cloud.fire.activity.NFCDev.NFCDevHistoryActivity;
+import com.smart.cloud.fire.activity.NFCDev.NFCImageShowActivity;
 import com.smart.cloud.fire.activity.NFCDev.NFCRecordBean;
+import com.smart.cloud.fire.global.ConstantValues;
 import com.smart.cloud.fire.mvp.fragment.MapFragment.Smoke;
 import com.smart.cloud.fire.mvp.fragment.ShopInfoFragment.Security.AirInfoActivity;
 import com.smart.cloud.fire.ui.CallManagerDialogActivity;
@@ -87,7 +89,7 @@ public class NFCDevAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             ((ItemViewHolder) holder).smoke_name_text.setText(normalSmoke.getDeviceName());
 
-            ((ItemViewHolder) holder).category_group_lin.setOnClickListener(new View.OnClickListener() {
+            ((ItemViewHolder) holder).nfc_history_btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext, NFCDevHistoryActivity.class);
@@ -98,6 +100,7 @@ public class NFCDevAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             });
 
 
+            ((ItemViewHolder) holder).model_tv.setText(normalSmoke.getModel());//@@
             ((ItemViewHolder) holder).address_tv.setText(normalSmoke.getAddress());
             ((ItemViewHolder) holder).mac_tv.setText(normalSmoke.getUid());//@@
             String state="待检";
@@ -122,6 +125,20 @@ public class NFCDevAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             ((ItemViewHolder) holder).area_tv.setText(normalSmoke.getAreaName());
             ((ItemViewHolder) holder).addtime_tv.setVisibility(View.VISIBLE);
             ((ItemViewHolder) holder).addtime_tv.setText(normalSmoke.getAddTime());
+            if(normalSmoke.getPhoto1()==null||normalSmoke.getPhoto1().length()==0){
+                ((ItemViewHolder) holder).nfc_image.setVisibility(View.GONE);
+            }else{
+                ((ItemViewHolder) holder).nfc_image.setVisibility(View.VISIBLE);
+            }
+            ((ItemViewHolder) holder).nfc_image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String path= ConstantValues.NFC_IMAGES+"nfcdevimages/"+normalSmoke.getUid()+".jpg";
+                    Intent intent=new Intent(mContext, NFCImageShowActivity.class);
+                    intent.putExtra("path",path);
+                    mContext.startActivity(intent);
+                }
+            });
 
             holder.itemView.setTag(position);
         } else if (holder instanceof FootViewHolder) {
@@ -188,6 +205,12 @@ public class NFCDevAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         TextView addtime_tv;
         @Bind(R.id.item_lin)
         LinearLayout item_lin;//@@8.8
+        @Bind(R.id.nfc_image)
+        TextView nfc_image;
+        @Bind(R.id.model_tv)
+        TextView model_tv;
+        @Bind(R.id.nfc_history_btn)
+        TextView nfc_history_btn;
         public ItemViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);

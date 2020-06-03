@@ -1,5 +1,6 @@
 package com.smart.cloud.fire.global;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -15,6 +16,7 @@ import android.widget.RemoteViews;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.hikvision.open.hikvideoplayer.HikVideoPlayerFactory;
+import com.mob.MobSDK;
 import com.p2p.core.P2PHandler;
 import com.p2p.core.update.UpdateManager;
 import com.smart.cloud.fire.activity.Functions.constant.Constant;
@@ -34,6 +36,8 @@ import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 
 import org.litepal.LitePal;
 
+import java.util.List;
+
 import fire.cloud.smart.com.smartcloudfire.R;
 
 /**
@@ -50,6 +54,7 @@ public class MyApp extends Application {
     public LocationService locationService;
     public Vibrator mVibrator;
     public static String userid;
+    public static String mAppProcessName;//包名
 
     public static long a;
     public static long b;
@@ -64,7 +69,7 @@ public class MyApp extends Application {
         //启动集错程序
         CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(this);
-        //检查内存是否泄漏初始化，正式版应该关闭
+        //检查内存是否泄漏初始化，正式版应该关闭0
         LeakCanary.install(this);
         LitePal.initialize(this);//数据库框架
         SQLiteDatabase db = LitePal.getDatabase();
@@ -74,6 +79,8 @@ public class MyApp extends Application {
         HikVideoPlayerFactory.initLib(null, true);
 //        AutoScreenUtils.AdjustDensity(this);//屏幕适配
         ZXingLibrary.initDisplayOpinion(this);
+//        MobSDK.init(this,"m2efb245f9ef5e","9380ce616f2726beec68851a03b6f8ca");//测试
+        MobSDK.init(this,"m2efaa2323a73c","5c3b5136396cbfc63c2fe8d4fb198fdf");//正式
     }
 
 
@@ -93,7 +100,7 @@ public class MyApp extends Application {
 //                .setAppVersion(packageInfo.versionName)
 //                .setAesKey(null)
 //                .setEnableDebug(true)
-//                .setPatchLoadStatusStub(new PatchLoadStatusListener() {
+//                .setPatchLoadStatusStub(new PatchLoadStatusListener() {-
 //                    @Override
 //                    public void onLoad(final int mode, final int code, final String info, final int handlePatchVersion) {
 //                        // 补丁加载回调通知
@@ -211,6 +218,25 @@ public class MyApp extends Application {
             mNotificationManager.notify(NOTIFICATION_DOWN_ID,
                     mNotification);
         }
+    }
+
+    //获取包名
+    public static String getAppProcessName(Context context) {
+        if(mAppProcessName==null){
+            //当前应用pid
+            int pid = android.os.Process.myPid();
+            //任务管理类
+            ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            //遍历所有应用
+            List<ActivityManager.RunningAppProcessInfo> infos = manager.getRunningAppProcesses();
+            for (ActivityManager.RunningAppProcessInfo info : infos) {
+                if (info.pid == pid){
+                    mAppProcessName=info.processName;
+                    break;
+                }
+            }
+        }
+        return mAppProcessName;
     }
 
     public void hideDownNotification(){

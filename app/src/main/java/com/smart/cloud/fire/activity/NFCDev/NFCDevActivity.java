@@ -92,7 +92,7 @@ public class NFCDevActivity extends MvpActivity<NFCDevPresenter> implements NFCD
     @Bind(R.id.offline_num)
     TextView offlineNum;
     @Bind(R.id.trace_search)
-    ImageButton trace_search;
+    ImageView trace_search;
     private LinearLayoutManager linearLayoutManager;
     private NFCDevAdapter shopSmokeAdapter;
     private int lastVisibleItem;
@@ -119,6 +119,8 @@ public class NFCDevActivity extends MvpActivity<NFCDevPresenter> implements NFCD
     XCDropDownListViewMapSearch stateCondition;//状态下拉选择。。
     @Bind(R.id.search_fire)
     ImageView searchFire;//搜索按钮。。
+    @Bind(R.id.insp_btn)
+    ImageButton insp_btn;//搜索按钮。。
     private boolean visibility = false;
     private ShopType mShopType;
     private State mState;
@@ -153,6 +155,7 @@ public class NFCDevActivity extends MvpActivity<NFCDevPresenter> implements NFCD
         stateCondition.setActivity(this);
         addFire.setVisibility(View.VISIBLE);//@@8.17
         addFire.setImageResource(R.drawable.search);//@@8.17
+        //
         mvpPresenter.getNFCInfo(userID, "", "",page, list, 1,false,null);
         mvpPresenter.getSmokeSummary(userID,privilege+"","","");//@@8.17
     }
@@ -209,6 +212,11 @@ public class NFCDevActivity extends MvpActivity<NFCDevPresenter> implements NFCD
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                if(dy>0){
+                    insp_btn.setVisibility(View.GONE);
+                }else{
+                    insp_btn.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -221,7 +229,7 @@ public class NFCDevActivity extends MvpActivity<NFCDevPresenter> implements NFCD
         getWindow().setAttributes(lp);
     }
 
-    @OnClick({R.id.state_condition,R.id.add_fire, R.id.area_condition, R.id.shop_type_condition, R.id.search_fire,R.id.turn_map_btn,R.id.trace_search})
+    @OnClick({R.id.state_condition,R.id.add_fire, R.id.area_condition, R.id.shop_type_condition, R.id.search_fire,R.id.insp_btn,R.id.trace_search})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.add_fire://显示查询条件按钮。。
@@ -377,10 +385,9 @@ public class NFCDevActivity extends MvpActivity<NFCDevPresenter> implements NFCD
                     return;
                 }
                 break;
-            case R.id.turn_map_btn:
-                Intent intent=new Intent(NFCDevActivity.this, MapActivity.class);
-                intent.putExtra("devType","7");
-                startActivity(intent);
+            case R.id.insp_btn:
+                Intent intent3 = new Intent(mContext, UploadNFCInfoActivity.class);
+                startActivity(intent3);
                 break;
             case R.id.trace_search:
                 showPopupWindow(view);
@@ -439,6 +446,15 @@ public class NFCDevActivity extends MvpActivity<NFCDevPresenter> implements NFCD
                 Intent intent1=new Intent(NFCDevActivity.this, ChooseConditionActivity.class);
                 startActivity(intent1);
                 popupWindow.dismiss();
+            }
+        });
+        RelativeLayout map_rela=(RelativeLayout)contentView.findViewById(R.id.setting_nfc_map);
+        map_rela.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(NFCDevActivity.this, MapActivity.class);
+                intent.putExtra("devType","7");
+                startActivity(intent);
             }
         });
         RelativeLayout period_rela=(RelativeLayout)contentView.findViewById(R.id.setting_nfc_period);

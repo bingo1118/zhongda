@@ -81,7 +81,7 @@ public class AllSmokePresenter extends BasePresenter<AllSmokeView> {
                     }
                 }else{
                     List<Smoke> mSmokeList = new ArrayList<>();
-                    mvpView.getDataSuccess(mSmokeList,false);
+                    mvpView.getDataSuccess(mSmokeList,model.getAllDevCount(),false);
                     mvpView.getDataFail("无数据");
                 }
             }
@@ -90,8 +90,47 @@ public class AllSmokePresenter extends BasePresenter<AllSmokeView> {
             public void onFailure(int code, String msg) {
                 if(type!=1){
                     List<Smoke> mSmokeList = new ArrayList<>();
-                    mvpView.getDataSuccess(mSmokeList,false);
+                    mvpView.getDataSuccess(mSmokeList,0,false);
                 }
+                mvpView.getDataFail("网络错误");
+            }
+
+            @Override
+            public void onCompleted() {
+                mvpView.hideLoading();
+            }
+        }));
+    }
+
+
+    public void getAlarmDeviceByType(String userId, String privilege, String page,String type,  boolean refresh){
+//        if(!refresh){
+            mvpView.showLoading();
+//        }
+        Observable mObservable;
+        mObservable = apiStores1.getNeedAlarmDevice(userId,privilege,page,type);
+
+        addSubscription(mObservable,new SubscriberCallBack<>(new ApiCallback<HttpError>() {
+            @Override
+            public void onSuccess(HttpError model) {
+                int result=model.getErrorCode();
+                if(result==0){
+                    List<Smoke> smokeList = model.getSmoke();
+                    if(refresh){
+                        mvpView.getDataSuccess(smokeList,model.getAllDevCount(),false);
+                    }else{
+                        mvpView.onLoadingMore(smokeList);
+                    }
+
+                }else{
+                    List<Smoke> mSmokeList = new ArrayList<>();
+                    mvpView.getDataSuccess(mSmokeList,model.getAllDevCount(),false);
+                    mvpView.getDataFail("无数据");
+                }
+            }
+
+            @Override
+            public void onFailure(int code, String msg) {
                 mvpView.getDataFail("网络错误");
             }
 

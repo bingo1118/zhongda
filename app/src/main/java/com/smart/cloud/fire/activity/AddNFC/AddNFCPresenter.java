@@ -14,8 +14,11 @@ import com.smart.cloud.fire.rxjava.ApiCallback;
 import com.smart.cloud.fire.rxjava.SubscriberCallBack;
 import com.smart.cloud.fire.service.LocationService;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
+import okhttp3.MultipartBody;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -110,11 +113,35 @@ public class AddNFCPresenter extends BasePresenter<AddNFCView> {
         }));
     }
 
-    public void addNFC(String userID,String privilege,String smokeName,String smokeMac,String address,String longitude,
-                         String latitude,String placeTypeId,String areaId,String producer,String makeTime,String workerPhone,String makeAddress){
+    public void addNFC(String userID, String privilege, String smokeName, String smokeMac, String address, String longitude,
+                       String latitude, String placeTypeId, String areaId, String producer, String makeTime, String workerPhone, String makeAddress,String model, File file){
         mvpView.showLoading();
-        Observable mObservable = apiStores1.addNFC(userID,privilege,smokeName,smokeMac,address,
-                longitude,latitude,placeTypeId,areaId,producer,makeTime,workerPhone,makeAddress);
+
+        Observable mObservable=null;
+        List<MultipartBody.Part> parts = new ArrayList<>();
+        parts.add(toRequestBodyOfText("userId", userID));
+        parts.add(toRequestBodyOfText("privilege", privilege));
+        parts.add(toRequestBodyOfText("smokeName", smokeName));
+        parts.add(toRequestBodyOfText("uid", smokeMac));
+        parts.add(toRequestBodyOfText("address", address));
+        parts.add(toRequestBodyOfText("longitude", longitude));
+        parts.add(toRequestBodyOfText("latitude", latitude));
+        parts.add(toRequestBodyOfText("areaId", areaId));
+        parts.add(toRequestBodyOfText("deviceType", placeTypeId));
+
+        parts.add(toRequestBodyOfText("producer", producer));
+        parts.add(toRequestBodyOfText("deviceType", makeTime));
+        parts.add(toRequestBodyOfText("workerPhone", workerPhone));
+        parts.add(toRequestBodyOfText("makeAddress", makeAddress));
+        parts.add(toRequestBodyOfText("model", model));
+
+        if(file!=null&&file.exists()){
+            parts.add(toRequestBodyOfImage("imagefile",file));//图片
+        }
+        mObservable = apiStores1.addNFCWithImage(parts);
+
+//        Observable mObservable = apiStores1.addNFC(userID,privilege,smokeName,smokeMac,address,
+//                longitude,latitude,placeTypeId,areaId,producer,makeTime,workerPhone,makeAddress);
         addSubscription(mObservable,new SubscriberCallBack<>(new ApiCallback<ConfireFireModel>() {
             @Override
             public void onSuccess(ConfireFireModel model) {
@@ -129,6 +156,7 @@ public class AddNFCPresenter extends BasePresenter<AddNFCView> {
 
             @Override
             public void onFailure(int code, String msg) {
+
                 mvpView.addSmokeResult("添加失败",1);
             }
 

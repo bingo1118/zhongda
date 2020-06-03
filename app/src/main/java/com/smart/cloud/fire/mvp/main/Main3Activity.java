@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -23,6 +24,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.igexin.sdk.PushManager;
 import com.p2p.core.P2PHandler;
 import com.smart.cloud.fire.activity.AddDev.ChioceDevTypeActivity;
+import com.smart.cloud.fire.activity.AlarmButtonDev.AlarmButtomActivity;
+import com.smart.cloud.fire.activity.AlarmDevDetail.AlarmDevDetailActivity;
+import com.smart.cloud.fire.activity.AlarmDeviceByType.AlarmDeviceByTypeActivity;
 import com.smart.cloud.fire.activity.AlarmHistory.AlarmHistoryActivity;
 import com.smart.cloud.fire.activity.AlarmMsg.AlarmMsgActivity;
 import com.smart.cloud.fire.activity.AllSmoke.AllSmokeActivity;
@@ -40,6 +44,7 @@ import com.smart.cloud.fire.activity.NFCDev.NFCDevActivity;
 import com.smart.cloud.fire.activity.SecurityDev.SecurityDevActivity;
 import com.smart.cloud.fire.activity.Setting.MyZoomActivity;
 import com.smart.cloud.fire.activity.WiredDev.WiredDevActivity;
+import com.smart.cloud.fire.activity.ZDDevList.DeviceListByTypeActivity;
 import com.smart.cloud.fire.adapter.MyRecyclerViewAdapter;
 import com.smart.cloud.fire.base.ui.MvpActivity;
 import com.smart.cloud.fire.global.ConstantValues;
@@ -91,16 +96,33 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
     TextView offline_sum;
     @Bind(R.id.fault_sum)
     TextView fault_sum;
+    @Bind(R.id.lowvoltage_sum)
+    TextView lowvoltage_sum;
     @Bind(R.id.alarm_sum)
     TextView alarm_sum;
+    @Bind(R.id.all_sum)
+    TextView all_sum;
     @Bind(R.id.scan_btn)
     Button scan_btn;
     @Bind(R.id.circleProgressBar)
     CircleProgressBar circleProgressBar;
 
+    @Bind(R.id.alldev_line)
+    LinearLayout alldev_line;
+    @Bind(R.id.normal_line)
+    LinearLayout normal_line;
+    @Bind(R.id.fault_line)
+    LinearLayout fault_line;
+    @Bind(R.id.offline_line)
+    LinearLayout offline_line;
+    @Bind(R.id.alarmdev_line)
+    LinearLayout alarmdev_line;
+    @Bind(R.id.lowvoltage_line)
+    LinearLayout lowvoltage_line;
+
 
     Timer getlastestAlarm;
-    AnimationDrawable anim ;
+    AnimationDrawable anim;
 
     MainPresenter presenter;
     ArrayList<ApplyTable> list;
@@ -117,7 +139,7 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
         ButterKnife.bind(this);
-        mContext=this;
+        mContext = this;
         privilege = MyApp.app.getPrivilege();
 
         regFilter();
@@ -132,106 +154,118 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
     private void initView() {
         getHistoryCore();
 
-        String a =Constant.APPLY_MINE;
+        String a = Constant.APPLY_MINE;
         list = (ArrayList<ApplyTable>) ACache.get(MyApp.app).getAsObject(Constant.APPLY_MINE);
-        if(list==null){
-            list= (ArrayList<ApplyTable>) ApplyTableManager.loadNewsChannelsStatic(privilege);
-            ACache.get(MyApp.app).put(Constant.APPLY_MINE,list);
+        if (list == null) {
+            list = (ArrayList<ApplyTable>) ApplyTableManager.loadNewsChannelsStatic(privilege);
+            ACache.get(MyApp.app).put(Constant.APPLY_MINE, list);
         }
-        if(privilege==31||privilege==32||privilege==4||privilege==6||privilege==61||privilege==7){
-            ApplyTable editModel=new ApplyTable("更多功能","11",11,false, "bianji.png",1);
-            list.add(editModel);
-            scan_btn.setVisibility(View.VISIBLE);
-            circleProgressBar.setVisibility(View.VISIBLE);
-        }else{
-            circleProgressBar.setVisibility(View.INVISIBLE);
-            scan_btn.setVisibility(View.GONE);
-        }
+        scan_btn.setVisibility(View.VISIBLE);
+        circleProgressBar.setVisibility(View.VISIBLE);
+//        if (privilege == 31 || privilege == 32 || privilege == 4 || privilege == 6 || privilege == 61 || privilege == 7) {
+////            ApplyTable editModel=new ApplyTable("更多功能","11",11,false, "bianji.png",1);
+////            list.add(editModel);
+//            scan_btn.setVisibility(View.VISIBLE);
+//            circleProgressBar.setVisibility(View.VISIBLE);
+//        } else {
+//            circleProgressBar.setVisibility(View.INVISIBLE);
+//            scan_btn.setVisibility(View.GONE);
+//        }
 
 
         myAdapte1r = new MyRecyclerViewAdapter(list);
 
         myAdapte1r.setItemClickListener(new MyRecyclerViewAdapter.MyItemClickListener() {
             Intent intent;
+
             @Override
             public void onItemClick(View view, int position) {
-                ApplyTable table=list.get(position);
+                ApplyTable table = list.get(position);
                 if (ButtonUtils.isFastDoubleClick(Integer.parseInt(table.getId()))) {
                     return;
                 }
-                switch (Integer.parseInt(table.getId())){
+                switch (Integer.parseInt(table.getId())) {
                     case 0:
                         intent = new Intent(mContext, ChioceDevTypeActivity.class);
                         break;
-                    case 1:
-                        intent = new Intent(mContext, AllSmokeActivity.class);
-                        break;
-                    case 2:
-                        intent = new Intent(mContext, WiredDevActivity.class);
-                        break;
-                    case 3:
-                        intent = new Intent(mContext, ElectricDevActivity.class);
-                        break;
-                    case 4:
-                        intent = new Intent(mContext, SecurityDevActivity.class);
-                        break;
-                    case 5:
-                        intent = new Intent(mContext, CameraDevActivity.class);
-                        break;
+//                    case 1:
+//                        intent = new Intent(mContext, AllSmokeActivity.class);
+//                        break;
+//                    case 2:
+//                        intent = new Intent(mContext, WiredDevActivity.class);
+//                        break;
+//                    case 3:
+//                        intent = new Intent(mContext, ElectricDevActivity.class);
+//                        break;
+//                    case 4:
+//                        intent = new Intent(mContext, SecurityDevActivity.class);
+//                        break;
+////                    case 5:
+//                        intent = new Intent(mContext, CameraDevActivity.class);
+////                        break;
                     case 6:
                         intent = new Intent(mContext, NFCDevActivity.class);
                         break;
-                    case 7:
-                        intent= new Intent(mContext, HostActivity.class);
-                        break;
-                    case 8:
-                        intent=new Intent(mContext, InspectionMainActivity.class);
-                        break;
+//                    case 7:
+//                        intent= new Intent(mContext, HostActivity.class);
+//                        break;
+//                    case 8:
+//                        intent=new Intent(mContext, InspectionMainActivity.class);
+//                        break;
+//                    case 5:
+////                        intent=new Intent(mContext, AlarmButtomActivity.class);
+//                        intent = new Intent(mContext, DeviceListByTypeActivity.class);
+//                        intent.putExtra("ApplyTable", table);
+//                        break;
                     case 11:
-                        intent=new Intent(mContext, FunctionsActivity.class);
+                        intent = new Intent(mContext, FunctionsActivity.class);
                         break;
+                    default:
+                        intent = new Intent(mContext, DeviceListByTypeActivity.class);
+                        intent.putExtra("ApplyTable", table);
+                        break;
+
                 }
                 startActivity(intent);
-                MyApp.a=System.currentTimeMillis();
             }
         });
 
         recyclerView = (RecyclerView) findViewById(R.id.message_notice_list_item);
         //纵向线性布局
-        GridLayoutManager layoutManager = new GridLayoutManager(this,4);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
         recyclerView.addItemDecoration(new ItemDivider().setDividerWith(2).setDividerColor(0xe5e5e5));
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(myAdapte1r);
 
 
         connect();
-        getlastestAlarm=null;
-        getlastestAlarm=new Timer();
+        getlastestAlarm = null;
+        getlastestAlarm = new Timer();
         getlastestAlarm.schedule(new TimerTask() {
             @Override
             public void run() {
                 String username = MyApp.getUserID();
-                String url= ConstantValues.SERVER_IP_NEW+"getLastestAlarm?userId="+username+"&privilege="+privilege;
+                String url = ConstantValues.SERVER_IP_NEW + "getLastestAlarm?userId=" + username + "&privilege=" + privilege;
                 VolleyHelper.getInstance(mContext).getJsonResponse(url,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
                                 try {
-                                    int errorCode=response.getInt("errorCode");
+                                    int errorCode = response.getInt("errorCode");
                                     String content = "";
-                                    if(errorCode==0){
-                                        JSONObject lasteatalarm=response.getJSONObject("lasteatAlarm");
+                                    if (errorCode == 0) {
+                                        JSONObject lasteatalarm = response.getJSONObject("lasteatAlarm");
 
-                                        if(lasteatalarm.getInt("ifDealAlarm")==0){
+                                        if (lasteatalarm.getInt("ifDealAlarm") == 0) {
                                             anim.start();
-                                            content=lasteatalarm.getString("address")+"\n"+lasteatalarm.getString("name")+"发生报警";
-                                        }else{
+                                            content = lasteatalarm.getString("address") + "\n" + lasteatalarm.getString("name") + "发生报警";
+                                        } else {
                                             anim.stop();
-                                            content=lasteatalarm.getString("address") +"\n"+lasteatalarm.getString("name")+"发生报警【已处理】";
+                                            content = lasteatalarm.getString("address") + "\n" + lasteatalarm.getString("name") + "发生报警【已处理】";
                                         }
-                                    }else{
+                                    } else {
                                         anim.stop();
-                                        content="无最新报警信息";
+                                        content = "无最新报警信息";
                                     }
                                     home_alarm_info_text.setText(content);
                                 } catch (JSONException e) {
@@ -239,20 +273,20 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
                                 }
                             }
                         }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        anim.stop();
-                        home_alarm_info_text.setText("未获取到数据");
-                    }
-                });
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                anim.stop();
+                                home_alarm_info_text.setText("未获取到数据");
+                            }
+                        });
             }
-        },0,60000);
+        }, 0, 60000);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if(getlastestAlarm!=null){
+        if (getlastestAlarm != null) {
             getlastestAlarm.cancel();
         }
     }
@@ -300,50 +334,48 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
      * 个推解绑@@5.16
      */
     private void unbindAlias() {
-        String userCID = SharedPreferencesManager.getInstance().getData(this,SharedPreferencesManager.SP_FILE_GWELL,"CID");//@@
+        String userCID = SharedPreferencesManager.getInstance().getData(this, SharedPreferencesManager.SP_FILE_GWELL, "CID");//@@
         String username = SharedPreferencesManager.getInstance().getData(mContext,
                 SharedPreferencesManager.SP_FILE_GWELL,
                 SharedPreferencesManager.KEY_RECENTNAME);
-        String url= ConstantValues.SERVER_IP_NEW+"loginOut?userId="+username+"&alias="+username+"&cid="+userCID+"&appId=1";//@@5.27添加app编号
+        String url = ConstantValues.SERVER_IP_NEW + "loginOut?userId=" + username + "&alias=" + username + "&cid=" + userCID + "&appId=1";//@@5.27添加app编号
         VolleyHelper.getInstance(mContext).getJsonResponse(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                     }
                 }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
 
-            }
-        });
+                    }
+                });
     }
 
+    Timer timer;
     private void dealWithScan() {
-        Timer timer = new Timer();
+        timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 int privilege = MyApp.app.getPrivilege();
-                String userID = SharedPreferencesManager.getInstance().getData(mContext,
-                        SharedPreferencesManager.SP_FILE_GWELL,
-                        SharedPreferencesManager.KEY_RECENTNAME);
-                presenter.getSmokeSummary(userID,privilege+"","","","","");
+                String userID = MyApp.getUserID();
+                presenter.getSmokeSummary(userID, privilege + "", "", "", "", "");
             }
         };
-        timer.schedule(timerTask,5000);
+        timer.schedule(timerTask, 5000);
     }
 
-    @OnClick({R.id.scan_btn,R.id.my_image,R.id.alarm_msg,R.id.alarm_line,R.id.circleProgressBar})
+    @OnClick({R.id.scan_btn, R.id.my_image, R.id.alarm_msg, R.id.alarm_line, R.id.circleProgressBar})
     public void onClick(View view) {
         Intent intent;
         switch (view.getId()) {
             case R.id.scan_btn:
-//                intent=new Intent(mContext, BigDataActivity.class);
-//                startActivity(intent);
                 getHistoryCore();
+                presenter.getSmokeSummary(MyApp.getUserID(), privilege + "", "", "", "", "");
                 break;
             case R.id.alarm_msg:
-                intent=new Intent(mContext, AlarmMsgActivity.class);
+                intent = new Intent(mContext, AlarmMsgActivity.class);
                 startActivity(intent);
                 break;
             case R.id.my_image:
@@ -366,13 +398,13 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
         String username = SharedPreferencesManager.getInstance().getData(mContext,
                 SharedPreferencesManager.SP_FILE_GWELL,
                 SharedPreferencesManager.KEY_RECENTNAME);
-        String url= ConstantValues.SERVER_IP_NEW+"getHistorSafeScore?userId="+username;
+        String url = ConstantValues.SERVER_IP_NEW + "getHistorSafeScore?userId=" + username;
         VolleyHelper.getInstance(mContext).getJsonResponse(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            if(response.getInt("errorCode")==0){
+                            if (response.getInt("errorCode") == 0) {
                                 circleProgressBar.setProgress(response.getInt("safeScore"), true);
                             }
                         } catch (JSONException e) {
@@ -380,16 +412,16 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
                         }
                     }
                 }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                T.showShort(mContext,"获取历史分数错误");
-            }
-        });
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        T.showShort(mContext, "获取历史分数错误");
+                    }
+                });
     }
 
     @Override
     protected MainPresenter createPresenter() {
-        presenter=new MainPresenter(this);
+        presenter = new MainPresenter(this);
         return presenter;
     }
 
@@ -418,22 +450,83 @@ public class Main3Activity extends MvpActivity<MainPresenter> implements MainVie
         super.onDestroy();
         getlastestAlarm.cancel();
         VolleyHelper.getInstance(mContext).stopRequestQueue();
+        timer.cancel();
     }
 
     @Override
     public void getOnlineSummary(SmokeSummary model) {
-        dev_sum.setText((model.getAllSmokeNumber()-model.getLossSmokeNumber())+"");
-        offline_sum.setText(model.getLossSmokeNumber()+"");
-        fault_sum.setText(model.getLowVoltageNumber()+"");
-        alarm_sum.setText(model.getAlarmDevNumber()+"");
+        all_sum.setText(model.getAllSmokeNumber() + "");
+        dev_sum.setText((model.getOnlineSmokeNumber()) + "");
+        offline_sum.setText(model.getLossSmokeNumber() + "");
+        fault_sum.setText(model.getFaultDevNumber() + "");
+        alarm_sum.setText(model.getAlarmDevNumber() + "");
+        lowvoltage_sum.setText(model.getLowVoltageNumber() + "");
+
+        alldev_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Main3Activity.this, AlarmDeviceByTypeActivity.class);
+                intent.putExtra("sum", model.getAllSmokeNumber() + "");
+                intent.putExtra("type", 6);
+                startActivity(intent);
+            }
+        });
+
+        normal_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Main3Activity.this, AlarmDeviceByTypeActivity.class);
+                intent.putExtra("sum", model.getOnlineSmokeNumber() + "");
+                intent.putExtra("type", 5);
+                startActivity(intent);
+            }
+        });
+
+        alarmdev_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Main3Activity.this, AlarmDeviceByTypeActivity.class);
+                intent.putExtra("sum", model.getAlarmDevNumber() + "");
+                intent.putExtra("type", 1);
+                startActivity(intent);
+            }
+        });
+        offline_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Main3Activity.this, AlarmDeviceByTypeActivity.class);
+                intent.putExtra("sum", model.getLossSmokeNumber() + "");
+                intent.putExtra("type", 2);
+                startActivity(intent);
+            }
+        });
+        fault_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Main3Activity.this, AlarmDeviceByTypeActivity.class);
+                intent.putExtra("sum", model.getFaultDevNumber() + "");
+                intent.putExtra("type", 3);
+                startActivity(intent);
+            }
+        });
+        lowvoltage_line.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Main3Activity.this, AlarmDeviceByTypeActivity.class);
+                intent.putExtra("sum", model.getLowVoltageNumber() + "");
+                intent.putExtra("type", 4);
+                startActivity(intent);
+            }
+        });
+
     }
 
     @Override
     public void getSafeScore(SafeScore model) {
-        if(model!=null){
+        if (model != null) {
             circleProgressBar.setProgress((int) model.getSafeScore(), true);
-        }else{
-            T.showShort(mContext,"获取评分失败");
+        } else {
+            T.showShort(mContext, "获取评分失败");
         }
     }
 

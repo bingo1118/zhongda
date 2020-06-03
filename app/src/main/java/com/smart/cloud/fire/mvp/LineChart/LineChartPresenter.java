@@ -20,6 +20,9 @@ public class LineChartPresenter extends BasePresenter<LineChartView> {
     public final  static String TYPE_TEM="1";
     public final  static String TYPE_HUM="2";
 
+
+
+
     public LineChartPresenter(LineChartView view){
         attachView(view);
     }
@@ -27,11 +30,12 @@ public class LineChartPresenter extends BasePresenter<LineChartView> {
 //    @Query("userId") String userId, @Query("privilege") String privilege,
 //    @Query("smokeMac") String smokeMac, @Query("electricType") String electricType,
 //    @Query("electricNum") String electricNum, @Query("page") String page
-    public void getElectricTypeInfo(String userId,String privilege,String mac,String electricType,String electricNum,String page,boolean refresh,int devType){
+    public void getElectricTypeInfo(String userId,String privilege,String mac,String electricType,String electricNum,String page,boolean refresh,int devType,int pageNum){
         if(!refresh){
             mvpView.showLoading();
         }
-        Observable<TemperatureTime> mObservable = apiStores1.getElectricTypeInfo(userId,privilege,mac,electricType,electricNum,page,devType);
+
+        Observable<TemperatureTime> mObservable = apiStores1.getElectricTypeInfo(userId,privilege,mac,electricType,electricNum,page,devType,pageNum);
         addSubscription(mObservable,new SubscriberCallBack<>(new ApiCallback<TemperatureTime>() {
             @Override
             public void onSuccess(TemperatureTime model) {

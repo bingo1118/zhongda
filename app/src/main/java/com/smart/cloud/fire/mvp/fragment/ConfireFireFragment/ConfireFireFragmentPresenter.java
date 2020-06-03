@@ -17,11 +17,14 @@ import com.smart.cloud.fire.service.LocationService;
 import com.smart.cloud.fire.utils.DeviceTypeUtils;
 import com.smart.cloud.fire.utils.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import okhttp3.MultipartBody;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -146,9 +149,9 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
         }));
     }
 
-    public void addSmoke(String userID,String privilege,String smokeName,String smokeMac,String address,String longitude,
-                         String latitude,String placeAddress,String placeTypeId,String principal1,String principal1Phone,String principal2,
-                         String principal2Phone,String areaId,String repeater,String camera,boolean isUploadImage){
+    public void addSmoke(String userID, String privilege, String smokeName, String smokeMac, String address, String longitude,
+                         String latitude, String placeAddress, String placeTypeId, String principal1, String principal1Phone, String principal2,
+                         String principal2Phone, String areaId, String repeater, String camera, File imagefile,String mDeviceType,String oldimage){
         int electrState=0;//@@8.26电气开关
         if(longitude.length()==0||latitude.length()==0){
             mvpView.addSmokeResult("请获取经纬度",1);
@@ -177,7 +180,7 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
         if(devType.getErrorCode()==0){
             smokeMac=devType.getMac();
             electrState=devType.getElectrState();
-            deviceType=devType.getDevType();
+            deviceType=(mDeviceType!=null&&mDeviceType.length()>0)?mDeviceType:devType.getDevType();
         }else{
             mvpView.addSmokeResult(devType.getError(),1);
             return;
@@ -185,22 +188,33 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
 
         mvpView.showLoading();
         Observable mObservable =null;
-        if(smokeMac.length()==15&&(deviceType.equals("41")||deviceType.equals("45"))){
-            mObservable = apiStores1.addHeiMenSmoke(userID,smokeName,privilege,smokeMac,address,
-                    longitude,latitude,placeAddress,placeTypeId,principal1,principal1Phone,principal2,
-                    principal2Phone,areaId,repeater,camera,deviceType,electrState+"");
-        }else{
-            if(isUploadImage){//上传图片成功
-                mObservable = apiStores1.addSmoke(userID,smokeName,privilege,smokeMac,address,
-                        longitude,latitude,placeAddress,placeTypeId,principal1,principal1Phone,principal2,
-                        principal2Phone,areaId,repeater,camera,deviceType,electrState+"",smokeMac+".jpg");
-            }else{
-                mObservable = apiStores1.addSmoke(userID,smokeName,privilege,smokeMac,address,
-                        longitude,latitude,placeAddress,placeTypeId,principal1,principal1Phone,principal2,
-                        principal2Phone,areaId,repeater,camera,deviceType,electrState+"","");
-            }
 
+        List<MultipartBody.Part> parts = new ArrayList<>();
+        parts.add(toRequestBodyOfText("userId", userID));
+        parts.add(toRequestBodyOfText("smokeName", smokeName));
+        parts.add(toRequestBodyOfText("privilege", privilege));
+        parts.add(toRequestBodyOfText("smokeMac", smokeMac));
+        parts.add(toRequestBodyOfText("address", address));
+        parts.add(toRequestBodyOfText("longitude", longitude));
+        parts.add(toRequestBodyOfText("latitude", latitude));
+        parts.add(toRequestBodyOfText("placeAddress", placeAddress));
+        parts.add(toRequestBodyOfText("placeTypeId", placeTypeId));
+        parts.add(toRequestBodyOfText("principal1", principal1));
+        parts.add(toRequestBodyOfText("principal1Phone", principal1Phone));
+        parts.add(toRequestBodyOfText("principal2", principal2));
+        parts.add(toRequestBodyOfText("principal2Phone", principal2Phone));
+        parts.add(toRequestBodyOfText("areaId", areaId));
+        parts.add(toRequestBodyOfText("repeater", repeater));
+        parts.add(toRequestBodyOfText("camera", camera));
+        parts.add(toRequestBodyOfText("deviceType", deviceType));
+        parts.add(toRequestBodyOfText("electrState", electrState+""));
+        if(imagefile!=null&&imagefile.exists()){
+            parts.add(toRequestBodyOfImage("imagefile",imagefile));//图片
         }
+        if(imagefile==null&&oldimage!=null&&oldimage.length()>1){
+            parts.add(toRequestBodyOfText("oldimage", "1"));
+        }
+        mObservable = apiStores1.addSmokeWithImage(parts);
 
         addSubscription(mObservable,new SubscriberCallBack<>(new ApiCallback<ConfireFireModel>() {
             @Override
@@ -208,7 +222,7 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
                 int result = model.getErrorCode();
                 String error=model.getError();//@@6.15
                 if(result==0){
-                    mvpView.addSmokeResult("添加成功",0);
+                    mvpView.addSmokeResult(error,0);
                 }else{
                     mvpView.addSmokeResult(error,1);//@@6.15
                 }
@@ -222,6 +236,9 @@ public class ConfireFireFragmentPresenter extends BasePresenter<ConfireFireFragm
             @Override
             public void onCompleted() {
                 mvpView.hideLoading();
+                if(imagefile!=null){
+                    imagefile.delete();
+                }
             }
         }));
     }

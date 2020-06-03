@@ -88,8 +88,8 @@ public class OfflineSecurityDevFragment extends MvpFragment<SecurityDevPresenter
 //        smokeTotal.setVisibility(View.VISIBLE);
         list = new ArrayList<>();
         refreshListView();
-        mvpPresenter.getNeedLossSmoke(userID, privilege + "", "","", "", page+"","4",false,1,list,OfflineSecurityDevFragment.this);
-        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","4",OfflineSecurityDevFragment.this);
+        mvpPresenter.getNeedLossSmoke(userID, privilege + "", "","", "", page+"","4",false,1,list,this);
+        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","4");
     }
 
     private void refreshListView() {
@@ -231,8 +231,8 @@ public class OfflineSecurityDevFragment extends MvpFragment<SecurityDevPresenter
     public void refreshView() {
         page = 1;
         list.clear();
-        mvpPresenter.getNeedLossSmoke(userID, privilege + "", "","", "", page+"","4",true,1,list,OfflineSecurityDevFragment.this);
-        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","4",OfflineSecurityDevFragment.this);
+        mvpPresenter.getNeedLossSmoke(userID, privilege + "", "","", "", page+"","4",true,1,list,this);
+        mvpPresenter.getSmokeSummary(userID,privilege+"","","","","4");
     }
 
     @Override

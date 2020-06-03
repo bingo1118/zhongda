@@ -31,6 +31,16 @@
                 android:textSize="12sp"
                 android:layout_below="@id/smoke_name_text"
                 android:text="2017-09-16"/>
+            <TextView
+                android:id="@+id/nfc_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="5dp"
+                android:textColor="@color/blue"
+                android:textSize="10sp"
+                android:text="安装图片"/>
         </RelativeLayout>
         <TextView
             android:layout_width="match_parent"
@@ -114,17 +124,32 @@
                 android:textColor="#000"
                 android:text="小区"/>
             <TextView
-                android:id="@+id/address_name_tv"
+                android:id="@+id/model_name_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tpye_name_tv"
+                android:textColor="#6f6f6f"
+                android:text="型号："/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/model_tv"
+                android:layout_below="@id/tpye_name_tv"
+                android:layout_toRightOf="@id/model_name_tv"
+                android:textColor="#000"
+                android:text="无"/>
+            <TextView
+                android:id="@+id/address_name_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/model_name_tv"
                 android:textColor="#6f6f6f"
                 android:text="地址："/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/address_tv"
-                android:layout_below="@id/tpye_name_tv"
+                android:layout_below="@id/model_name_tv"
                 android:layout_toRightOf="@id/address_name_tv"
                 android:textColor="#000"
                 android:text="广东省广州市黄浦区"/>
@@ -134,6 +159,7 @@
             android:layout_height="1dp"
             android:background="#dddddd"/>
         <TextView
+            android:id="@+id/nfc_history_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="查看巡检记录"

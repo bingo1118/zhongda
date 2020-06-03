@@ -48,14 +48,6 @@ public class OffLineElectricDevFragment extends MvpFragment<ElectricDevPresenter
     SwipeRefreshLayout swipereFreshLayout;
     @Bind(R.id.mProgressBar)
     ProgressBar mProgressBar;
-//    @Bind(R.id.smoke_total)
-//    LinearLayout smokeTotal;//@@9.5
-//    @Bind(R.id.total_num)
-//    TextView totalNum;
-//    @Bind(R.id.online_num)
-//    TextView onlineNum;
-//    @Bind(R.id.offline_num)
-//    TextView offlineNum;
     private LinearLayoutManager linearLayoutManager;
     private ShopSmokeAdapter shopSmokeAdapter;
     private int lastVisibleItem;
@@ -85,7 +77,6 @@ public class OffLineElectricDevFragment extends MvpFragment<ElectricDevPresenter
                 SharedPreferencesManager.KEY_RECENTNAME);
         privilege = MyApp.app.getPrivilege();
         page = 1;
-//        smokeTotal.setVisibility(View.VISIBLE);
         list = new ArrayList<>();
         refreshListView();
         mvpPresenter.getNeedLossSmoke(userID, privilege + "","", "", "", page+"","3",false,1,list,OffLineElectricDevFragment.this);
